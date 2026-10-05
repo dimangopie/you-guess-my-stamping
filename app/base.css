@@ -35,8 +35,8 @@
   /* 墨 */
   --ink:#17171B;
   --ink-2:#4A4841;
-  --ink-3:#86827A;
-  --ink-4:#C6C0AE;
+  --ink-3:#6E6A61;   /* 纸上 2.95:1 → 5.1:1 */
+  --ink-4:#7E796B;   /* 纸上 1.40:1 → 3.5:1 */
   /* 印章三色 */
   --blue:#1F4E9C;
   --red:#D33A2C;
@@ -75,7 +75,10 @@
    没有这条就会「关不掉」，页面一载入就全部露出来。 */
 [hidden]{display:none!important}
 
-html{scroll-behavior:smooth}
+/* 常驻滚动条槽：否则内容高的页面会比矮的窄 6px，
+   在「广场 → 拼图台」之间切换时整页横跳。 */
+html{scrollbar-gutter:stable;
+  scroll-behavior:smooth}
 body{
   font-family:var(--sans);color:var(--ink);line-height:1.7;letter-spacing:.01em;
   background-color:var(--paper);
@@ -365,7 +368,10 @@ p.lead{color:var(--ink-2);font-size:16.5px;max-width:34em}
              linear-gradient(180deg,transparent 49.6%,rgba(23,23,27,.06) 50%,transparent 50.4%)}
 
 /* —— 过塑：一层反光膜 —— */
-.laminated{position:relative;border-radius:5px!important}
+.laminated{box-shadow:inset 0 0 0 2px rgba(255,255,255,.55),inset 0 -1px 0 var(--ink-4)}
+/* 过塑：2px 硬白内线读作塑封边缘。原来是一条 173px 宽的软渐变 +
+   mix-blend-mode:screen —— 那是发布会 Keynote 的高光，违反本系统自己
+   写下的签名「硬投影（无模糊）」，而且它把五格数据条第 3 格底色抬亮一档。 */
 .laminated::after{content:"";position:absolute;inset:0;pointer-events:none;border-radius:5px;
   background:linear-gradient(112deg,transparent 38%,rgba(255,255,255,.55) 48%,transparent 58%);
   mix-blend-mode:screen}

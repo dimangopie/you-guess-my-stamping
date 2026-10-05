@@ -127,8 +127,9 @@ section[id]{scroll-margin-top:130px}
     repeating-linear-gradient(0deg,rgba(23,23,27,.03) 0 1px,transparent 1px 8px)}
 .stage .drop{position:absolute;inset:15%;border:2px dashed var(--ink-4);border-radius:2px;
   display:grid;place-items:center;transition:opacity .4s}
-.stage .drop i{font-size:34px;line-height:1;filter:grayscale(.25);animation:dip 1.8s ease-in-out infinite}
-@keyframes dip{0%,100%{transform:translateY(-4px)}50%{transform:translateY(4px)}}
+/* 去掉无限点头与降饱和：这套动画词汇全是一次性物理动作
+     （盖章/打孔/翻牌/抽签），唯一一个无限循环不该是「快看我」的营销抖动。 */
+.stage .drop i{font-size:34px;line-height:1}
 .stage .drop.off{opacity:0}
 .stage .pc{position:absolute;font-family:var(--emoji);font-size:34px;line-height:1;
   transform:translate(-50%,-50%) scale(var(--s)) rotate(var(--r));
