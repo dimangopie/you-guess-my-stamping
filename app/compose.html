@@ -52,8 +52,18 @@
    而这里的牌就是圆的 —— 设计系统里唯一一条被写下来的禁令，
    被它自己的核心物件违反了。而且 23px 的 emoji 装不进 46px 的圆，
    消防车、灭火器都溢出环外，那个圆读作「盖在 emoji 上的镜片」。 */
-.spoke{position:absolute;top:50%;left:50%;width:46px;height:46px;margin:-23px;
-  display:grid;place-items:center;font-family:var(--emoji);font-size:23px;line-height:1;
+/* ⚠ 牌的尺寸不能写死 46px。
+   我第一版只让 --R（半径）随宽度缩，牌保持 46px —— 1024 下半径约 61px，
+   圆周 383px 而十张牌需要 460px，于是**牌互相叠压、压进中心圆盘**。
+   （K3：「这是本轮唯一一处『坏了』而非『空着』的问题。」）
+   现在牌尺寸也走令牌 --tile，由 JS 按转盘宽度算，与半径成同一比例。 */
+.spoke{position:absolute;top:50%;left:50%;
+  /* ⚠ 不能在这里写 --tile:46px —— 自定义属性会继承，而元素自身的声明
+     会**遮蔽**祖先传来的值。JS 在 .wheel 上设的 --tile 就传不进来了，
+     牌永远是 46px，窄窗照样叠压。用 var() 的 fallback 表达默认值。 */
+  width:var(--tile,46px);height:var(--tile,46px);margin:calc(var(--tile,46px) / -2);
+  display:grid;place-items:center;font-family:var(--emoji);
+  font-size:calc(var(--tile,46px) * .5);line-height:1;
   background:var(--paper-4);border:2px solid var(--ink);border-radius:2px;
   box-shadow:3px 3px 0 rgba(23,23,27,.16);cursor:grab;padding:0;touch-action:none;
   /* 半径由 JS 按转盘实际宽度写进 --R —— 写死 -104px 时，
@@ -69,11 +79,14 @@
 .spoke.used:hover{box-shadow:3px 3px 0 rgba(23,23,27,.16)}
 
 .wheel .hub{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-  width:84px;height:84px;border-radius:50%;background:var(--paper-2);border:2px solid var(--ink);
+  /* ⚠ 尺寸不能写死。1024 下转盘只有 172px，而写死的圆盘半径 50.5px
+     占了半宽的 59%，牌无论放哪都会压上去（实测 4 张）。
+     改用转盘宽度的百分比：满尺寸 268px 时 38% ≈ 102px，与原设计接近。 */
+  width:38%;height:38%;border-radius:50%;background:var(--paper-2);border:2px solid var(--ink);
   display:grid;place-items:center;z-index:4;text-align:center;padding:6px}
-.wheel .hub::after{content:"";position:absolute;inset:-8px;border:1.5px dotted var(--ink-3);border-radius:50%}
-.wheel .hub .n{font-family:var(--mono);font-weight:700;font-size:23px;line-height:1}
-.wheel .hub .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;color:var(--ink-3);margin-top:3px}
+.wheel .hub::after{content:"";position:absolute;inset:-6%;border:1.5px dotted var(--ink-3);border-radius:50%}
+.wheel .hub .n{font-family:var(--mono);font-weight:700;font-size:calc(var(--R,104px) * .22);line-height:1}
+.wheel .hub .k{font-family:var(--mono);font-size:calc(var(--R,104px) * .09);letter-spacing:.14em;color:var(--ink-3);margin-top:3px}
 .wheel-note{margin-top:12px;display:flex;gap:10px;justify-content:center;align-items:center}
 
 /* ---------- 画板 ---------- */
@@ -455,8 +468,23 @@ const ANGS=Array.from({length:10},(_,i)=>i*36);
 function syncSpokeRadius(){
   const w=document.querySelector(".wheel"); if(!w) return;
   const half=w.getBoundingClientRect().width/2;
-  const R=Math.max(52, Math.round(half-23-6));
+  // 牌尺寸 = 转盘半宽的 34%（满尺寸时 134×.34 ≈ 46，与原设计一致）
+  const tile=Math.max(24, Math.round(half*0.34));
+  // 半径要同时满足两个约束：
+  //   上限 —— 牌完整落在转盘内：half − 半个牌 − 4
+  //   下限 —— 牌不压中心圆盘：中心圆盘半径（含 ::after 的 8px 外扩）+ 半个牌 + 3
+  // 只写下限时 1024 下会有 4 张牌压进「10 还剩」那个圆盘里。
+  const hub=w.querySelector(".hub");
+  const hubR=hub ? hub.getBoundingClientRect().width/2 + 8 : 0;
+  const hi=Math.round(half - tile/2 - 4);
+  const lo=Math.round(hubR + tile/2 + 3);
+  const R=Math.max(30, Math.min(hi, Math.max(lo, hi)));
+  w.dataset.rLo = lo; w.dataset.rHi = hi;
+  w.style.setProperty("--tile", tile+"px");
   w.style.setProperty("--R", R+"px");
+  // 十张牌在半径 R 的圆周上需要的弧长是 10×tile；不够就报告出来，别让它悄悄重叠。
+  const need=10*tile, have=2*Math.PI*R;
+  w.dataset.fit = need<=have ? "ok" : "tight";
 }
 addEventListener("resize",syncSpokeRadius);
 if(window.ResizeObserver) new ResizeObserver(syncSpokeRadius).observe(document.documentElement);

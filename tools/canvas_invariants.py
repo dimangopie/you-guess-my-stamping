@@ -118,12 +118,72 @@ def main():
             ok, why = check(page, w, h)
             if not ok:
                 bad.append(f"{page} {w}x{h}: {why}")
+    # 转盘：牌不重叠 / 不压中心盘 / 不溢出
+    for w, h in VIEWPORTS:
+        if not check_wheel("compose.html", w, h):
+            bad.append(f"compose.html {w}x{h}: 转盘不变量不通过（牌重叠或压到中心圆盘）")
     for b in bad:
         print("     " + b)
     if not bad:
         print(f"  \033[32m✓\033[0m 画布不变量：{len(PAGES)} 页 × {len(VIEWPORTS)} 视口全部通过"
-              f"（不滚 / 无横向溢出 / 无裁切 / 画布正方 / 按钮在画布内）")
+              f"（不滚 / 无横向溢出 / 无裁切 / 画布正方 / 按钮在画布内 / 转盘不重叠）")
     return 1 if bad else 0
+
+
+
+
+# ── 转盘不变量 ──────────────────────────────────────────────
+# K3 第 9 轮抓到的回归：「1024 档转盘事故：牌与牌互相叠压、牌压进中心圆盘。
+# 这是本轮唯一一处『坏了』而非『空着』的问题。」
+# 根因有两层，都不是肉眼能看出来的：
+#   ① .spoke 里写了 `--tile:46px`，**遮蔽**了 JS 在 .wheel 上设的继承值，
+#      于是牌永远是 46px，缩了半径也没用。
+#   ② .wheel .hub 尺寸写死 84px，1024 下占转盘半宽的 59%，牌放哪都会压上去。
+# 这两条都属于「量了数值但没量关系」，所以在浏览器里直接断言关系。
+WHEEL_PROBE = r'''<script>
+(function(){
+  var fails=[], w=document.querySelector(".wheel");
+  if(!w){ document.body.innerHTML="<pre style='background:#F00;color:#fff'>找不到 .wheel</pre>"; return; }
+  var sp=[].slice.call(document.querySelectorAll(".spoke"));
+  var rects=sp.map(function(s){return s.getBoundingClientRect();});
+  var worst=0;
+  for(var i=0;i<rects.length;i++)for(var j=i+1;j<rects.length;j++){
+    var a=rects[i],b=rects[j];
+    var ox=Math.min(a.right,b.right)-Math.max(a.left,b.left);
+    var oy=Math.min(a.bottom,b.bottom)-Math.max(a.top,b.top);
+    if(ox>0&&oy>0) worst=Math.max(worst,Math.min(ox,oy));
+  }
+  if(worst>1.5) fails.push("牌间重叠 "+worst.toFixed(1)+"px");
+  var hub=document.querySelector(".wheel .hub");
+  if(hub){var h=hub.getBoundingClientRect();
+    var hit=rects.filter(function(r){return r.left<h.right&&r.right>h.left&&r.top<h.bottom&&r.bottom>h.top;}).length;
+    if(hit) fails.push(hit+" 张牌压到中心圆盘");}
+  var wr=w.getBoundingClientRect();
+  var out=rects.filter(function(r){return r.left<wr.left||r.right>wr.right||r.top<wr.top||r.bottom>wr.bottom;}).length;
+  if(out) fails.push(out+" 张牌溢出转盘");
+  var d=document.createElement("div");
+  d.style.cssText="position:fixed;inset:0;z-index:2147483647;background:"+(fails.length?"#FF0000":"#00CC00");
+  document.body.appendChild(d);
+})();
+</script>
+</body>'''
+
+
+def check_wheel(page, w, h):
+    (WORK / "home").mkdir(parents=True, exist_ok=True)
+    q = WORK / "app" / page
+    q.write_text((APP / page).read_text(encoding="utf-8").replace("</body>", WHEEL_PROBE, 1),
+                 encoding="utf-8")
+    shot = WORK / "shots" / f"wheel_{w}x{h}.png"
+    shot.unlink(missing_ok=True)
+    subprocess.run([FF, "--headless", "--no-remote", f"--window-size={w},{h}",
+                    "--screenshot", str(shot), f"file://{q}"],
+                   env={**os.environ, "HOME": str(WORK / "home")},
+                   capture_output=True, timeout=120)
+    if not shot.exists(): return False
+    r = subprocess.run(["convert", str(shot), "-format", f"%[pixel:p{{{w//2},{h//2}}}]", "info:"],
+                       capture_output=True, text=True)
+    return "0,204,0" in r.stdout.lower()
 
 
 if __name__ == "__main__":
