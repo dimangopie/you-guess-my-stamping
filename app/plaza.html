@@ -28,22 +28,31 @@
 .bl-x:hover{background:var(--ink);color:var(--paper)}
 
 /* ---------- 页头 ---------- */
-.head{padding:46px 0 12px}
-.head-grid{display:grid;grid-template-columns:1fr auto;gap:40px;align-items:end}
-@media(max-width:860px){.head-grid{grid-template-columns:1fr;gap:26px}}
-.head h1{margin:14px 0 16px}
-.head-stamps{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+/* 报头压成横带。改前实测：报头 y117 高 465 = **占屏 52%**，
+   内容到 y616（屏高 68%）才开始，而文档高 2822px（3.1 屏）——
+   也就是第一屏的一半是报头，用户要翻页才看得到内容。
+   现在「标签 / 标题 / 两个数字 / 印章」并成一行，「每日一题」是第二条横带。 */
+.head{padding:14px 0 10px}
+.head-grid{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.head-grid>div:first-child{display:flex;align-items:baseline;gap:16px;flex:1 1 auto;min-width:0;flex-wrap:wrap}
+@media(max-width:860px){.head-grid{gap:10px}.head h1{white-space:normal}}
+.head h1{margin:0;font-size:23px;line-height:1.3;white-space:nowrap}
+.head-stamps{display:flex;gap:8px;align-items:center}
+/* 报头压成一行后，原来的 74px 圆章比一行标题还高，挤在标题末尾像贴歪了。
+   缩到 46px 并给它 10px 左间距，让它读作「标题旁的一枚章」而不是「第三个标题」。 */
+.head-stamps .stamp.round{width:46px;height:46px;font-size:8px;letter-spacing:.06em;
+  line-height:1.15;display:grid;place-items:center;margin-left:22px}
 /* 页头右侧：三个数字，不加「件」不加形容 */
-.head-side{text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+.head-side{display:flex;flex-direction:row;align-items:baseline;gap:20px;white-space:nowrap}
 .head-side .n{color:var(--ink);font-family:var(--mono);font-size:15px;font-weight:700}
 .head-side .n.red{color:var(--red-ink)}
-@media(max-width:860px){.head-side{text-align:left;align-items:flex-start}}
+@media(max-width:860px){.head-side{gap:14px}}
 
 /* 每日一题：公告本身是纸，只有倒计时那一小块是屏 */
-.today{margin-top:30px;background:var(--paper-4);border:2px solid var(--ink);border-radius:var(--rad);
-  box-shadow:var(--sh-soft);display:grid;grid-template-columns:1fr auto;gap:24px;align-items:center;
-  padding:20px 24px 20px 20px;border-left:8px solid var(--red)}
-.today h2{font-size:24px;font-weight:900;letter-spacing:.22em;margin-bottom:8px;color:var(--ink)}
+.today{margin-top:12px;background:var(--paper-4);border:2px solid var(--ink);border-radius:var(--rad);
+  box-shadow:var(--sh-soft);display:grid;grid-template-columns:1fr auto;gap:20px;align-items:center;
+  padding:12px 20px 12px 16px;border-left:8px solid var(--red)}
+.today h2{font-size:18px;font-weight:900;letter-spacing:.18em;margin-bottom:3px;color:var(--ink)}
 .today .kv{font-family:var(--mono);font-size:12px;color:var(--ink-3);letter-spacing:.04em}
 .today .right{display:flex;align-items:center;gap:20px;flex-wrap:wrap}
 .today .cd b{font-variant-numeric:tabular-nums;margin-left:9px}
@@ -185,7 +194,7 @@
     <div class="head-grid">
       <div>
         <span class="lbl-lg">公 告 栏 · NO. 1管51-P</span>
-        <h1 class="tk">别人拼的题，<br>都贴在这儿</h1>
+        <h1 class="tk">别人拼的题，都贴在这儿</h1>
         <div class="head-stamps">
           <span class="stamp round">公 告 栏<br>1管51</span>
         </div>
