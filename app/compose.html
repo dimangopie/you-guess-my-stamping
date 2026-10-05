@@ -419,9 +419,9 @@ cv.addEventListener("pointerdown",e=>{
   const cy=r.top +r.height*parseFloat(p.style.top)/100;
   if(e.target.classList.contains("h-scale"))      mode={t:"scale",el:p,d0:dist(e,cx,cy),s0:sOf(p),cx,cy};
   else if(e.target.classList.contains("h-rot"))   mode={t:"rotate",el:p,a0:ang(e,cx,cy),r0:rOf(p),cx,cy};
-  else mode={t:"move",el:p,
-             dx:e.clientX-r.left-r.width*parseFloat(p.style.left)/100,
-             dy:e.clientY-r.top -r.height*parseFloat(p.style.top)/100};
+  else mode={t:"move",el:p,r,          // r 存下来给 pointermove 用（拖动期间画布不动）
+             dx:e.clientX-cx,          // 抓点相对牌心的偏移（视口坐标）
+             dy:e.clientY-cy};
   try{ p.setPointerCapture(e.pointerId); }catch(_){}
 });
 
@@ -429,9 +429,14 @@ addEventListener("pointermove",e=>{
   if(!mode) return;
   const p=mode.el;
   if(mode.t==="move"){
-    const r=cv.getBoundingClientRect();
-    p.style.left=Math.max(0,Math.min(r.width, e.clientX-mode.dx))/r.width*100+"%";
-    p.style.top =Math.max(0,Math.min(r.height,e.clientY-mode.dy))/r.height*100+"%";
+    /* ⚠ 必须减 r.left / r.top。
+       抓取偏移 dx 是在「视口坐标」下算出来的（e.clientX - 牌心），
+       而 left% 要的是「画布内坐标」。少了这一减，X 会被整体推偏 r.left，
+       画布在中间栏时（r.left≈390 / 画布宽 520）牌会一拖就贴到右边缘。
+       r 在 pointerdown 时存进 mode —— 拖动期间画布不会动，不必每次重算。 */
+    const r=mode.r;
+    p.style.left=Math.max(0,Math.min(r.width, e.clientX-mode.dx-r.left))/r.width*100+"%";
+    p.style.top =Math.max(0,Math.min(r.height,e.clientY-mode.dy-r.top ))/r.height*100+"%";
     clampInto(p);
   }else if(mode.t==="scale"){
     const k=dist(e,mode.cx,mode.cy)/Math.max(mode.d0,1);
