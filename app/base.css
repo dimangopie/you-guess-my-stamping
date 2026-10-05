@@ -41,6 +41,13 @@
   --blue:#1F4E9C;
   --red:#D33A2C;
   --amber:#C98A0E;
+  /* 屏 / 牌：大块深色填充用这个，不用 --ink。
+     它是印章蓝的暗调（色相 217 → 220），所以不引入第四色相。
+     原来直接用 --ink（#17171B，偏冷的近黑），压在暖米色的纸上太突兀 ——
+     换成深靛之后读作「车站时刻表」，而不是「一块黑」。
+     规则：大块深色填充 → --screen；文字与线条 → --ink。 */
+  --screen:#22304F;
+  --screen-2:#18233B;   /* 更深一档：边框、凹槽 */
   /* 字体 */
   --mono:"Noto Sans Mono CJK SC",ui-monospace,"DejaVu Sans Mono",monospace;
   --sans:"Noto Sans CJK SC","Source Han Sans SC",system-ui,sans-serif;
@@ -99,14 +106,14 @@ p.lead{color:var(--ink-2);font-size:16.5px;max-width:34em}
   font-size:clamp(21px,3.2vw,32px)}
 
 /* ---------- 4. 导航（车站指示牌） ---------- */
-.nav{position:sticky;top:0;z-index:100;background:var(--ink);color:var(--paper);
+.nav{position:sticky;top:0;z-index:100;background:var(--screen);color:var(--paper);
   border-bottom:4px solid var(--amber)}
 .nav .wrap{display:flex;align-items:center;gap:26px;height:68px}
 .logo{font-family:var(--mono);font-weight:700;font-size:18px;letter-spacing:.06em;
   white-space:nowrap;display:flex;align-items:center;gap:10px;color:var(--paper);text-decoration:none}
 .logo .no{background:var(--paper);color:var(--ink);padding:2px 9px;border-radius:2px;font-size:14px}
 .nav nav{display:flex;gap:24px;margin-left:auto;font-family:var(--mono);font-size:13.5px}
-.nav nav a{color:#B9B5A8;text-decoration:none;transition:.2s;white-space:nowrap}
+.nav nav a{color:#B0BACC;text-decoration:none;transition:.2s;white-space:nowrap}
 .nav nav a::before{content:"› ";opacity:.5}
 .nav nav a:hover,.nav nav a[aria-current]{color:var(--amber)}
 @media(max-width:860px){.nav .wrap{height:60px;gap:12px}.logo{font-size:15px}.logo .no{font-size:12px;padding:2px 6px}
@@ -119,7 +126,7 @@ p.lead{color:var(--ink-2);font-size:16.5px;max-width:34em}
   transition:.14s;white-space:nowrap;cursor:pointer}
 .btn:hover{transform:translate(-2px,-2px);box-shadow:var(--sh-3)}
 .btn:active{transform:translate(2px,2px);box-shadow:var(--sh-1)}
-.btn.dark{background:var(--ink);color:var(--paper);box-shadow:4px 4px 0 var(--blue)}
+.btn.dark{background:var(--screen);color:var(--paper);box-shadow:4px 4px 0 var(--blue)}
 .btn.dark:hover{box-shadow:6px 6px 0 var(--blue)}
 .btn.ghost{background:var(--paper-4);color:var(--ink)}
 .btn.blue{background:var(--blue);box-shadow:4px 4px 0 var(--ink)}
@@ -251,15 +258,15 @@ p.lead{color:var(--ink-2);font-size:16.5px;max-width:34em}
   .meters .m:nth-child(1),.meters .m:nth-child(2){border-bottom:1.5px dashed var(--ink-3)}}
 
 /* ---------- 10. 表格（时刻表 / 调度单 / 时间线共用） ---------- */
-.board{border:2px solid var(--ink);border-radius:var(--rad);overflow:hidden;background:var(--ink)}
+.board{border:2px solid var(--screen-2);border-radius:var(--rad);overflow:hidden;background:var(--screen)}
 .board .row{display:grid;align-items:center;border-bottom:1px solid rgba(242,239,228,.13)}
 .board .row:last-child{border-bottom:none}
 .board .row>div{padding:14px 16px;font-family:var(--mono);font-size:13.5px;min-width:0}
 .board .row:hover{background:rgba(201,138,14,.09)}
 .board .c1{color:var(--amber);letter-spacing:.1em;border-right:1px solid rgba(242,239,228,.13)}
 .board .c2{color:var(--paper);font-weight:700;letter-spacing:.22em;border-right:1px solid rgba(242,239,228,.13)}
-.board .c3{color:#A9A597;overflow:hidden;text-overflow:ellipsis}
-.board .c4{color:#6F6C61;text-align:right;font-size:12px;white-space:nowrap}
+.board .c3{color:#A8B2C6;overflow:hidden;text-overflow:ellipsis}   /* 冷灰蓝：配靛蓝底，6.14:1 */
+.board .c4{color:#8A96AF;text-align:right;font-size:12px;white-space:nowrap}   /* 4.40:1（原暖灰在靛底只有 2.49）*/
 .board.light{background:var(--paper-4)}
 .board.light .row{border-bottom:1px solid var(--ink-4)}
 .board.light .row:hover{background:rgba(31,78,156,.055)}
@@ -374,7 +381,7 @@ p.lead{color:var(--ink-2);font-size:16.5px;max-width:34em}
   background:var(--ink);border-radius:3px 3px 0 0}
 
 /* —— 柜台窗口牌 —— */
-.window-sign{display:inline-flex;align-items:center;gap:10px;background:var(--ink);
+.window-sign{display:inline-flex;align-items:center;gap:10px;background:var(--screen);
   color:var(--paper);font-family:var(--mono);font-size:12.5px;letter-spacing:.16em;
   padding:8px 16px;border-radius:2px;border-bottom:3px solid var(--amber)}
 .window-sign b{color:var(--amber);font-size:15px}
@@ -481,11 +488,11 @@ p.lead{color:var(--ink-2);font-size:16.5px;max-width:34em}
 .say{font-family:var(--mono);font-size:12px;color:var(--ink-2);letter-spacing:.02em}
 
 /* ---------- 18. 尾 ---------- */
-footer.site{background:var(--ink);color:#8E8A7E;padding:30px 0;
+footer.site{background:var(--screen);color:#A9B4CB;padding:30px 0;
   font-family:var(--mono);font-size:12px;letter-spacing:.08em;border-top:4px solid var(--amber)}
 /* 页脚只有一行：不再重复导航（导航在页头已经有了）*/
 footer.site .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
-footer.site a{color:#B9B5A8;text-decoration:none}
+footer.site a{color:#B0BACC;text-decoration:none}
 footer.site a:hover{color:var(--amber)}
 
 /* ---------- 19. 进场 ---------- */

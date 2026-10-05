@@ -49,13 +49,13 @@ section[id]{scroll-margin-top:130px}
 .bay-hd{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 
 /* 机头：深色 = 牌（设备面板），不是强调 */
-.gate{position:relative;z-index:3;background:var(--ink);border:2px solid var(--ink);
+.gate{position:relative;z-index:3;background:var(--screen);border:2px solid var(--screen-2);
   border-radius:3px 3px 0 0;padding:11px 14px 0}
 .gate-top{display:flex;align-items:center;gap:10px;padding-bottom:8px}
 .gate-top .gk{font-family:var(--mono);font-size:12.5px;letter-spacing:.22em;color:var(--paper)}
 /* 出票读数：编号是内容，进度是那条细实线 */
 .feed{display:flex;align-items:center;gap:12px;padding-bottom:10px}
-.feed-no{font-family:var(--mono);font-size:12px;letter-spacing:.1em;color:#B9B5A8;white-space:nowrap}
+.feed-no{font-family:var(--mono);font-size:12px;letter-spacing:.1em;color:#B0BACC;white-space:nowrap}
 .thinbar{flex:1;height:2px;background:rgba(242,239,228,.18);min-width:80px}
 /* 细实线进度：一格一格跳，不做缓动 —— 机器是机械的 */
 .thinbar i{display:block;height:2px;width:0;background:var(--amber)}
@@ -622,7 +622,7 @@ document.addEventListener("visibilitychange",()=>{
   document.title=document.hidden?"(1) 您的号已叫到 · 你拼我猜":TITLE0;
 });
 
-console.log("%c你拼我猜 · 1管51 站","font:700 14px/1.6 monospace;color:#F2EFE4;background:#17171B;padding:4px 10px");
+console.log("%c你拼我猜 · 1管51 站","font:700 14px/1.6 monospace;color:#F2EFE4;background:#22304F;padding:4px 10px");
 console.log("%c会按 F12 的，都是自己人。三件事说给你听：\n"+
   "① 顶上那条通告里的号一直往上叫，叫到头会告诉你「号发完了，门一直开着」—— 号是真的，吓唬人是假的。\n"+
   "② 把这一页切到后台，标题会变成「(1) 您的号已叫到」。试试。\n"+

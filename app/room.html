@@ -30,7 +30,7 @@
 .rh-note{margin-left:auto;transition:color .2s}
 .rh-note.on{color:var(--blue)}
 /* 本站广播（页头的一枚小条，不做弹窗、不动标题栏） */
-.cast{display:inline-flex;align-items:center;gap:10px;background:var(--ink);
+.cast{display:inline-flex;align-items:center;gap:10px;background:var(--screen);
   color:var(--paper);font-family:var(--mono);font-size:11.5px;letter-spacing:.1em;
   padding:5px 12px;border-radius:2px;border-bottom:3px solid var(--amber);transition:.2s}
 .cast b{color:var(--amber)}
@@ -120,8 +120,8 @@
 .slotbar .slot .v i{font-style:normal;color:var(--ink-3);font-size:13px}
 /* 倒计时读数 = 屏 */
 .cd-strip{display:flex;align-items:flex-end;justify-content:space-between;gap:16px}
-.cd-box{background:var(--ink);border-radius:2px;padding:8px 18px;text-align:right}
-.cd-box .k{font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:#A9A597}
+.cd-box{background:var(--screen);border-radius:2px;padding:8px 18px;text-align:right}
+.cd-box .k{font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:#A8B2C6}
 .cd-v{font-family:var(--mono);font-weight:700;font-size:clamp(32px,4.4vw,50px);line-height:.95;
   color:var(--amber);font-variant-numeric:tabular-nums;transition:color .25s}
 .cd-v.urgent{color:var(--red)}
@@ -135,10 +135,10 @@
 .stats.st3 .k{color:var(--ink-4)}
 
 /* 柜台窗口牌 + 叫号（谁该到哪个窗口去猜） */
-.winbar{margin-top:16px;background:var(--ink);border-radius:2px;padding:14px 18px;
+.winbar{margin-top:16px;background:var(--screen);border-radius:2px;padding:14px 18px;
   display:flex;align-items:center;gap:22px;flex-wrap:wrap;border-bottom:4px solid var(--amber)}
 .winbar .q{display:grid;gap:2px;text-align:center}
-.winbar .q .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.22em;color:#A9A597}
+.winbar .q .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.22em;color:#A8B2C6}
 .winbar .queue-no{font-size:44px}
 .winbar .signs{display:flex;gap:8px;flex-wrap:wrap;flex:1;min-width:190px}
 .winbar .window-sign{background:rgba(242,239,228,.08);border-bottom-color:var(--ink-3)}
@@ -185,8 +185,8 @@
 .srow .c2{display:flex;align-items:center;gap:9px}
 .srow .sc{font-family:var(--mono);font-weight:700;font-size:15px;color:var(--paper);
   font-variant-numeric:tabular-nums}
-#score .throw .lbl{color:#A9A597}
-#score .srow .c4{color:#A9A597;font-size:13px}
+#score .throw .lbl{color:#A8B2C6}
+#score .srow .c4{color:#A8B2C6;font-size:13px}
 /* 猜测流的合计：emoji 承担名词，一行两三个数字（律五） */
 .flow-sum{display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:0 14px;
   font-family:var(--mono);font-size:11px;letter-spacing:.06em;color:var(--ink-3);
@@ -211,7 +211,7 @@ footer.site a[aria-current]{color:var(--amber)}
    柜台：右键操作台（轴 8 的入口）
    票据 = 纸，操作台 = 屏；菜单头压一条琥珀，不用第四色
    ============================================================ */
-.ctx{position:fixed;z-index:950;min-width:230px;background:var(--ink);color:var(--paper);
+.ctx{position:fixed;z-index:950;min-width:230px;background:var(--screen);color:var(--paper);
   border:2px solid var(--ink);border-radius:3px;overflow:hidden;
   box-shadow:var(--sh-2),0 22px 44px -18px rgba(23,23,27,.6)}
 .ctx .ctx-h{background:var(--paper-2);color:var(--ink);font-family:var(--mono);font-size:11px;
@@ -225,8 +225,8 @@ footer.site a[aria-current]{color:var(--amber)}
 .ctx button:hover{background:rgba(201,138,14,.16);color:var(--amber)}
 .ctx button .ci{width:17px;text-align:center;opacity:.7}
 .ctx button .cl{display:flex;flex-direction:column;line-height:1.5}
-.ctx button .cl i{font-style:normal;font-size:10.5px;color:#8E8A7E;letter-spacing:.04em}
-.ctx .ctx-f{padding:7px 12px;font-family:var(--mono);font-size:10px;letter-spacing:.08em;color:#8E8A7E}
+.ctx button .cl i{font-style:normal;font-size:10.5px;color:#8A96AF;letter-spacing:.04em}
+.ctx .ctx-f{padding:7px 12px;font-family:var(--mono);font-size:10px;letter-spacing:.08em;color:#8A96AF}
 
 /* ---- 画布上的柜台动作结果 ---- */
 /* 撕口：一条锯齿纸边压在画布下沿（用元素不用伪元素，避免和别的伪元素打架） */
@@ -336,7 +336,7 @@ footer.site a[aria-current]{color:var(--amber)}
               <span class="hint" title="本题时限">⏱ <b id="limitTxt">60</b>s</span>
               <span class="cd-box">
                 <span class="k">本 题 剩 余</span>
-                <span class="cd-v" id="cd">47</span><span class="cd-u" style="color:#A9A597">秒</span>
+                <span class="cd-v" id="cd">47</span><span class="cd-u" style="color:#A8B2C6">秒</span>
               </span>
             </div>
             <div class="tick" id="tick"><i id="tickFill" style="width:78%"></i></div>
@@ -891,7 +891,7 @@ function tearStub(){
 /* ---------- 14. 来访登记计数器：全站重复的装饰，本次简化删除（docs/07 病灶④） ---------- */
 
 /* ---------- 15. 控制台：给会看控制台的人留一句 ---- */
-console.log("%c 1 管 51 站 · 调 度 单 ","background:#17171B;color:#F2EFE4;font-weight:700;letter-spacing:3px;padding:3px 6px;border-bottom:3px solid #C98A0E");
+console.log("%c 1 管 51 站 · 调 度 单 ","background:#22304F;color:#F2EFE4;font-weight:700;letter-spacing:3px;padding:3px 6px;border-bottom:3px solid #C98A0E");
 console.log("%c画布左下角那枚 🧾 就是柜台：撕下票根 / 盖一个章 / 复印这份。\n"+
   "  谜面上点右键也行，两个入口是同一张操作台。",
   "color:#4A4841;line-height:1.9");
