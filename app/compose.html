@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>拼图台 · 制作单 — 你拼我猜</title>
+<link rel="stylesheet" href="base.css">
+<style>
+/* ============================================================
+   拼图台 · 制作单
+   转盘发牌 → 盖章落牌 → 拨杆调姿 → 封存交题
+   物理动作：抽签（转盘）· 盖章（落牌）· 打孔（用掉）· 装订（存档）
+   声音：Web Audio 合成，不加载任何音频文件
+   ============================================================ */
+
+.head{padding:46px 0 6px}
+.head h1{margin:12px 0 14px}
+
+.bench{display:grid;grid-template-columns:326px 1fr 268px;gap:22px;align-items:start;
+  padding-top:26px}
+@media(max-width:1180px){.bench{grid-template-columns:1fr 1fr}.bench .order{grid-column:1/-1}}
+@media(max-width:860px){.bench{grid-template-columns:1fr}}
+
+/* ---------- 转盘发牌器 ---------- */
+.wheel-box{text-align:center}
+.wheel{position:relative;width:min(300px,80vw);aspect-ratio:1;margin:6px auto 0}
+.wheel .ring{position:absolute;inset:0;border:1.5px dashed var(--ink-3);border-radius:50%}
+.wheel .ring2{position:absolute;inset:15%;border:1px solid rgba(23,23,27,.16);border-radius:50%}
+.wheel .spin{position:absolute;inset:0;animation:spin 72s linear infinite}
+.wheel:hover .spin,.wheel:focus-within .spin{animation-play-state:paused}   /* 悬停暂停，便于点选 */
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.spoke{position:absolute;top:50%;left:50%;width:48px;height:48px;margin:-24px;
+  display:grid;place-items:center;font-family:var(--emoji);font-size:24px;line-height:1;
+  background:var(--paper-4);border:2px solid var(--ink);border-radius:50%;
+  box-shadow:3px 3px 0 rgba(23,23,27,.16);cursor:pointer;padding:0;
+  transform:rotate(var(--a)) translateY(-118px) rotate(calc(-1 * var(--a)));
+  transition:transform .16s,box-shadow .16s,border-color .16s}
+.spoke:hover{transform:rotate(var(--a)) translateY(-118px) rotate(calc(-1 * var(--a))) scale(1.14)}
+.spoke:active{box-shadow:1px 1px 0 rgba(23,23,27,.16)}
+/* 用掉即打孔 —— 孔留在牌上（轴 B） */
+.spoke .hole{width:11px;height:11px;right:5px;top:5px;opacity:0}
+.spoke.used .hole{opacity:1}
+.spoke.used{opacity:.42;cursor:default}
+.spoke.used:hover{transform:rotate(var(--a)) translateY(-118px) rotate(calc(-1 * var(--a)))}
+
+.wheel .hub{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:92px;height:92px;border-radius:50%;background:var(--paper-2);border:2px solid var(--ink);
+  display:grid;place-items:center;z-index:4;text-align:center;padding:6px}
+.wheel .hub::after{content:"";position:absolute;inset:-9px;border:1.5px dotted var(--ink-3);border-radius:50%}
+.wheel .hub .n{font-family:var(--mono);font-weight:700;font-size:24px;line-height:1}
+.wheel .hub .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;color:var(--ink-3);margin-top:3px}
+
+.wheel-note{margin-top:14px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+
+/* ---------- 画布 ---------- */
+.canvas-box{position:relative}
+.canvas{position:relative;aspect-ratio:1/1;max-width:560px;margin:0 auto;overflow:hidden;
+  background:var(--paper-4);border:2px solid var(--ink);border-radius:var(--rad);
+  box-shadow:var(--sh-soft);cursor:default;
+  background-image:
+    repeating-linear-gradient(0deg,rgba(23,23,27,.055) 0 1px,transparent 1px 33.4%),
+    repeating-linear-gradient(90deg,rgba(23,23,27,.055) 0 1px,transparent 1px 33.4%)}
+.canvas .ph{position:absolute;inset:0;display:grid;place-items:center;text-align:center;
+  font-family:var(--mono);font-size:12px;color:var(--ink-4);line-height:2;pointer-events:none}
+
+.pc{position:absolute;font-family:var(--emoji);line-height:1;cursor:grab;user-select:none;
+  transform:translate(-50%,-50%) scale(var(--s)) rotate(var(--r));
+  filter:drop-shadow(1px 2px 0 rgba(23,23,27,.14));padding:2px;border-radius:4px;
+  outline:2px solid transparent;outline-offset:2px}
+.pc.sel{outline-color:var(--blue);cursor:grabbing}
+.pc.stamping{animation:stamp-down .3s cubic-bezier(.3,1.5,.5,1)}
+
+/* 画布左下角常驻操作提示（图标，不是文字 —— 律二） */
+.cv-btn{position:absolute;left:10px;bottom:10px;z-index:5}
+
+/* ---------- 三个物理拨杆 ---------- */
+.levers{margin:16px auto 0;max-width:560px;display:grid;gap:9px;
+  background:var(--paper-2);border:2px solid var(--ink);border-radius:var(--rad);padding:14px 16px}
+.levers.off{opacity:.42;pointer-events:none}
+.lever{display:grid;grid-template-columns:58px 1fr 54px;align-items:center;gap:12px}
+.lever .nm{font-family:var(--mono);font-size:11px;letter-spacing:.16em;color:var(--ink-2)}
+.lever .vl{font-family:var(--mono);font-size:11.5px;text-align:right;color:var(--ink);
+  font-variant-numeric:tabular-nums}
+.lever input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:24px;
+  background:transparent;margin:0;cursor:pointer}
+.lever input[type=range]::-webkit-slider-runnable-track{height:8px;background:var(--paper-3);
+  border:1.5px solid var(--ink-4);border-radius:2px}
+.lever input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:15px;height:22px;
+  margin-top:-8px;background:var(--ink);border-radius:2px;border:none;
+  box-shadow:2px 1px 0 rgba(23,23,27,.28)}
+.lever input[type=range]::-moz-range-track{height:8px;background:var(--paper-3);
+  border:1.5px solid var(--ink-4);border-radius:2px}
+.lever input[type=range]::-moz-range-thumb{width:15px;height:22px;background:var(--ink);
+  border-radius:2px;border:none;box-shadow:2px 1px 0 rgba(23,23,27,.28)}
+
+/* ---------- 制作单（右栏） ---------- */
+.order .sheet-hd{gap:8px}
+.order .sheet-hd .stamp{margin-left:auto;font-size:10px;padding:3px 8px}
+.od{display:flex;align-items:baseline;gap:8px;padding:8px 0;border-bottom:1px dotted var(--ink-4);
+  font-family:var(--mono);font-size:12.5px}
+.od:last-of-type{border-bottom:none}
+.od .k{color:var(--ink-3);font-size:11px;letter-spacing:.1em;white-space:nowrap}
+.od .d{flex:1;border-bottom:1px dotted var(--ink-4);transform:translateY(-4px)}
+.od b{color:var(--ink);white-space:nowrap}
+.od b.red{color:var(--red)}.od b.blue{color:var(--blue)}
+
+.ansrow{display:flex;gap:8px;margin:6px 0 4px}
+.ansrow input{flex:1;border:none;border-bottom:2px solid var(--ink);background:transparent;
+  font-family:var(--mono);font-size:17px;padding:6px 2px;color:var(--ink);outline:none;
+  letter-spacing:.1em;border-radius:0;min-width:0}
+.ansrow input:focus{border-bottom-color:var(--blue)}
+.ansrow input::placeholder{color:var(--ink-4)}
+
+/* 音效开关 */
+.snd{display:flex;align-items:center;gap:9px;margin-top:14px;padding-top:12px;
+  border-top:1.5px dashed var(--ink-4);font-family:var(--mono);font-size:11.5px;color:var(--ink-3)}
+.snd .ibtn{margin-left:auto}
+
+/* ---------- 交题后的结果 ---------- */
+.filed{margin-top:0}
+.filed .cert{position:relative;background:var(--paper-4);border:2px solid var(--ink);
+  border-radius:var(--rad);box-shadow:var(--sh-soft);padding:22px}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="logo" href="index.html">你拼我猜<span class="no">1管51</span></a>
+    <nav>
+      <a href="plaza.html">广场</a>
+      <a href="banks.html">词库</a>
+      <a href="works.html">我的作品</a>
+      <a href="me.html">我的主页</a>
+    </nav>
+    <a class="btn sm" href="room.html">回到房间</a>
+  </div>
+</header>
+
+<main>
+
+<section class="head">
+  <div class="wrap">
+    <span class="lbl-lg">拼 图 台 · 制 作 单 NO. <span id="orderNo">1管5-129</span></span>
+    <h1 class="tk">从转盘上取牌，<br>盖到画布上</h1>
+  </div>
+</section>
+
+<section class="bench wrap">
+
+  <!-- ================= 转盘发牌器 ================= -->
+  <div class="sheet xerox wheel-box">
+    <div class="sheet-hd">
+      <span class="tag-no">发 牌 器</span>
+      <span class="lbl">转 盘</span>
+    </div>
+    <div class="sheet-bd">
+      <div class="wheel" id="wheel">
+        <div class="ring"></div>
+        <div class="ring2"></div>
+        <div class="spin" id="spin"></div>
+        <div class="hub">
+          <div>
+            <div class="n" id="left">10</div>
+            <div class="k">还 剩</div>
+          </div>
+        </div>
+      </div>
+      <div class="wheel-note">
+        <span class="pip on" id="wheelHint">点牌取用</span>
+        <button class="ibtn" id="sndBtn" title="音效开关" aria-label="音效开关">🔊</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 画布 ================= -->
+  <div class="canvas-box">
+    <div class="canvas" id="canvas">
+      <div class="ph" id="ph">点转盘上的 emoji<br>盖到这里</div>
+    </div>
+    <div class="levers off" id="levers">
+      <div class="lever">
+        <span class="nm">缩 放</span>
+        <input type="range" id="lScale" min="40" max="360" value="140" aria-label="缩放">
+        <span class="vl" id="vScale">140%</span>
+      </div>
+      <div class="lever">
+        <span class="nm">旋 转</span>
+        <input type="range" id="lRot" min="-180" max="180" value="0" aria-label="旋转">
+        <span class="vl" id="vRot">0°</span>
+      </div>
+      <div class="lever">
+        <span class="nm">层 级</span>
+        <input type="range" id="lZ" min="1" max="40" value="1" aria-label="层级">
+        <span class="vl" id="vZ">1</span>
+      </div>
+      <div class="btn-row" style="margin-top:2px">
+        <button class="btn sm ghost" id="delBtn" disabled>删 掉 这 张</button>
+        <button class="btn sm ghost" id="clrBtn">清 空 画 布</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 制作单 ================= -->
+  <aside class="sheet order">
+    <div class="sheet-hd">
+      <span class="lbl">制 作 单</span>
+      <span class="stamp bar blue" id="stateStamp">未 封 存</span>
+    </div>
+    <div class="sheet-bd">
+      <div class="ansrow">
+        <input type="text" id="ans" placeholder="谜底答案" maxlength="12" autocomplete="off">
+      </div>
+      <div class="od"><span class="k">分 类</span><span class="d"></span><b id="cat">成语</b></div>
+      <div class="od"><span class="k">用 牌</span><span class="d"></span><b class="blue" id="used">0 / 10</b></div>
+      <div class="od"><span class="k">限 时</span><span class="d"></span><b>60 秒</b></div>
+      <div class="od"><span class="k">出 题 人</span><span class="d"></span><b>阿野</b></div>
+      <div class="od"><span class="k">编 号</span><span class="d"></span><b id="no2">1管5-129</b></div>
+      <div class="btn-row" style="margin-top:16px">
+        <button class="btn" id="fileBtn" disabled>封 存 交 题</button>
+      </div>
+      <div class="hint" style="margin-top:10px" id="fileHint">先盖一张牌，再填答案</div>
+    </div>
+  </aside>
+
+</section>
+
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <span>你拼我猜 · 拼图台</span>
+    <span>1管51 站 · 制版处</span>
+  </div>
+</footer>
+
+<script>
+const $=id=>document.getElementById(id);
+const EMOJI="font-family:var(--emoji)";
+
+/* ============================================================
+   音效：用 Web Audio 合成「盖章」，不加载任何音频文件
+   两声叠在一起 = 低频闷响（橡胶章压在纸上）+ 带通噪声（纸的脆响）
+   ============================================================ */
+let AC=null, sndOn=true;
+function ac(){
+  if(!AC) AC=new (window.AudioContext||window.webkitAudioContext)();
+  if(AC.state==="suspended") AC.resume();
+  return AC;
+}
+function stampSound(power){
+  if(!sndOn) return;
+  let c; try{ c=ac(); }catch(e){ return; }
+  const t=c.currentTime, p=Math.max(.35,Math.min(1.6,power||1));
+
+  // ① 低频闷响：频率快速下滑，像章压在纸上
+  const o=c.createOscillator(), g=c.createGain();
+  o.type="sine";
+  o.frequency.setValueAtTime(190*p, t);
+  o.frequency.exponentialRampToValueAtTime(46, t+.11);
+  g.gain.setValueAtTime(.26*p, t);
+  g.gain.exponentialRampToValueAtTime(.0008, t+.17);
+  o.connect(g).connect(c.destination);
+  o.start(t); o.stop(t+.19);
+
+  // ② 纸/木的脆响：一段迅速衰减的噪声，走带通
+  const n=Math.floor(c.sampleRate*.045);
+  const buf=c.createBuffer(1,n,c.sampleRate), d=buf.getChannelData(0);
+  for(let i=0;i<n;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/n,3.2);
+  const src=c.createBufferSource(); src.buffer=buf;
+  const bp=c.createBiquadFilter(); bp.type="bandpass";
+  bp.frequency.value=1700; bp.Q.value=.85;
+  const ng=c.createGain(); ng.gain.value=.16*p;
+  src.connect(bp).connect(ng).connect(c.destination);
+  src.start(t);
+}
+/* 取牌时的轻微「嗒」 */
+function pickSound(){
+  if(!sndOn) return;
+  let c; try{ c=ac(); }catch(e){ return; }
+  const t=c.currentTime;
+  const o=c.createOscillator(), g=c.createGain();
+  o.type="square"; o.frequency.setValueAtTime(880,t);
+  o.frequency.exponentialRampToValueAtTime(420,t+.05);
+  g.gain.setValueAtTime(.05,t);
+  g.gain.exponentialRampToValueAtTime(.0005,t+.07);
+  o.connect(g).connect(c.destination); o.start(t); o.stop(t+.08);
+}
+
+/* ============================================================
+   转盘发牌：十张牌均分圆周（沿用 S3 的几何）
+   ============================================================ */
+const POOL=["🔥","⛽","💧","🪵","🌫️","🧯","🕯️","☀️","🥵","🚒"];
+const ANGS=Array.from({length:10},(_,i)=>i*36);
+let pieces=[], zTop=1, sel=null, usedCount=0;
+
+function deal(){
+  $("spin").innerHTML=POOL.map((g,k)=>
+    `<button class="spoke" style="--a:${ANGS[k]}deg" data-i="${k}" type="button"
+       title="盖到画布"><span>${g}</span><span class="hole"></span></button>`).join("");
+}
+deal();
+
+$("spin").addEventListener("click",e=>{
+  const b=e.target.closest(".spoke"); if(!b||b.classList.contains("used")) return;
+  pickSound();
+  b.classList.add("used");
+  usedCount++;
+  $("left").textContent=10-usedCount;
+  $("used").textContent=usedCount+" / 10";
+  drop(b.querySelector("span").textContent, b, true);
+  refresh();
+});
+
+/* ---------- 盖章落牌 ---------- */
+function drop(glyph, spokeEl, isNew){
+  const cv=$("canvas"), r=cv.getBoundingClientRect();
+  const el=document.createElement("div");
+  el.className="pc";
+  const n=pieces.length;
+  // 落点沿内圈螺旋排布，避免叠在一起
+  const ang=n*2.1, rad=Math.min(r.width,r.height)*(n?0.16+0.035*n:0);
+  const x=50+Math.cos(ang)*rad/r.width*100;
+  const y=50+Math.sin(ang)*rad/r.height*100;
+  el.style.left=x+"%"; el.style.top=y+"%";
+  el.style.setProperty("--s",1.4);
+  el.style.setProperty("--r",(n%2?7:-6)+"deg");
+  el.style.fontSize="44px";
+  el.textContent=glyph;
+  el.dataset.z=++zTop;
+  el.style.zIndex=el.dataset.z;
+  cv.appendChild(el);
+  pieces.push(el);
+  // 盖章动效 + 音效（新落牌才响；拖动/调姿不响）
+  el.classList.add("stamping");
+  setTimeout(()=>el.classList.remove("stamping"),320);
+  if(isNew) stampSound(1);
+  $("ph").style.display="none";
+  select(el);
+  return el;
+}
+
+/* ---------- 选中与拨杆 ---------- */
+function select(el){
+  pieces.forEach(p=>p.classList.remove("sel"));
+  sel=el;
+  const L=$("levers");
+  if(!el){ L.classList.add("off"); $("delBtn").disabled=true; return; }
+  el.classList.add("sel");
+  L.classList.remove("off");
+  const s=parseFloat(getComputedStyle(el).getPropertyValue("--s"))||1.4;
+  const r=parseFloat(getComputedStyle(el).getPropertyValue("--r"))||0;
+  $("lScale").value=Math.round(s*100);  $("vScale").textContent=Math.round(s*100)+"%";
+  $("lRot").value=Math.round(r);        $("vRot").textContent=Math.round(r)+"°";
+  $("lZ").value=el.dataset.z;           $("vZ").textContent=el.dataset.z;
+  $("delBtn").disabled=false;
+  $("lZ").max=Math.max(40,zTop);
+}
+
+$("lScale").addEventListener("input",e=>{
+  if(!sel) return; const v=+e.target.value;
+  sel.style.setProperty("--s",v/100); $("vScale").textContent=v+"%";
+});
+$("lRot").addEventListener("input",e=>{
+  if(!sel) return; const v=+e.target.value;
+  sel.style.setProperty("--r",v+"deg"); $("vRot").textContent=v+"°";
+});
+$("lZ").addEventListener("input",e=>{
+  if(!sel) return; const v=+e.target.value;
+  sel.dataset.z=v; sel.style.zIndex=v; $("vZ").textContent=v;
+});
+
+/* ---------- 拖动 ---------- */
+let drag=null;
+$("canvas").addEventListener("pointerdown",e=>{
+  const p=e.target.closest(".pc");
+  if(!p){ select(null); return; }
+  select(p);
+  p.classList.add("stamping"); setTimeout(()=>p.classList.remove("stamping"),160);
+  const r=$("canvas").getBoundingClientRect();
+  drag={el:p, dx:e.clientX-(r.left+r.width*parseFloat(p.style.left)/100),
+              dy:e.clientY-(r.top+r.height*parseFloat(p.style.top)/100), r};
+  p.setPointerCapture(e.pointerId);
+});
+addEventListener("pointermove",e=>{
+  if(!drag) return;
+  const x=Math.max(0,Math.min(drag.r.width,  e.clientX-drag.dx))/drag.r.width*100;
+  const y=Math.max(0,Math.min(drag.r.height, e.clientY-drag.dy))/drag.r.height*100;
+  drag.el.style.left=x+"%"; drag.el.style.top=y+"%";
+});
+addEventListener("pointerup",()=>{ drag=null; });
+
+/* ---------- 删除 / 清空 ---------- */
+$("delBtn").addEventListener("click",()=>{
+  if(!sel) return;
+  sel.remove(); pieces=pieces.filter(p=>p!==sel);
+  select(null); refresh();
+  if(!pieces.length) $("ph").style.display="";
+});
+$("clrBtn").addEventListener("click",()=>{
+  pieces.forEach(p=>p.remove()); pieces=[]; select(null); refresh();
+  $("ph").style.display="";
+});
+
+/* ---------- 制作单状态 ---------- */
+function refresh(){
+  $("used").textContent=usedCount+" / 10";
+  const ok=pieces.length>0 && $("ans").value.trim().length>0;
+  $("fileBtn").disabled=!ok;
+  $("fileHint").textContent = pieces.length===0 ? "先盖一张牌，再填答案"
+                              : (!$("ans").value.trim() ? "还差一个答案" : "可以封存了");
+}
+$("ans").addEventListener("input",refresh);
+
+/* ---------- 封存交题：盖章 + 打孔 ---------- */
+$("fileBtn").addEventListener("click",()=>{
+  stampSound(1.5);
+  const st=$("stateStamp");
+  st.className="stamp bar"; st.textContent="已 封 存";
+  st.classList.add("stamping");
+  $("fileBtn").disabled=true;
+  $("fileHint").textContent="已交到广场";
+  // 画布右上角打一个归档孔
+  const h=document.createElement("span");
+  h.className="hole"; h.style.right="10px"; h.style.top="10px";
+  $("canvas").appendChild(h);
+  requestAnimationFrame(()=>h.classList.add("punching"));
+  setTimeout(()=>{ location.href="plaza.html"; },900);
+});
+
+/* ---------- 音效开关 ---------- */
+$("sndBtn").addEventListener("click",()=>{
+  sndOn=!sndOn;
+  $("sndBtn").textContent=sndOn?"🔊":"🔇";
+  $("sndBtn").classList.toggle("on",sndOn);
+  if(sndOn) stampSound(.7);
+});
+$("sndBtn").classList.add("on");
+
+/* ---------- 首屏给一张示例牌，让人知道能点 ---------- */
+setTimeout(()=>{ if(!pieces.length) $("spin").querySelector(".spoke")?.focus(); },400);
+</script>
+</body>
+</html>
