@@ -33,7 +33,9 @@ else:
     if "width:100%" not in b:
         bad.append(".bay 缺 width:100%")
 
-# ── B. 十张牌必须是 grid ──
+# ── B. 十张牌的高度不得依赖「放了几张」──
+# 演示循环是一张一张放的。曾经用 min-height + .tile{aspect-ratio}（高度由宽度反推），
+# 放牌过程中行高随内容变化，一路撑大 .sheet-bd / .tpaper / .bay。
 m = re.search(r'\.hand-row\{([^}]*)\}', idx)
 if not m:
     bad.append(".hand-row 规则不见了")
@@ -43,8 +45,16 @@ else:
         bad.append(".hand-row 又用 flex-wrap —— 1px 误差就换行")
     if "grid" not in b:
         bad.append(".hand-row 必须是 grid")
-    if "min-height" not in b:
-        bad.append(".hand-row 缺 min-height，空状态会塌")
+    if not re.search(r'(?<!min-)height:', b):
+        bad.append(".hand-row 必须有固定 height —— min-height 挡不住内容撑高")
+
+m = re.search(r'\.tile\{([^}]*)\}', idx)
+if not m:
+    bad.append(".tile 规则不见了")
+elif "aspect-ratio" in m.group(1):
+    bad.append(".tile 又用 aspect-ratio —— 高度会由宽度反推，放牌时行高会变")
+elif "height:100%" not in m.group(1):
+    bad.append(".tile 应 height:100%，把高度交给行决定")
 
 # ── C. 样张抬头不得换行 ──
 m = re.search(r'\.tpaper>\.sheet-hd\{([^}]*)\}', idx)
