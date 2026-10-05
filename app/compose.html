@@ -72,7 +72,7 @@
    不写任何 calc(100dvh - Npx) 的魔数：数字一改就悄悄错位，flex 不会。 */
 html,body{height:100%}
 body{display:flex;flex-direction:column;overflow:hidden}
-.nav{flex:0 0 auto}
+body>.nav{flex:0 0 auto}   /* 带上下文 = 局部覆盖，不是重定义 base.css 的 .nav */
 main{flex:1 1 auto;min-height:0;display:flex;flex-direction:column}
 /* ⚠ .wrap 带 margin:0 auto —— 放进 flex 容器后，auto margin 会吸收自由空间、
    使 align-self:stretch 失效，元素退化成 fit-content（.bench 只剩 640 而非 1180，
