@@ -139,6 +139,15 @@ if grep -q '全部达标' /tmp/_ct.txt; then
   ok "对比度全部达标（$n）"
 fi
 
+echo "── 6.5 画布不变量（浏览器级）──"
+# 真渲染真测量。静态检查抓不到 fixed 溢出、横向滚动条、元素重叠、overflow 裁切 ——
+# 这几条全是「量了数值但没量关系」，必须把浏览器拉进来。
+if command -v firefox >/dev/null 2>&1 || [ -x /snap/firefox/current/usr/lib/firefox/firefox ]; then
+  python3 "$(dirname "$0")/tools/canvas_invariants.py" || fail=1
+else
+  echo "     （无浏览器，跳过）"
+fi
+
 echo
 [ "$fail" -eq 0 ] && printf '\033[32m全部通过\033[0m\n' || printf '\033[31m有检查未通过\033[0m\n'
 exit $fail

@@ -32,9 +32,10 @@
 /* 子元素解除 min-width 下限：grid 的 1fr 是 minmax(auto,1fr)，
    那个 auto 等于内容的 min-content，窄屏下列会被顶住不缩。 */
 .bench>*{min-width:0}
-.bench{display:grid;grid-template-columns:300px minmax(0,1fr) 244px;gap:22px;align-items:start;
-  padding-top:26px}
-@media(max-width:1120px){.bench{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.bench .order{grid-column:1/-1}}
+/* 两列断点从 1120 下调到 1000。
+   1120 时 1024 宽的屏落进两列，画布只剩 257px（占视口高 33%）——
+   而三列在 1024 下能给 424px。断点必须落在「三列还放得下」的位置。 */
+@media(max-width:1000px){.bench{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.bench .order{grid-column:1/-1}}
 @media(max-width:820px){.bench{grid-template-columns:minmax(0,1fr)}
   .bench .canvas-box{order:1}.bench .wheel-box{order:2}.bench .order{order:3}}
 
@@ -52,7 +53,9 @@
   display:grid;place-items:center;font-family:var(--emoji);font-size:23px;line-height:1;
   background:var(--paper-4);border:2px solid var(--ink);border-radius:2px;
   box-shadow:3px 3px 0 rgba(23,23,27,.16);cursor:grab;padding:0;touch-action:none;
-  transform:rotate(var(--a)) translateY(-104px) rotate(calc(-1 * var(--a)));
+  /* 半径由 JS 按转盘实际宽度写进 --R —— 写死 -104px 时，
+     轨道一窄就整圈溢出（实测被切 92px，切掉的正是拖牌落手点）。 */
+  transform:rotate(var(--a)) translateY(calc(-1 * var(--R,104px))) rotate(calc(-1 * var(--a)));
   transition:box-shadow .14s,opacity .2s}
 .spoke:hover{box-shadow:0 0 0 4px rgba(31,78,156,.16),3px 3px 0 rgba(23,23,27,.16)}
 .spoke:active{cursor:grabbing}
@@ -87,8 +90,10 @@ main{flex:1 1 auto;min-height:0;display:flex;flex-direction:column}
    （当初 .bay 踩的同一个坑：宽度随内容变，画布列连锁塌陷。） */
 main>*{width:100%}
 
-.bench{flex:1 1 auto;min-height:0;align-items:start;
-  grid-template-columns:minmax(0,200px) minmax(0,1fr) minmax(0,224px);gap:16px;
+.bench{display:grid;flex:1 1 auto;min-height:0;align-items:start;padding-top:20px;
+  /* 左轨 296：转盘足迹 254px（半径 104 + 牌 23）+ sheet 内边距。
+     压到 200 时实测右侧溢出 92px，被切掉的正是拖牌落手点。 */
+  grid-template-columns:minmax(0,296px) minmax(0,1fr) minmax(0,224px);gap:16px;
   max-width:min(1600px,100% - 48px)}   /* 比全站 wrap(1180) 宽 —— 画布页优先给画布 */
 .bench>*{min-height:0}
 .bench .canvas-box{align-self:stretch}   /* 只有画布那列撑满高度，两条轨道保持自然高度 */
@@ -99,7 +104,11 @@ main>*{width:100%}
    此前它挂在画布下方，与画布争同一段高度，被压成 0 高、溢出到画布边框上
    （K3 连续三轮点名的那个「渲染事故」：按钮偏左 82px、骑在下边框上）。
    移进制作单之后：按钮是面板里的普通块，画布列只剩一个元素，尺寸计算不再有歧义。 */
-.canvas-box{min-height:0;min-width:0;overflow:hidden}
+.canvas-box{position:relative;min-height:0;min-width:0;overflow:hidden}
+/* 平时半透明、hover 才实心：不抢画布的注意力，但一直在手边。 */
+.canvas-reset{position:absolute;right:10px;bottom:10px;z-index:4;opacity:.42;
+  transition:opacity .16s}
+.canvas-reset:hover,.canvas-reset:focus-visible{opacity:1}
 .canvas-fit{height:100%;min-height:0;min-width:0;container-type:size;
   display:grid;place-items:center;overflow:hidden}
 /* 画布取盒子里能放下的最大正方形。
@@ -123,7 +132,8 @@ main>*{width:100%}
     repeating-linear-gradient(0deg,rgba(23,23,27,.055) 0 1px,transparent 1px 33.4%),
     repeating-linear-gradient(90deg,rgba(23,23,27,.055) 0 1px,transparent 1px 33.4%)}
 .canvas.armed{outline:2px dashed var(--blue);outline-offset:-7px}
-.canvas .ph{position:absolute;inset:0;display:grid;place-items:center;text-align:center;
+.canvas .ph{padding-bottom:44px;   /* 给右下角的「重发」让位 */
+  position:absolute;inset:0;display:grid;place-items:center;text-align:center;
   font-family:var(--mono);font-size:12px;color:var(--ink-3);line-height:2;pointer-events:none}
 
 /* 牌：尺寸用画布相对单位（--u = 画布宽度的 1%，由 JS 维护）
@@ -164,10 +174,10 @@ main>*{width:100%}
 .pc .pbar button:hover{background:var(--paper-3);border-color:var(--ink)}
 
 /* 拖动中的浮牌（跟手） */
-.ghost{position:fixed;z-index:999;pointer-events:none;font-family:var(--emoji);line-height:1;
+.drag-ghost{position:fixed;z-index:999;pointer-events:none;font-family:var(--emoji);line-height:1;
   font-size:40px;filter:drop-shadow(2px 4px 0 rgba(23,23,27,.3));opacity:.92;
   transform:translate(-50%,-50%)}
-.ghost.out{opacity:.35}
+.drag-ghost.out{opacity:.35}
 
 /* ---------- 制作单 ---------- */
 .order .sheet-hd{gap:8px}
@@ -266,8 +276,15 @@ main>*{width:100%}
     <!-- 尺寸容器：把「画布」与「按钮行」分开。
          原来两者是 .canvas-box 的同级子元素，配 place-items:center 会**重叠** ——
          按钮骑在画布下边框上（K3 点过三次）。 -->
+    <!-- 重发按钮在**画布右下角**。它是画布上的动作，且是破坏性的 ——
+         离「封存交题」远一点不会误点。position:absolute 不占纵向空间，
+         不参与 min(100cqw,100cqh) 的尺寸计算。
+         试过放进制作单：那一行可用宽 176px，而两个按钮需要 272px，装不下。 -->
     <div class="canvas-fit">
     <div class="canvas" id="canvas">
+      <!-- 重发按钮挂在**画布自己的角**上。相对 .canvas-box 定位会因画布居中而溢出
+           （实测右缘超出画布 45px）。绝对定位不占纵向空间、不参与尺寸计算。 -->
+      <button class="btn sm ghost canvas-reset" id="resetBtn" type="button">重 发 这 手 牌</button>
       <div class="ph" id="ph">把牌拖到这里<br><span style="font-size:11px">点一下已放好的牌可以调它</span></div>
     </div>
     </div>
@@ -288,7 +305,6 @@ main>*{width:100%}
       <div class="od"><span class="k">限 时</span><span class="d"></span><b>60 秒</b></div>
       <div class="od"><span class="k">编 号</span><span class="d"></span><b>1管5-129</b></div>
       <div class="btn-row" style="margin-top:16px">
-      <button class="btn sm ghost" id="resetBtn">重 发 这 手 牌</button>
         <button class="btn" id="fileBtn" disabled>封 存 交 题</button>
       </div>
       <div class="hint" style="margin-top:10px" id="fileHint">先放一张牌，再填答案</div>
@@ -361,11 +377,23 @@ setUnit();
    ============================================================ */
 const POOL=["🔥","⛽","💧","🪵","🌫️","🧯","🕯️","☀️","🥵","🚒"];
 const ANGS=Array.from({length:10},(_,i)=>i*36);
+/* --R：牌位半径 = 转盘宽度的一半 − 牌自身半径 − 6px 余量。
+   转盘足迹 = 2×(R + 牌半径)，写死 104 时轨道窄了就整圈溢出。 */
+function syncSpokeRadius(){
+  const w=document.querySelector(".wheel"); if(!w) return;
+  const half=w.getBoundingClientRect().width/2;
+  const R=Math.max(52, Math.round(half-23-6));
+  w.style.setProperty("--R", R+"px");
+}
+addEventListener("resize",syncSpokeRadius);
+if(window.ResizeObserver) new ResizeObserver(syncSpokeRadius).observe(document.documentElement);
+
 $("spokes").innerHTML=POOL.map((g,k)=>
   `<button class="spoke" style="--a:${ANGS[k]}deg" data-i="${k}" type="button"
      title="拖到画布上"><span>${g}</span><span class="hole"></span></button>`).join("");
 
 let pieces=[], zTop=1, sel=null, usedCount=0, carry=null;
+syncSpokeRadius();
 
 /* ============================================================
    ③ 取牌 = 从转盘拖到画布（落点由玩家决定）
@@ -374,7 +402,7 @@ let pieces=[], zTop=1, sel=null, usedCount=0, carry=null;
    ============================================================ */
 function pickUp(spoke,glyph,x,y){
   const el=document.createElement("div");
-  el.className="ghost"; el.textContent=glyph;
+  el.className="drag-ghost"; el.textContent=glyph;
   el.style.left=x+"px"; el.style.top=y+"px";
   document.body.appendChild(el);
   carry={spoke,glyph,ghost:el,startX:x,startY:y,moved:false};
