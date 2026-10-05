@@ -9,6 +9,7 @@
 """
 import html
 import pathlib
+import re
 import subprocess
 from datetime import datetime
 
@@ -89,6 +90,13 @@ def build():
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>整改台账 · 你拼我猜</title>
 <link rel="stylesheet" href="base.css">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#22304F">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="你拼我猜">
 <style>
 .ledger{{width:100%;border-collapse:collapse;font-size:13px}}
 .ledger th{{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-align:left;
@@ -174,10 +182,22 @@ def build():
   </div>
 </footer>
 
+<script src="pwa.js"></script>
 </body>
 </html>'''
-    OUT.write_text(page, encoding="utf-8")
-    print(f"  ✓ {OUT.relative_to(ROOT)}（{n} 条：已改 {c['fixed']} · 半改 {c['partial']} · 未改 {c['open']} · 误报 {c['bogus']}）")
+    # ⚠ 幂等：内容没变就不写盘。
+    #   否则 check.sh 每跑一次都把 issues.html 的 mtime 推新，
+    #   第 5 组就永远报「截图过期」—— 自己把自己判成陈旧交付物。
+    old = OUT.read_text(encoding="utf-8") if OUT.exists() else ""
+    new = page.replace(stamp, "STAMP")            # 时间戳不参与比较
+    if old.replace(re.search(r"截 至 [\d-]+ [\d:]+", old).group(0), "STAMP") if re.search(r"截 至 [\d-]+ [\d:]+", old) else old != new:
+        pass
+    changed = not old or re.sub(r"截至 [\d\-]+ [\d:]+", "", old) != re.sub(r"截至 [\d\-]+ [\d:]+", "", page)
+    if changed:
+        OUT.write_text(page, encoding="utf-8")
+        print(f"  ✓ {OUT.relative_to(ROOT)} 已更新（{n} 条：已改 {c['fixed']} · 半改 {c['partial']} · 未改 {c['open']}）")
+    else:
+        print(f"  = {OUT.relative_to(ROOT)} 无变化（内容与上次一致，不写盘）")
 
 
 ROUND_TITLE = {
