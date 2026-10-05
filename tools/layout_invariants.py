@@ -38,7 +38,9 @@ if m and "nowrap" not in m.group(1):
 if "url(#ink-soft)" not in base: bad.append("base.css 丢了 url(#ink-soft)")
 # 只有「用 filter:var(...) 中转」才是不渲染的写法。
 # 注意 --fiber 也是 data-URI SVG，但它用在 background-image 上，工作正常，不能误报。
-if re.search(r'filter:\s*var\(--', base):
+# 先把注释剥掉再扫 —— 否则会被解释这个坑的注释本身误伤
+_base_nc = re.sub(r'/\*.*?\*/', '', base, flags=re.S)
+if re.search(r'filter:\s*var\(--', _base_nc):
     bad.append("油墨滤镜又用 filter:var(...) 中转 —— Firefox 完全不会渲染")
 if 'id="ink-soft"' not in idx: bad.append("index.html 少了内联 svg defs")
 
