@@ -61,20 +61,6 @@ section[id]{scroll-margin-top:130px}
 .gate-top{display:flex;align-items:center;gap:10px;padding-bottom:8px}
 .gate-top .gk{font-family:var(--mono);font-size:12.5px;letter-spacing:.22em;color:var(--paper)}
 /* 出票读数：编号是内容，进度是那条细实线 */
-/* 出票读数行：高度必须与内容无关。
-   编号是变长的（演示循环会换号），若编号变长而 .thinbar 有 min-width:80px 顶着，
-   整行会溢出；高度也可能随字号/换行变化。这里把高度钉死、编号用等宽数字。 */
-.feed{display:flex;align-items:center;gap:12px;padding-bottom:10px;height:30px}
-.feed-no{font-family:var(--mono);font-size:12px;letter-spacing:.1em;color:#B0BACC;
-  white-space:nowrap;font-variant-numeric:tabular-nums;min-width:15ch}
-/* 进度条必须脱离文档流。
-   #fill 的宽度由 JS 从 0% 写到 100%，百分比相对 .thinbar 解析；
-   而 .thinbar 是 flex item，宽度又依赖 .feed-no 的文本宽度 ——
-   两者互相牵连就构成了反馈回路。position:absolute 之后 #fill 不参与
-   任何内在尺寸计算，宽度写多少都不可能影响祖先的尺寸。 */
-.thinbar{position:relative;flex:1 1 0;min-width:0;height:2px;background:rgba(242,239,228,.18)}
-/* 细实线进度：一格一格跳，不做缓动 —— 机器是机械的 */
-.thinbar i{position:absolute;left:0;top:0;height:2px;width:0;background:var(--amber)}
 .gate-slot{height:9px;background:#000;margin:0 -14px;position:relative}
 .gate-slot i{position:absolute;left:14px;right:14px;top:3px;height:2px;background:rgba(255,255,255,.14)}
 
@@ -247,10 +233,6 @@ footer.site .wrap{align-items:center}
         <div class="gate-top">
           <span class="dot composing"></span>
           <span class="gk">1 号 口 · 出 票 中</span>
-        </div>
-        <div class="feed">
-          <span class="feed-no" id="outNo">NO. 1管5-2043</span>
-          <span class="thinbar"><i id="fill"></i></span>
         </div>
         <div class="gate-slot"><i></i></div>
       </div>
@@ -485,17 +467,15 @@ $("wall").innerHTML=PUZZLES.map((p,i)=>`
    首屏演示：抽签（十支）→ 出票 → 上画布 → 揭晓 → 循环
    ============================================================ */
 const stage=$("stage"), hand=$("hand"), ansEl=$("ans"), hint=$("hint"),
-      tube=$("tube"), drawnEl=$("drawn"), outNo=$("outNo"), tagNo=$("tagNo"),
-      fill=$("fill");
+      tube=$("tube"), drawnEl=$("drawn"), tagNo=$("tagNo");
 let idx=0, timers=[];
 
 const later=(fn,ms)=>timers.push(setTimeout(fn,ms));
 const clearAll=()=>{timers.forEach(clearTimeout);timers=[]};
 
-function fillTube(){
+function resetDraw(){
   tube.innerHTML="<i></i>".repeat(10);
   drawnEl.textContent="00";
-  fill.style.width="0";
 }
 function drawStick(){                       /* 抽走一支：从右边起，留筒不变形 */
   const sticks=tube.querySelectorAll("i:not(.out)");
@@ -505,14 +485,13 @@ function drawStick(){                       /* 抽走一支：从右边起，留
 function play(){
   const p=PUZZLES[idx%PUZZLES.length];
   const no="1管5-"+(2043-idx);
-  outNo.textContent="NO. "+no;
   tagNo.textContent="NO. "+no;
 
   clearAll();
   stage.querySelectorAll(".pc").forEach(n=>n.remove());
   hint.classList.remove("off");
   hand.innerHTML="";
-  fillTube();
+  resetDraw();
   ansEl.textContent="— — — —";
   ansEl.style.color="var(--ink-3)";
 
@@ -526,7 +505,6 @@ function play(){
       hand.appendChild(t);
       drawStick();
       drawnEl.textContent=String(i+1).padStart(2,"0");
-      fill.style.width=Math.round((i+1)/p.d.length*100)+"%";
     },150*i+380);
   });
 
