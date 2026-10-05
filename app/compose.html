@@ -220,13 +220,7 @@ main>*{width:100%}
      第五道 = 统一方向的硬投影，与本语言「硬投影无模糊」一致
    链式 filter 的顺序有意义：后一道作用于前一道的结果，
    所以投影投的是「带白边的贴纸」而不是「emoji 本身」。 */
-.pc .g{pointer-events:none;
-  filter:
-    drop-shadow(1.6px 0 0 var(--paper-4))
-    drop-shadow(-1.6px 0 0 var(--paper-4))
-    drop-shadow(0 1.6px 0 var(--paper-4))
-    drop-shadow(0 -1.6px 0 var(--paper-4))
-    drop-shadow(3px 4px 0 rgba(23,23,27,.30))}
+.pc .g{pointer-events:none;filter:var(--sticker)}
 .pc.stamping{animation:stamp-down .28s cubic-bezier(.3,1.5,.5,1)}
 @keyframes stamp-down{
   0%{transform:translate(-50%,-50%) scale(calc(var(--s) * 2)) rotate(var(--r));opacity:.2}

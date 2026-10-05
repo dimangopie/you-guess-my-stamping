@@ -70,6 +70,20 @@
   --screen-2:#18233B;   /* 更深一档：边框、凹槽 */
   /* 纸纤维：一层极淡的噪声，让「纸」不是纯色 */
   --fiber:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='p'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='160' height='160' filter='url(%23p)' opacity='.12'/></svg>");
+  /* 贴纸处理 —— emoji 上纸的统一物理。
+     四道白色硬描边（用纸色而非纯白）+ 一道方向统一的硬投影。
+     链式 filter 的顺序有意义：投影投的是「带白边的贴纸」而不是「emoji 本身」。
+     ⚠ 必须共享：原先只有拼图台的 .pc .g 有，plaza 卡片与 guess 谜面的
+     .snap .pc 只有投影、没有白边 —— 同一套牌在两种尺寸下材质不一致。
+     （K3：「缩略图里的 emoji 在小尺寸下贴纸边几乎消失，物理系统到缩略图这一级断档。」） */
+  --sticker:saturate(.90) contrast(.94) brightness(1.02)
+    drop-shadow(1.6px 0 0 var(--paper-4)) drop-shadow(-1.6px 0 0 var(--paper-4))
+    drop-shadow(0 1.6px 0 var(--paper-4)) drop-shadow(0 -1.6px 0 var(--paper-4))
+    drop-shadow(3px 4px 0 rgba(23,23,27,.30));
+  --sticker-sm:saturate(.90) contrast(.94) brightness(1.02)
+    drop-shadow(1px 0 0 var(--paper-4)) drop-shadow(-1px 0 0 var(--paper-4))
+    drop-shadow(0 1px 0 var(--paper-4)) drop-shadow(0 -1px 0 var(--paper-4))
+    drop-shadow(2px 2.5px 0 rgba(23,23,27,.28));
   /* 字体 */
   --mono:"Noto Sans Mono CJK SC",ui-monospace,"DejaVu Sans Mono",monospace;
   --sans:"Noto Sans CJK SC","Source Han Sans SC",system-ui,sans-serif;
@@ -356,7 +370,7 @@ p.lead{color:var(--ink-2);font-size:16.5px;max-width:34em}
     repeating-linear-gradient(90deg,rgba(23,23,27,.06) 0 1px,transparent 1px 33.4%)}
 .snap .pc{position:absolute;font-family:var(--emoji);line-height:1;
   transform:translate(-50%,-50%) scale(var(--s)) rotate(var(--r));
-  filter:drop-shadow(1px 2px 0 rgba(23,23,27,.14))}
+  filter:var(--sticker-sm)}
 
 /* ============================================================
    15. 物理动作零件（扩展轴 8）
