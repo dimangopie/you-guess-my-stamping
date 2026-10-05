@@ -58,7 +58,12 @@ dup=[s for s,n in c.items() if n>1]
 if dup: print(f"  \033[31m✗\033[0m base.css 重复定义: {', '.join(dup)}"); sys.exit(1)
 if t.count('{')!=t.count('}'): print("  \033[31m✗\033[0m base.css 括号不配平"); sys.exit(1)
 tok=set(re.findall(r'(--[\w-]+)\s*:', t))
-used=set(re.findall(r'var\((--[\w-]+)', t))
+# 使用面要扫全站：token 定义在 base.css，但绝大多数使用写在 13 个页面里。
+# 只扫 base.css 会把「页面专用 token」（如 --amber-ink / --red-ink）全部误报成死令牌。
+import glob
+used=set()
+for _f in ['app/base.css'] + sorted(glob.glob('app/*.html')):
+    used |= set(re.findall(r'var\((--[\w-]+)', open(_f, encoding='utf-8').read()))
 dead=sorted(tok-used)
 if dead: print(f"  \033[31m✗\033[0m 死令牌: {', '.join(dead)}"); sys.exit(1)
 print("  \033[32m✓\033[0m base.css 无重复定义 / 括号配平 / 无死令牌")
