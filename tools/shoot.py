@@ -109,8 +109,12 @@ def shoot(page, out, w, h, wait=0):
                    capture_output=True, timeout=120)
     if not tmp.exists():
         print(f"     ✗ {page} {w}x{h} 截图失败"); return False
-    scale = f"{min(1000, w)}x" if out.parent == PREVIEW else f"{w}x"
-    subprocess.run(["convert", str(tmp), "-resize", scale, str(out)], capture_output=True)
+    # ⚠ 不降采样。
+    #   原来主页图一律 -resize 1000x（1440 → 0.69×）。评委在像素级量这些图，
+    #   13.5px 的浅色细笔画降采样后会与深色底混合 —— 它量到 #1b2130 并据此
+    #   判定「颜色没修」，而原始分辨率下那里是 #EE8A7A。
+    #   交付给评委的图不能有尺度失真：要么原尺寸，要么放大。
+    subprocess.run(["convert", str(tmp), "-resize", f"{w}x", str(out)], capture_output=True)
     print(f"     ✓ {out.relative_to(ROOT)}")
     return True
 

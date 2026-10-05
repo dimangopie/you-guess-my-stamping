@@ -77,16 +77,20 @@
      ⚠ 必须共享：原先只有拼图台的 .pc .g 有，plaza 卡片与 guess 谜面的
      .snap .pc 只有投影、没有白边 —— 同一套牌在两种尺寸下材质不一致。
      （K3：「缩略图里的 emoji 在小尺寸下贴纸边几乎消失，物理系统到缩略图这一级断档。」） */
+  /* ⚠ 边要**纯白**并且够宽。原来用 --paper-4（#FBF9F1），而画布底色也是它 ——
+     白边与底同色，等于没有。评委沿火焰/水滴边缘横切取样：
+     「奶油色画布 → 1px 抗锯齿过渡 → emoji 本色，没有任何白边」。
+     真贴纸的模切边是纸白的，压在米白纸上靠 1.6px 读不出来；改 2.5px 纯白。 */
   --sticker:saturate(.90) contrast(.94) brightness(1.02)
-    drop-shadow(1.6px 0 0 var(--paper-4)) drop-shadow(-1.6px 0 0 var(--paper-4))
-    drop-shadow(0 1.6px 0 var(--paper-4)) drop-shadow(0 -1.6px 0 var(--paper-4))
+    drop-shadow(2.5px 0 0 #fff) drop-shadow(-2.5px 0 0 #fff)
+    drop-shadow(0 2.5px 0 #fff) drop-shadow(0 -2.5px 0 #fff)
     drop-shadow(3px 4px 0 rgba(23,23,27,.30));
   /* ⚠ 边宽 2px 而不是 1px。边色是 --paper-4（米白），缩略图底也是米白 ——
      1px 时它只在 emoji 自身的彩色像素上留一圈 1px 亮边，在 172px 尺寸下读不出来。
      （K3 第 10 轮 8× 最近邻放大后说「没有任何白边/模切边」。） */
   --sticker-sm:saturate(.90) contrast(.94) brightness(1.02)
-    drop-shadow(2px 0 0 var(--paper-4)) drop-shadow(-2px 0 0 var(--paper-4))
-    drop-shadow(0 2px 0 var(--paper-4)) drop-shadow(0 -2px 0 var(--paper-4))
+    drop-shadow(2px 0 0 #fff) drop-shadow(-2px 0 0 #fff)
+    drop-shadow(0 2px 0 #fff) drop-shadow(0 -2px 0 #fff)
     drop-shadow(2.5px 3px 0 rgba(23,23,27,.32));
   /* 字体 */
   --mono:"Noto Sans Mono CJK SC",ui-monospace,"DejaVu Sans Mono",monospace;
