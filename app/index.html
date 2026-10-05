@@ -44,7 +44,14 @@ section[id]{scroll-margin-top:130px}
 .pips{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
 
 /* ---------- 取票台：机头（牌）+ 从出票口吐出来的样张（纸） ---------- */
-.bay{display:grid;gap:10px;max-width:456px;margin-left:auto}
+/* ⚠ 这里不能用 margin-left:auto 来右对齐。
+   grid item 上 margin-left:auto 会吸收自由空间，使 justify-self:stretch 失效，
+   元素退化成 **fit-content**（由内容决定宽）——
+   .hand-row 一填牌，max-content 变大，.bay 就从 342px 涨到 395px；
+   而 .stage 是 aspect-ratio:1，宽度一变高度跟着变，整个 hero 随之重排。
+   用户看到的就是「这块大小会突变」。
+   justify-self:end 只做对齐、不参与尺寸计算，宽度从此与内容无关。 */
+.bay{display:grid;gap:10px;width:100%;max-width:456px;justify-self:end}
 @media(max-width:960px){.bay{max-width:520px;margin:0 auto}}
 .bay-hd{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 
@@ -112,8 +119,15 @@ section[id]{scroll-margin-top:130px}
   transition:opacity .3s,background .3s}
 .tube i.out{opacity:.1;background:transparent}
 
-.hand-row{display:flex;gap:5px;flex-wrap:wrap;min-height:46px}
-.tile{position:relative;flex:0 0 auto;width:calc((100% - 44px) / 10);aspect-ratio:5/6.4;
+/* 十张牌：必须是**网格**，不能用 flex-wrap。
+   原来写的是 flex + width:calc((100% - 44px)/10) —— 10 张牌 + 9 个 5px 间隙 = 45px，
+   但公式只减 44px，永远超 1px，最后一张必然被挤到第二排。
+   后果不是"错位"，是**高度翻倍**：.hand-row 从 46px 跳到约 88px，
+   撑高 #paper → 撑高 .bay → 整个 hero 重排（用户看到的「大小突变」）。
+   网格给死 10 列，浏览器自己分配余数，既不会换行也没有 1px 漂移。
+   min-height 兜住「演示循环还没发牌」的空状态，让高度与内容无关。 */
+.hand-row{display:grid;grid-template-columns:repeat(10,1fr);gap:5px;min-height:53px}
+.tile{position:relative;width:auto;aspect-ratio:5/6.4;
   border-radius:2px;display:grid;place-items:center;font-family:var(--emoji);font-size:19px;
   background:var(--paper-2);border:1.5px solid var(--ink-4);transition:.3s}
 .tile.used{border-color:var(--blue);background:var(--paper-4);transform:translateY(-4px);
