@@ -50,7 +50,8 @@ MAP = {
     "full/plaza-mobile.png": "plaza.html", "full/compose-mobile.png": "compose.html",
     "full/guess-mobile.png": "guess.html",
     "issues.png": "issues.html",
-    "canvas-full.png": "compose.html",   # 画布改动的前后对比图
+    "canvas-full.png": "compose.html",   # 画布改动：三档视口对比
+    "routemap.png": "404.html",           # 站台导向图特写
     # 元素特写（定点评审用的分析图），来源页见右
     "el-1-bind.png": "works.html", "el-2-footer-login.png": "login.html",
     "el-3-footer-guess.png": "guess.html",
