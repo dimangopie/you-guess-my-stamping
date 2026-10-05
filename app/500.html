@@ -20,7 +20,12 @@
 .mast{padding:34px 0 8px}
 
 /* 通告纸：横版，比 404 宽，向右压一点 */
-.paper500{position:relative;max-width:960px;margin:0 auto 0 2%;transform:rotate(.5deg);
+/* 通告是「贴」在墙上的，不居中。
+   居中会让它读起来像对话框 —— 而这四页是站台通告。
+   纸和它下面的出口列表必须共用同一条基准边，否则会互相错开。
+   四页偏移量各不相同：墙不是网格，通告本来就不会贴在同一条线上
+   （和 .stamp 的 -7°、.stamp.bar 的 -1.5° 是同一个道理）。 */
+.paper500{position:relative;max-width:960px;margin:0 0 0 3%;transform:rotate(.5deg);
   padding:24px 30px 28px;border-left:7px solid var(--amber)}
 .paper500 .hole{left:20px;top:20px}
 @media(max-width:900px){.paper500{margin:0 auto}}
@@ -86,8 +91,9 @@
   .jam .row .wd{font-size:11px}}
 
 /* 出口 */
-.exits{max-width:960px;margin:0 auto;padding-top:22px}
+.exits{max-width:960px;margin:0 0 0 3%;padding-top:22px}
 .note-out{margin-top:14px;font-family:var(--mono);font-size:11px;color:var(--ink-4);letter-spacing:.06em}
+@media(max-width:1000px){.paper500, .exits{margin-left:0;margin-right:0}}
 </style>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#22304F">
