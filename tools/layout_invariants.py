@@ -11,6 +11,9 @@
      公式少减 1px 就换行，行高直接翻倍。
 
   C. 会换行的抬头里放变长文本（#ans 从「— — — —」变成真答案）→ +1 行高。
+
+  D. 进度条的宽度百分比相对 flex item 解析，而该 item 的宽度又依赖文本宽度
+     → 反馈回路。#fill 必须脱离文档流。
 """
 import pathlib, re, sys
 
@@ -48,9 +51,15 @@ m = re.search(r'\.tpaper>\.sheet-hd\{([^}]*)\}', idx)
 if m and "nowrap" not in m.group(1):
     bad.append(".tpaper>.sheet-hd 又会换行 —— #ans 变长就 +1 行")
 
+# ── D. 进度条必须脱离文档流 ──
+m = re.search(r'\.thinbar i\{([^}]*)\}', idx)
+if not m:
+    bad.append(".thinbar i 规则不见了")
+elif "position:absolute" not in m.group(1):
+    bad.append(".thinbar i 必须 position:absolute —— 否则宽度会参与祖先的尺寸计算")
 
 for b in bad:
     print("     " + b)
 if not bad:
-    print("  \033[32m✓\033[0m 未被破坏（.bay / .hand-row / .sheet-hd）")
+    print("  \033[32m✓\033[0m 未被破坏（.bay / .hand-row / .sheet-hd / .thinbar i）")
 sys.exit(1 if bad else 0)
