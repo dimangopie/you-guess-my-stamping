@@ -524,8 +524,8 @@ p.lead{color:var(--ink-2);font-size:16.5px;max-width:34em}
 /* —— 提示弱化：可删的说明就该看起来可删 ——
    .hint 与 .lbl 降到最浅一档灰，让它们退到背景里。
    真正的信息不应该靠这两个类承载。 */
-.hint{font-family:var(--mono);font-size:10.5px;color:var(--ink-4);letter-spacing:.04em}
-.lbl{font-family:var(--mono);font-size:11.5px;letter-spacing:.14em;color:var(--ink-4)}
+.hint{font-family:var(--mono);font-size:10.5px;color:var(--ink-2);letter-spacing:.04em}
+.lbl{font-family:var(--mono);font-size:11.5px;letter-spacing:.14em;color:var(--ink-2)}
 .lbl-lg{font-family:var(--mono);font-size:12.5px;letter-spacing:.3em;color:var(--ink-3)}
 /* 需要被读到的说明才用 .say（正常对比度）—— 用之前先问：能不能改成交互？ */
 .say{font-family:var(--mono);font-size:12px;color:var(--ink-2);letter-spacing:.02em}
