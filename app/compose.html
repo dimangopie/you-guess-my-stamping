@@ -18,8 +18,16 @@
    ④ 缩放 / 旋转 / 图层都由控制点决定，不用滑杆
    ============================================================ */
 
-.head{padding:46px 0 6px}
-.head h1{margin:12px 0 14px}
+/* 抬头压成一条 56px 横带。
+   原来 224px（padding 46 + 两行大标题），占屏幕 25%，而它只装三件信息
+   （台名 / 单号 / 一句操作提示）。画布页的抬头不该是一块版位，该是一条状态带。 */
+.head{flex:0 0 auto;height:56px;padding:0;background:var(--paper-2);
+  border-bottom:2px solid var(--ink);display:flex;align-items:center}
+.head .wrap{display:flex;align-items:center;gap:18px;height:100%;flex:1 1 auto;min-width:0}
+.head .lbl-lg{white-space:nowrap;flex:0 0 auto}
+.head h1{margin:0;font-size:13.5px;font-weight:400;color:var(--ink-2);letter-spacing:.02em;
+  border-left:1.5px solid var(--ink-4);padding-left:18px;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis}
 
 /* 子元素解除 min-width 下限：grid 的 1fr 是 minmax(auto,1fr)，
    那个 auto 等于内容的 min-content，窄屏下列会被顶住不缩。 */
@@ -63,15 +71,52 @@
 .wheel-note{margin-top:12px;display:flex;gap:10px;justify-content:center;align-items:center}
 
 /* ---------- 画板 ---------- */
-.canvas-box{min-width:0}
 
+/* ══ 画布页的工作台骨架 ══
+   用户要求：「涉及到画布的页面都尽量让它盛满整个页面，因为画布要放大才好操作」。
+   实测瓶颈是**宽度**不是高度：画布 520 宽，而工作台有 584 高 —— 高度还空着 250px。
+   所以要收窄两轨、放宽工作台，让画布由高度决定。
+
+   不写 calc(100dvh - Npx) 的魔数：数字一改就悄悄错位，flex 不会。 */
+html,body{height:100%}
+body{display:flex;flex-direction:column;overflow:hidden}
+body>.nav{flex:0 0 auto}
+main{flex:1 1 auto;min-height:0;display:flex;flex-direction:column}
+/* ⚠ .wrap 带 margin:0 auto —— 放进 flex 容器后 auto margin 会吸收自由空间、
+   使 align-self:stretch 失效，元素退化成 fit-content。
+   （当初 .bay 踩的同一个坑：宽度随内容变，画布列连锁塌陷。） */
+main>*{width:100%}
+
+.bench{flex:1 1 auto;min-height:0;align-items:start;
+  grid-template-columns:minmax(0,200px) minmax(0,1fr) minmax(0,224px);gap:16px;
+  max-width:min(1600px,100% - 48px)}   /* 比全站 wrap(1180) 宽 —— 画布页优先给画布 */
+.bench>*{min-height:0}
+.bench .canvas-box{align-self:stretch}   /* 只有画布那列撑满高度，两条轨道保持自然高度 */
+.bench .sheet.wheel-box,.bench .sheet.order{overflow:auto}
+
+/* 画布列**只有画布**。
+   「重发这手牌」已移到制作单 —— 它本来就是制作单上的动作。
+   此前它挂在画布下方，与画布争同一段高度，被压成 0 高、溢出到画布边框上
+   （K3 连续三轮点名的那个「渲染事故」：按钮偏左 82px、骑在下边框上）。
+   移进制作单之后：按钮是面板里的普通块，画布列只剩一个元素，尺寸计算不再有歧义。 */
+.canvas-box{min-height:0;min-width:0;overflow:hidden}
+.canvas-fit{height:100%;min-height:0;min-width:0;container-type:size;
+  display:grid;place-items:center;overflow:hidden}
+/* 画布取盒子里能放下的最大正方形。
+   为什么要 cqw/cqh：只给 max-height，浏览器不会拿它反推宽度
+   （1440x620 下会得到 544x368 的长方）；只给 height:100%+width:auto，
+   盒子偏高时又会被 max-width 截成非正方形。cqw/cqh 是唯一能直接表达「两轴取小」的单位。 */
 /* 「重发这手牌」必须相对**画布**居中。
    原来它左对齐在 .canvas-box 里：画布中心 515，按钮中心 458，偏左 57px，
    而且底边距页脚琥珀线只有 4px —— 读起来是渲染事故，不是设计。 */
-.canvas-box .btn-row{justify-content:center}
-.canvas-box{padding-bottom:24px}
+/* 按钮行在画布**下方**，与画布之间 14px（flex gap），不再压在边框上。 */
+/* ⚠ flex:0 0 auto 不能省。默认 flex-shrink:1，而 .canvas-fit 是 flex:1 1 auto，
+   两者争夺同一段高度时按钮行被压成 0 高 —— 它的内容于是溢出、
+   骑到画布的下边框上（K3 点过三次的那个「渲染事故」）。 */
 
-.canvas{position:relative;width:100%;max-width:520px;aspect-ratio:1/1;margin:0 auto;
+.canvas{position:relative;width:min(100cqw,100cqh);height:min(100cqw,100cqh);
+  aspect-ratio:1/1;margin:0;   /* 取盒子里能放下的最大正方形 */
+  
   overflow:hidden;background:var(--paper-4);border:2px solid var(--ink);border-radius:var(--rad);
   box-shadow:var(--sh-soft);touch-action:none;
   background-image:
@@ -140,6 +185,20 @@
 .od .d{flex:1;border-bottom:1px dotted var(--ink-4);transform:translateY(-4px)}
 .od b{color:var(--ink);white-space:nowrap}
 .od b.blue{color:var(--blue)}
+
+/* ⚠ 必须排在所有基础规则之后：媒体查询不提升优先级，同权重下靠后的赢。 */
+@media(max-width:900px){
+  html,body{height:auto}
+  body{display:block;overflow:auto}
+  main{display:block}
+  .head{height:auto;padding:12px 0}
+  .bench{display:grid;height:auto;min-height:0;flex:none;
+    grid-template-columns:minmax(0,1fr);gap:14px;max-width:none}
+  .canvas-box{display:block;overflow:visible}
+  .canvas-fit{container-type:normal;display:block;overflow:visible}
+  .canvas{width:100%;height:auto;max-width:560px;margin:0 auto}
+  .bench .canvas-box{order:-1}
+}
 </style>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#22304F">
@@ -171,7 +230,7 @@
 <section class="head">
   <div class="wrap">
     <span class="lbl-lg">拼 图 台 · 制 作 单 NO. 1管5-129</span>
-    <h1 class="tk">从转盘上拖一张牌，<br>放到画布上</h1>
+    <h1 class="tk">从转盘上拖一张牌，放到画布上</h1>
   </div>
 </section>
 
@@ -204,11 +263,13 @@
 
   <!-- ================= 画板 ================= -->
   <div class="canvas-box">
+    <!-- 尺寸容器：把「画布」与「按钮行」分开。
+         原来两者是 .canvas-box 的同级子元素，配 place-items:center 会**重叠** ——
+         按钮骑在画布下边框上（K3 点过三次）。 -->
+    <div class="canvas-fit">
     <div class="canvas" id="canvas">
       <div class="ph" id="ph">把牌拖到这里<br><span style="font-size:11px">点一下已放好的牌可以调它</span></div>
     </div>
-    <div class="btn-row" style="justify-content:center;margin-top:14px">
-      <button class="btn sm ghost" id="resetBtn">重 发 这 手 牌</button>
     </div>
   </div>
 
@@ -227,6 +288,7 @@
       <div class="od"><span class="k">限 时</span><span class="d"></span><b>60 秒</b></div>
       <div class="od"><span class="k">编 号</span><span class="d"></span><b>1管5-129</b></div>
       <div class="btn-row" style="margin-top:16px">
+      <button class="btn sm ghost" id="resetBtn">重 发 这 手 牌</button>
         <button class="btn" id="fileBtn" disabled>封 存 交 题</button>
       </div>
       <div class="hint" style="margin-top:10px" id="fileHint">先放一张牌，再填答案</div>
