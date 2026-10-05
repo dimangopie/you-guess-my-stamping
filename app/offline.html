@@ -47,9 +47,9 @@
 /* 状态条：一眼看出通还是断（颜色 + 短词 + 计时） */
 .state{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:13px 16px;
   border:2px solid var(--red);background:rgba(211,58,44,.07);border-radius:var(--rad)}
-.state .dot{width:11px;height:11px;background:var(--red);border-color:var(--red);
+.state .dot{width:11px;height:11px;background:var(--red);border-color:var(--red-ink);
   box-shadow:0 0 0 4px rgba(211,58,44,.16)}
-.state .tx{font-family:var(--mono);font-weight:700;font-size:16px;letter-spacing:.1em;color:var(--red)}
+.state .tx{font-family:var(--mono);font-weight:700;font-size:16px;letter-spacing:.1em;color:var(--red-ink)}
 .state .tm{margin-left:auto;font-family:var(--mono);font-size:12px;color:var(--ink-2);
   font-variant-numeric:tabular-nums;white-space:nowrap}
 .paperoff.ok .state{border-color:var(--blue);background:rgba(31,78,156,.07)}
@@ -60,7 +60,7 @@
 .stampline{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin:20px 0 14px}
 .stampline .stamp{margin-left:auto}
 .stampline h1{font-size:clamp(23px,4.2vw,34px);font-weight:900;letter-spacing:.08em;line-height:1.35}
-.stampline h1 em{font-style:normal;color:var(--red)}
+.stampline h1 em{font-style:normal;color:var(--red-ink)}
 .paperoff.ok .stampline h1 em{color:var(--blue)}
 
 /* 字段表：全是内容（编号 / 时间 / 原始值） */
@@ -70,7 +70,7 @@
 .fs .r:last-child{border-bottom:2px solid var(--ink)}
 .fs .k{color:var(--ink-3);letter-spacing:.14em}
 .fs .v{word-break:break-all;font-variant-numeric:tabular-nums;display:flex;align-items:center;gap:8px}
-.fs .v.bad{color:var(--red);font-weight:700}
+.fs .v.bad{color:var(--red-ink);font-weight:700}
 .fs .v.ok{color:var(--blue);font-weight:700}
 @media(max-width:520px){.fs .r{grid-template-columns:100px minmax(0,1fr);font-size:11.5px}}
 
@@ -84,8 +84,8 @@
 .dlog div{padding-left:1.2em;position:relative}
 .dlog div::before{content:"·";position:absolute;left:.25em;color:var(--ink-3)}
 .dlog .t{color:var(--ink-3)}
-.dlog .w{color:var(--amber)}
-.dlog .d{color:var(--red)}
+.dlog .w{color:var(--amber-ink)}
+.dlog .d{color:var(--red-ink)}
 .dlog .ok{color:var(--blue)}
 
 /* 出口 */

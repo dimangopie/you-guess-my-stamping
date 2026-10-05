@@ -21,7 +21,7 @@
 .eyebrow{display:inline-flex;align-items:center;gap:10px;font-family:var(--mono);
   font-size:12px;letter-spacing:.2em;color:var(--ink-2);border:1.5px dashed var(--ink-3);
   padding:6px 14px;border-radius:2px;margin-bottom:24px;background:rgba(255,255,255,.5)}
-.eyebrow b{color:var(--red)}
+.eyebrow b{color:var(--red-ink)}
 .hero h1{margin-bottom:18px}
 .hero .lead{margin-bottom:26px}
 .hero .lead b{color:var(--ink);border-bottom:2px solid var(--amber);font-weight:700}
@@ -47,8 +47,8 @@
 .find input::placeholder{color:var(--ink-4);font-size:13px;letter-spacing:.1em}
 .find input::-webkit-search-cancel-button,.find input::-webkit-search-decoration{-webkit-appearance:none}
 /* 检索次数用完：单子上盖一枚朱红细边（原来是荧光） */
-.find.spent{border-bottom-color:var(--red)}
-.find.spent input::placeholder{color:var(--red)}
+.find.spent{border-bottom-color:var(--red-ink)}
+.find.spent input::placeholder{color:var(--red-ink)}
 
 .chips{display:flex;gap:7px;flex-wrap:wrap}
 .chip{font-family:var(--mono);font-size:11.5px;letter-spacing:.1em;padding:4px 11px;border-radius:2px;
@@ -135,7 +135,7 @@
 .bookseal{margin-left:auto;font-size:11.5px;padding:7px 14px;letter-spacing:.2em}
 /* 防伪核对：样张 = 目标，右上角一个问号，不用文字解释 */
 .sample .eq{font-size:15px;color:var(--ink-3);margin:0 2px}
-.sample .qm{font-family:var(--mono);font-weight:700;font-size:22px;color:var(--red)}
+.sample .qm{font-family:var(--mono);font-weight:700;font-size:22px;color:var(--red-ink)}
 .find .ibtn{width:26px;height:26px;font-size:13px}
 
 /* ---- 我的词库：索引卡 ---- */
@@ -208,7 +208,7 @@
 .rank .row.locked .rt{color:var(--ink-3);font-weight:400;font-size:15px}
 .rank .row.locked .pl{color:var(--ink-3)}
 .rank .row:focus-visible{outline:2px solid var(--blue);outline-offset:-2px}
-.redl{color:var(--red);font-weight:700}
+.redl{color:var(--red-ink);font-weight:700}
 .rank .row.justunlocked{animation:unlockflash 1.3s ease-out}
 @keyframes unlockflash{0%{background:rgba(31,78,156,.26)}100%{background:transparent}}
 
@@ -250,7 +250,7 @@
 .lcard .row .df{font-size:12px}
 .lcard .row .df .stars{letter-spacing:.06em}
 .lcard .row .hit{font-size:13.5px;font-weight:700;font-variant-numeric:tabular-nums}
-.lcard .row .hit.sweet{color:var(--red)}
+.lcard .row .hit.sweet{color:var(--red-ink)}
 .lcard .row .hit.off{color:var(--ink-4);font-weight:400}
 @media(max-width:520px){
   .lcard .row{grid-template-columns:34px minmax(0,1fr) 74px;
@@ -261,7 +261,7 @@
   .lcard .row .hit{grid-area:hit}
 }
 
-.tag-out.warn{color:var(--amber);border-color:var(--amber)}
+.tag-out.warn{color:var(--amber-ink);border-color:var(--amber-ink)}
 .cat[hidden],.mcard[hidden],.newcard[hidden],.rank .row[hidden]{display:none}
 
 /* ---------- 柜台递出来的提示条：交互反馈（介绍信 / 防伪 / 检索） ---------- */
@@ -274,7 +274,7 @@
 .slip .tx b{color:var(--ink)}
 .slip .x3{flex:none;background:none;border:none;color:var(--ink-3);font-family:var(--mono);
   font-size:14px;line-height:1;cursor:pointer;padding:2px}
-.slip .x3:hover{color:var(--red)}
+.slip .x3:hover{color:var(--red-ink)}
 
 @media(max-width:720px){
   .mc-hd .stamp{margin-left:0}

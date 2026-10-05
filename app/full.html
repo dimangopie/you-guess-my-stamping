@@ -66,8 +66,8 @@
 .berth .r .v{margin-left:auto;font-weight:700;letter-spacing:.04em;
   font-variant-numeric:tabular-nums;text-align:right}
 .berth .r .v.blue{color:var(--blue)}
-.berth .r .v.red{color:var(--red)}
-.berth .r .v.amber{color:var(--amber)}
+.berth .r .v.red{color:var(--red-ink)}
+.berth .r .v.amber{color:var(--amber-ink)}
 .seats{display:flex;gap:4px;flex-wrap:wrap;margin:4px 0 2px}
 .seats i{width:15px;height:15px;border:1.5px solid var(--ink);border-radius:2px;
   background:var(--red);display:block}
@@ -79,7 +79,7 @@
 .wait .acts{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
 .wait .slot{margin:0}
 .wait .slot .qno{font-family:var(--mono);font-weight:700;font-size:30px;letter-spacing:.04em;
-  line-height:1;color:var(--red)}
+  line-height:1;color:var(--red-ink)}
 .wait .slot .qno.idle{color:var(--ink-4)}
 .wait .slot .cap{font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;color:var(--ink-3);
   text-align:center;margin-top:6px}
@@ -89,7 +89,7 @@
 .result .line1{font-family:var(--mono);font-size:12.5px;color:var(--ink-2);line-height:2}
 .result .line1 b{color:var(--ink)}
 .result .no-big{font-family:var(--mono);font-weight:900;font-size:clamp(24px,3.4vw,34px);
-  letter-spacing:.06em;color:var(--red);line-height:1.15;font-variant-numeric:tabular-nums}
+  letter-spacing:.06em;color:var(--red-ink);line-height:1.15;font-variant-numeric:tabular-nums}
 .result .pos{margin-top:10px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .result .pos .k{font-family:var(--mono);font-size:11px;letter-spacing:.16em;color:var(--ink-3)}
 .result .pos .n{font-family:var(--mono);font-weight:700;font-size:26px;color:var(--ink);
@@ -104,7 +104,7 @@
 .tt .board{margin-top:0;border-top:none;border-radius:0 0 var(--rad) var(--rad)}
 .tt .row{grid-template-columns:96px minmax(0,1fr) 92px 92px}
 .tt .row .c3{white-space:normal}
-.tt .row.now .c2{color:var(--amber)}
+.tt .row.now .c2{color:var(--amber-ink)}
 .tt .row.now{background:rgba(201,138,14,.10)}
 @media(max-width:640px){.tt .row{grid-template-columns:70px minmax(0,1fr) 62px}
   .tt .row .c4{display:none}}

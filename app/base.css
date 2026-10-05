@@ -27,6 +27,14 @@
 
 /* ---------- 1. 令牌 ---------- */
 :root{
+  /* 彩色阶在**纸上**的深色变体。
+     --amber 原色在 paper-2 上只有 2.27:1、paper-4 上 2.80:1 ——
+     连大字号 3:1 都不过，而它恰好被用在「47% 被猜中率」「92% 抢修进度」
+     这种最该被读到的数字上。深底（--screen）上用原色是对的（4.46:1），
+     所以不改本体，只加纸上专用的深色。 */
+  --amber-ink:#8A5D00;   /* 纸上 ≥4.5:1 */
+  --red-ink:#A82A1F;     /* 纸上 ≥4.5:1 */
+
   /* 纸 */
   --paper:#F2EFE4;      /* 页面底：票据米白 */
   --paper-2:#E7E2D2;    /* 次级面：存根、表头 */
@@ -368,13 +376,15 @@ p.lead{color:var(--ink-2);font-size:16.5px;max-width:34em}
              linear-gradient(180deg,transparent 49.6%,rgba(23,23,27,.06) 50%,transparent 50.4%)}
 
 /* —— 过塑：一层反光膜 —— */
-.laminated{box-shadow:inset 0 0 0 2px rgba(255,255,255,.55),inset 0 -1px 0 var(--ink-4)}
+/* 过塑：1px --ink-4 硬内线。
+   试过 2px 白内线 —— 压在 paper-4 上是 1.03:1，等于没画（评委实测）。
+   与其做一层看不见的效果，不如承认「纸上过塑本来就该几乎看不见」，
+   但留下一条**可测量**的边。 */
+.laminated{box-shadow:inset 0 0 0 1px var(--ink-4)}
 /* 过塑：2px 硬白内线读作塑封边缘。原来是一条 173px 宽的软渐变 +
    mix-blend-mode:screen —— 那是发布会 Keynote 的高光，违反本系统自己
    写下的签名「硬投影（无模糊）」，而且它把五格数据条第 3 格底色抬亮一档。 */
-.laminated::after{content:"";position:absolute;inset:0;pointer-events:none;border-radius:5px;
-  background:linear-gradient(112deg,transparent 38%,rgba(255,255,255,.55) 48%,transparent 58%);
-  mix-blend-mode:screen}
+
 
 /* —— 划横线：注销，不做橡皮擦 —— */
 .struck{text-decoration:line-through;text-decoration-color:var(--red);

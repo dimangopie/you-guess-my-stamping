@@ -43,6 +43,7 @@
 
 /* 标题 + 主章：一句标题说清发生了什么，章只说状态 */
 .pf-act{display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin:20px 0 4px}
+.pf-act .url{overflow-wrap:anywhere;word-break:break-all}
 .pf-act h1{font-size:clamp(20px,3.6vw,30px);font-weight:900;letter-spacing:.1em;line-height:1.5}
 .pf-act .stamp{margin-left:auto}
 
@@ -53,7 +54,7 @@
 .station .py{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.26em;
   color:var(--ink-3);margin-top:9px;font-weight:400}
 .station .say{margin-top:11px;text-wrap:pretty}
-.station .say::before{content:"▍";color:var(--red);margin-right:7px}
+.station .say::before{content:"▍";color:var(--red-ink);margin-right:7px}
 
 /* 存档栏：单据流水，全留 */
 .rec{margin-top:20px;border-top:1.5px dashed var(--ink-3);padding-top:13px;
@@ -151,7 +152,16 @@
 const $ = id => document.getElementById(id);
 const params = new URLSearchParams(location.search);
 /* 支持 ?p=/admin 这类手工演示；没有就取真实路径 */
-const raw = (params.get("p") || (location.pathname + location.search) || "/").trim() || "/";
+/* ⚠ file:// 下 location.pathname 是**本机绝对路径**
+   （实测印出过 /home/<用户名>/…/app/404.html —— 泄露构建机目录结构，
+   而且 26px 等宽斜体让它成了整页视觉焦点）。
+   本地打开时根本没有「路径」这个概念，只取文件名；
+   线上才用真正的 pathname。 */
+const isLocal = location.protocol === "file:";
+const guessed = isLocal
+  ? "/" + (location.pathname.split("/").pop() || "404.html")
+  : (location.pathname + location.search);
+const raw = (params.get("p") || guessed || "/").trim() || "/";
 const n = [...raw].length;
 
 $("badUrl").textContent = raw;

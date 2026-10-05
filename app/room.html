@@ -33,7 +33,7 @@
 .cast{display:inline-flex;align-items:center;gap:10px;background:var(--screen);
   color:var(--paper);font-family:var(--mono);font-size:11.5px;letter-spacing:.1em;
   padding:5px 12px;border-radius:2px;border-bottom:3px solid var(--amber);transition:.2s}
-.cast b{color:var(--amber)}
+.cast b{color:var(--amber-ink)}
 .cast.quiet{background:var(--paper-3);color:var(--ink-3);border-bottom-color:var(--ink-4)}
 .cast.quiet b{color:var(--ink-2)}
 
@@ -46,7 +46,7 @@
 .setchip i{font-style:normal;opacity:.55}
 .setchip:hover{border-color:var(--ink);transform:translate(-1px,-1px);box-shadow:var(--sh-1)}
 .setchip:focus-visible{outline:2.5px solid var(--blue);outline-offset:2px}
-.setchip.flash{background:var(--paper-2);border-color:var(--amber)}
+.setchip.flash{background:var(--paper-2);border-color:var(--amber-ink)}
 
 /* ---- 三栏主体 ---- */
 .grid3{display:grid;grid-template-columns:294px minmax(0,1fr) 326px;gap:18px;align-items:start}
@@ -123,8 +123,8 @@
 .cd-box{background:var(--screen);border-radius:2px;padding:8px 18px;text-align:right}
 .cd-box .k{font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:#A8B2C6}
 /* 字号交给 .flap 控制 */.cd-v{font-size:inherit;font-family:var(--mono);font-weight:700;font-size:clamp(32px,4.4vw,50px);line-height:.95;
-  color:var(--amber);font-variant-numeric:tabular-nums;transition:color .25s}
-.cd-v.urgent{color:var(--red)}
+  color:var(--amber-ink);font-variant-numeric:tabular-nums;transition:color .25s}
+.cd-v.urgent{color:var(--red-ink)}
 .cd-u{font-family:var(--mono);font-size:11.5px;color:var(--ink-3);margin-left:7px;letter-spacing:.1em}
 .tick{height:10px;border:1.5px solid var(--ink);background:var(--paper-3);border-radius:2px;
   margin-top:10px;overflow:hidden}
@@ -166,7 +166,7 @@
 .g.hit .g-main{color:var(--blue);font-weight:700}
 .g.hit .g-mark{color:var(--blue)}
 .g.star{background:rgba(211,58,44,.055);border-left:3px solid var(--red)}
-.g.star .g-mark{color:var(--red)}
+.g.star .g-mark{color:var(--red-ink)}
 .g.sys{grid-template-columns:1fr;padding:7px 14px;background:var(--paper-2);text-align:center;
   font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;color:var(--ink-3)}
 .g.in{animation:gin .42s cubic-bezier(.2,1,.3,1)}
@@ -222,7 +222,7 @@ footer.site a[aria-current]{color:var(--amber)}
 .ctx button{display:flex;width:100%;align-items:center;gap:11px;background:none;border:none;
   color:inherit;text-align:left;cursor:pointer;padding:10px 13px;font-family:var(--mono);
   font-size:13px;letter-spacing:.06em;border-bottom:1px solid rgba(242,239,228,.14)}
-.ctx button:hover{background:rgba(201,138,14,.16);color:var(--amber)}
+.ctx button:hover{background:rgba(201,138,14,.16);color:var(--amber-ink)}
 .ctx button .ci{width:17px;text-align:center;opacity:.7}
 .ctx button .cl{display:flex;flex-direction:column;line-height:1.5}
 .ctx button .cl i{font-style:normal;font-size:10.5px;color:#8A96AF;letter-spacing:.04em}
@@ -634,7 +634,7 @@ function callNext(){
   reanim(queueNo,"called");
   const act=WINDOWS[door%WINDOWS.length].w;
   renderSigns(act);
-  queueHint.innerHTML=`<b style="color:var(--amber)">${no}</b> · ${who} · ${act}`;
+  queueHint.innerHTML=`<b style="color:var(--amber-ink)">${no}</b> · ${who} · ${act}`;
   sysLine(`叫号 ${no} · ${who} · ${act}`);
 }
 

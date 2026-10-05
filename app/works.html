@@ -18,7 +18,7 @@
 .whead{padding:26px 0 0}
 .crumb{font-family:var(--mono);font-size:11.5px;letter-spacing:.12em;color:var(--ink-3);
   text-decoration:none;display:inline-block;margin-bottom:20px}
-.crumb:hover{color:var(--red)}
+.crumb:hover{color:var(--red-ink)}
 .mla{margin-left:auto}
 
 /* ---------- 驳回通知单：一张纸 + 一枚盖歪的红章 ---------- */
@@ -26,7 +26,7 @@
 .notice .sheet-hd .stamp{margin-left:auto}
 .ntc-t{font-size:14.5px;color:var(--ink-2);line-height:1.9}
 .ntc-t b{color:var(--ink)}
-.ntc-t b.bad{color:var(--red)}
+.ntc-t b.bad{color:var(--red-ink)}
 .notice .btn-row{margin-top:14px}
 
 /* ---------- 调阅台：筛选 / 排序 / 复印申请 ---------- */
@@ -63,9 +63,9 @@
   position:relative;overflow:hidden}
 .copybar .bar i{position:absolute;left:0;top:0;bottom:0;width:0;transition:width .2s;
   background:repeating-linear-gradient(90deg,var(--ink) 0 3px,var(--paper-2) 3px 5px)}
-.copybar b{color:var(--red);font-variant-numeric:tabular-nums}
+.copybar b{color:var(--red-ink);font-variant-numeric:tabular-nums}
 .copy-ok{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;font-size:14.5px}
-.copy-ok .num{font-family:var(--mono);font-weight:700;letter-spacing:.08em;color:var(--red)}
+.copy-ok .num{font-family:var(--mono);font-weight:700;letter-spacing:.08em;color:var(--red-ink)}
 .urge{margin-top:10px;font-family:var(--mono);font-size:11.5px;color:var(--ink-3);
   border-top:1.5px dashed var(--ink-4);padding-top:8px}
 .urge b{color:var(--ink)}
@@ -118,7 +118,7 @@
 /* 最佳歪解：整页最该被看到的东西 */
 .best{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;padding:8px 12px;
   border-left:3px solid var(--red);background:rgba(211,58,44,.055)}
-.best .bq{font-family:var(--mono);font-weight:700;font-size:15.5px;color:var(--red);
+.best .bq{font-family:var(--mono);font-weight:700;font-size:15.5px;color:var(--red-ink);
   letter-spacing:.04em;line-height:1.5}
 .best .who{font-family:var(--mono);font-size:11px;color:var(--ink-3);margin-left:auto}
 
@@ -128,8 +128,8 @@
   background:var(--paper-4);border:1.5px solid var(--ink-4);border-radius:2px;padding:5px 11px;
   cursor:pointer;transition:.14s}
 .act:hover{border-color:var(--ink);color:var(--ink);background:var(--paper-2)}
-.act.del{color:var(--red);border-color:rgba(211,58,44,.45)}
-.act.del:hover{border-color:var(--red);background:rgba(211,58,44,.07)}
+.act.del{color:var(--red-ink);border-color:rgba(211,58,44,.45)}
+.act.del:hover{border-color:var(--red-ink);background:rgba(211,58,44,.07)}
 
 /* ---------- 折叠时间线 ---------- */
 .tlwrap{margin-top:2px;padding-top:11px;border-top:1.5px dashed var(--ink-3)}
@@ -152,14 +152,14 @@
 .tl-c .g{font-family:var(--mono);color:var(--ink);letter-spacing:.04em}
 .tl-mark{font-family:var(--mono);font-size:11px;letter-spacing:.08em;white-space:nowrap}
 .tl-mark.hit{color:var(--blue);font-weight:700}
-.tl-mark.best{color:var(--red);font-weight:700}
+.tl-mark.best{color:var(--red-ink);font-weight:700}
 .tl-row.is-hit .tl-c .g{color:var(--blue)}
-.tl-row.is-best .tl-c .g{color:var(--red)}
+.tl-row.is-best .tl-c .g{color:var(--red-ink)}
 .tl-sum{display:flex;gap:16px;flex-wrap:wrap;margin-top:12px;padding-top:10px;
   border-top:1.5px dashed var(--ink-4);font-family:var(--mono);font-size:10.5px;
   letter-spacing:.08em;color:var(--ink-3)}
 .tl-sum b{color:var(--blue);font-weight:700}
-.tl-sum i{font-style:normal;color:var(--red);font-weight:700}
+.tl-sum i{font-style:normal;color:var(--red-ink);font-weight:700}
 
 /* ---------- 卷宗调阅（真分页，换成档案的说法） ---------- */
 .pager{margin-top:26px}
@@ -183,7 +183,7 @@
 .meta b{color:var(--ink)}
 .fk{font-family:var(--mono);font-size:11.5px;letter-spacing:.14em;color:var(--ink-2)}
 .doc-t{font-family:var(--mono);font-size:11.5px;letter-spacing:.2em;color:var(--ink-2)}
-.kvs b.sweet{color:var(--red)}
+.kvs b.sweet{color:var(--red-ink)}
 
 /* ---------- 册尾 ---------- */
 .listsec{padding-top:32px}
@@ -202,7 +202,7 @@
 .slip .tx b{color:var(--ink)}
 .slip .x3{flex:none;background:none;border:none;color:var(--ink-3);font-family:var(--mono);
   font-size:14px;line-height:1;cursor:pointer;padding:2px}
-.slip .x3:hover{color:var(--red)}
+.slip .x3:hover{color:var(--red-ink)}
 
 @media(max-width:720px){
   .whead{padding:20px 0 0}

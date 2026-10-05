@@ -36,7 +36,7 @@
 /* 页头右侧：三个数字，不加「件」不加形容 */
 .head-side{text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:8px}
 .head-side .n{color:var(--ink);font-family:var(--mono);font-size:15px;font-weight:700}
-.head-side .n.red{color:var(--red)}
+.head-side .n.red{color:var(--red-ink)}
 @media(max-width:860px){.head-side{text-align:left;align-items:flex-start}}
 
 /* 每日一题：公告本身是纸，只有倒计时那一小块是屏 */
@@ -49,7 +49,7 @@
 .today .cd b{font-variant-numeric:tabular-nums;margin-left:9px}
 .today .cd{background:var(--screen);color:#A8B2C6;border-radius:2px;padding:9px 18px;text-align:center;
   font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;white-space:nowrap}
-.today .cd b{display:block;font-size:26px;color:var(--amber);letter-spacing:.06em;
+.today .cd b{display:block;font-size:26px;color:var(--amber-ink);letter-spacing:.06em;
   font-variant-numeric:tabular-nums;margin-top:3px}
 @media(max-width:700px){.today{grid-template-columns:1fr}.today .cd{text-align:center}}
 
@@ -91,7 +91,7 @@
 /* 最佳歪解条 */
 .wrong{margin-top:11px;display:flex;align-items:center;gap:9px;flex-wrap:wrap;
   background:rgba(211,58,44,.06);border-left:3px solid var(--red);padding:8px 12px;border-radius:2px}
-.wrong .q{font-family:var(--mono);font-size:14px;font-weight:700;color:var(--red);letter-spacing:.03em}
+.wrong .q{font-family:var(--mono);font-size:14px;font-weight:700;color:var(--red-ink);letter-spacing:.03em}
 .wrong .v{font-family:var(--mono);font-size:11px;color:var(--ink-3);margin-left:auto;white-space:nowrap}
 
 /* 复印件（追加的卷宗）：更淡、纸色降一级 */
@@ -113,9 +113,9 @@
 .rk .row{grid-template-columns:38px 1fr auto}
 .rk .c1{text-align:center;padding-left:8px;padding-right:8px}
 .rk .c3{text-align:right;white-space:nowrap}
-.rk .c3 b{color:var(--amber)}
+.rk .c3 b{color:var(--amber-ink)}
 .rk .sub{font-family:var(--mono);font-size:10.5px;color:#6F6C61;display:block;margin-top:2px}
-.rk .row.top1 .c1{color:var(--red)}
+.rk .row.top1 .c1{color:var(--red-ink)}
 .rk .row.top1 .c2{color:#fff}
 
 /* ---------- 调阅更多卷宗 ---------- */
@@ -133,7 +133,7 @@
   box-shadow:var(--sh-soft);padding:15px 44px 15px 16px;display:flex;gap:14px;align-items:center;
   flex-wrap:wrap}
 .insert .txt{flex:1;min-width:190px;font-size:13.5px;line-height:1.7}
-.insert .txt b{color:var(--red)}
+.insert .txt b{color:var(--red-ink)}
 .insert .ad-x{position:absolute;top:8px;right:10px;background:none;border:none;color:var(--ink-3);
   font-size:15px;line-height:1;cursor:pointer;padding:2px 4px}
 .insert .ad-x:hover{color:var(--ink)}
@@ -179,7 +179,7 @@
     <nav>
       <a href="plaza.html" aria-current="page">广场</a>
       <a href="banks.html">词库</a>
-      <a href="works.html">我的作品<span style="color:var(--amber);font-size:11px"> 3</span></a>
+      <a href="works.html">我的作品<span style="color:var(--amber-ink);font-size:11px"> 3</span></a>
       <a href="me.html">我的主页</a>
       <a href="login.html">退出</a>
     </nav>

@@ -78,13 +78,13 @@
 .take-no .q{display:flex;justify-content:center;gap:5px;margin-top:12px;flex-wrap:wrap}
 .take-no .q i{font-style:normal;font-family:var(--mono);font-size:11.5px;padding:4px 9px;
   border:1px solid var(--ink-4);border-radius:2px;color:var(--ink-3)}
-.take-no .q i.now{background:var(--red);color:#fff;border-color:var(--red)}
+.take-no .q i.now{background:var(--red);color:#fff;border-color:var(--red-ink)}
 
 .price{font-family:var(--mono);font-size:12.5px}
 .price .r{display:flex;align-items:baseline;gap:8px;padding:7px 0;border-bottom:1px dotted var(--ink-4)}
 .price .r:last-child{border-bottom:none}
 .price .r .d{flex:1;border-bottom:1px dotted var(--ink-4);transform:translateY(-4px)}
-.price .r b{color:var(--red);font-weight:700;white-space:nowrap}
+.price .r b{color:var(--red-ink);font-weight:700;white-space:nowrap}
 .price .r .free{color:var(--blue)}
 
 .notice-list{font-family:var(--mono);font-size:12px;color:var(--ink-2);line-height:2.1}
@@ -102,7 +102,7 @@
   display:grid;place-items:center;font-family:var(--emoji);font-size:32px;background:var(--paper-2)}
 .issued .cert .nm{font-size:24px;font-weight:900;letter-spacing:.12em}
 .issued .cert .no{font-family:var(--mono);font-weight:700;font-size:26px;letter-spacing:.06em;
-  color:var(--red)}
+  color:var(--red-ink)}
 .issued .cert .stamp{position:absolute;right:22px;bottom:20px}
 </style>
 <link rel="manifest" href="manifest.webmanifest">
@@ -317,7 +317,7 @@ $("grid").addEventListener("click",e=>{
   // 机构走流程：核对不通过也放行，只是留一句记录
   $("capNote").innerHTML = verified
     ? '<span style="color:var(--blue)">✓ 核对通过 · 记入档案</span>'
-    : '<span style="color:var(--red)">与样张不符 · 已记录在案</span>';
+    : '<span style="color:var(--red-ink)">与样张不符 · 已记录在案</span>';
   checkReady();
 });
 

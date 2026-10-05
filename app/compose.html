@@ -60,6 +60,13 @@
 
 /* ---------- 画板 ---------- */
 .canvas-box{min-width:0}
+
+/* 「重发这手牌」必须相对**画布**居中。
+   原来它左对齐在 .canvas-box 里：画布中心 515，按钮中心 458，偏左 57px，
+   而且底边距页脚琥珀线只有 4px —— 读起来是渲染事故，不是设计。 */
+.canvas-box .btn-row{justify-content:center}
+.canvas-box{padding-bottom:24px}
+
 .canvas{position:relative;width:100%;max-width:520px;aspect-ratio:1/1;margin:0 auto;
   overflow:hidden;background:var(--paper-4);border:2px solid var(--ink);border-radius:var(--rad);
   box-shadow:var(--sh-soft);touch-action:none;
