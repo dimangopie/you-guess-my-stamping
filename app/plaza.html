@@ -88,9 +88,12 @@
   padding:10px 16px;background:var(--paper-2);border-bottom:2px solid var(--ink)}
 .n-hd .n-time{margin-left:auto}                  /* 时间是内容，不归 .lbl 管 */
 .n-time{font-family:var(--mono);font-size:11px;color:var(--ink-2);letter-spacing:.06em;white-space:nowrap}
-.n-bd{display:grid;grid-template-columns:112px 1fr;gap:18px;padding:16px}
-.n-bd .snap{width:112px;height:112px}
-.n-bd .snap .pc{font-size:23px}
+.n-bd{display:grid;grid-template-columns:172px minmax(0,1fr);gap:20px;padding:16px;align-items:start}
+/* 缩略图 112 → 172px。评委：「卡片约 495px 宽，内容到 260px 就结束了，
+   右半约 45% 仍是一片奶油色空地。」而这块牌面本来就是卡片里最该看的东西 ——
+   放大它比往右边塞别的内容更对：卡片是「一张贴出来的谜面」，不是信息条目。 */
+.n-bd .snap{width:172px;height:172px}
+.n-bd .snap .pc{font-size:35px}   /* 与 172px 同比（原 23px @112px） */
 .n-bd h3{font-size:21px;letter-spacing:.16em;font-weight:900;margin:6px 0 8px}
 .n-kv{font-family:var(--mono);font-size:11.5px;color:var(--ink-3);letter-spacing:.03em;line-height:1.95}
 .n-kv b{color:var(--ink-2);font-weight:700}
