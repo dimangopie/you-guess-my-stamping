@@ -323,8 +323,8 @@ footer.site .wrap{align-items:center}
         <div class="sheet-bd">
           <h3 class="tk-sm">自建题库</h3>
           <div class="btn-row" style="margin-top:16px">
-            <a class="btn sm" href="#">新建</a>
-            <a class="ibtn" href="#" title="导入文本" aria-label="导入文本">📥</a>
+            <a class="btn sm" href="banks.html">新建</a>
+            <a class="ibtn" href="banks.html" title="导入文本" aria-label="导入文本">📥</a>
           </div>
         </div>
       </div>
@@ -431,7 +431,7 @@ const LAYOUT=[
 
 /* ---------- 模式卡 ---------- */
 $("modeGrid").innerHTML=MODES.map((m,i)=>`
-  <a class="mode" href="#">
+  <a class="mode" href="compose.html">
     <div class="no">MODE ${String(i+1).padStart(2,"0")}</div>
     <h3>${m.n}</h3>
     <p>${m.d}</p>

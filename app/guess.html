@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>猜题单 · 阿野 出的题 — 你拼我猜</title>
+<link rel="stylesheet" href="base.css">
+<style>
+/* ============================================================
+   猜题单
+   别人把一条链接丢进群里，落点就是这一页。
+   上半：谜面（emoji 保留原来的大小与角度 —— 那是笔迹）
+   下半：交卷 → 盖章 → 揭晓 + 歪解榜
+   物理动作：交卷打孔 · 揭晓盖章 · 歪解投票
+   ============================================================ */
+
+.head{padding:44px 0 4px}
+.head h1{margin:12px 0 12px}
+.head .from{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+
+.solve{display:grid;grid-template-columns:1fr 380px;gap:26px;align-items:start;padding-top:24px}
+@media(max-width:1000px){.solve{grid-template-columns:1fr;gap:30px}}
+
+/* ---------- 谜面 ---------- */
+.puzzle .snap{max-width:520px;margin:0 auto;aspect-ratio:1}
+.puzzle .snap .pc{font-size:84px}
+@media(max-width:560px){.puzzle .snap .pc{font-size:58px}}
+
+.meta{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:16px;
+  padding-top:14px;border-top:1.5px dashed var(--ink-3)}
+.meta .sep{color:var(--ink-4)}
+
+/* ---------- 交卷 ---------- */
+.guessbox{margin-top:20px}
+.guessbox .row{display:flex;gap:12px;align-items:flex-end}
+.guessbox input{flex:1;min-width:0;border:none;border-bottom:2.5px solid var(--ink);
+  background:transparent;font-family:var(--mono);font-size:22px;padding:8px 2px;color:var(--ink);
+  outline:none;letter-spacing:.14em;border-radius:0}
+.guessbox input::placeholder{color:var(--ink-4);letter-spacing:.06em;font-size:17px}
+.guessbox input:focus{border-bottom-color:var(--blue)}
+.guessbox input[disabled]{opacity:.5;border-bottom-style:dashed}
+.guessbox .under{display:flex;gap:12px;align-items:center;margin-top:10px;flex-wrap:wrap}
+
+/* 交卷用的「卷」：一张待打孔的小票 */
+.slip{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:11px;
+  color:var(--ink-3);letter-spacing:.06em}
+
+/* ---------- 揭晓 ---------- */
+.verdict{margin-top:22px;padding:20px;border:2px solid var(--ink);border-radius:var(--rad);
+  background:var(--paper-4);box-shadow:var(--sh-soft);position:relative;overflow:hidden}
+.verdict .line{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.verdict .big{font-family:var(--mono);font-weight:700;font-size:clamp(20px,3.4vw,30px);
+  letter-spacing:.14em}
+.verdict .ans{margin-top:14px;padding-top:14px;border-top:1.5px dashed var(--ink-3)}
+.verdict .ans .k{font-family:var(--mono);font-size:11px;letter-spacing:.2em;color:var(--ink-3)}
+.verdict .ans .v{font-size:clamp(24px,4.4vw,38px);font-weight:900;letter-spacing:.2em;margin-top:6px}
+.verdict .seal{position:absolute;right:18px;bottom:16px}
+
+/* ---------- 歪解榜（屏 = 深色） ---------- */
+.wrong .board .c2{letter-spacing:.14em}
+.wrong .board .row.you{background:rgba(211,58,44,.16)}
+.wrong .board .row.you .c2{color:#FFD9D2}
+.wrong .board .top .c2{color:var(--amber)}
+.wrong .locked{padding:26px 20px;text-align:center;background:var(--ink);color:#8E8A7E;
+  font-family:var(--mono);font-size:12px;line-height:2;border:2px solid var(--ink);
+  border-radius:var(--rad)}
+.wrong .locked b{color:var(--amber)}
+.vote{background:none;border:1.5px solid #4A4841;border-radius:2px;color:#A9A597;
+  font-family:var(--mono);font-size:11px;padding:2px 8px;cursor:pointer;line-height:1.5}
+.vote:hover{border-color:var(--amber);color:var(--amber)}
+.vote.on{background:var(--amber);border-color:var(--amber);color:var(--ink)}
+
+/* 出题人卡片 */
+.fromcard{display:flex;align-items:center;gap:12px}
+.fromcard .av{width:40px;height:40px;border:2px solid var(--ink);border-radius:2px;
+  display:grid;place-items:center;font-family:var(--emoji);font-size:20px;background:var(--paper-2)}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="logo" href="index.html">你拼我猜<span class="no">1管51</span></a>
+    <nav>
+      <a href="plaza.html">广场</a>
+      <a href="banks.html">词库</a>
+      <a href="works.html">我的作品</a>
+      <a href="me.html">我的主页</a>
+    </nav>
+    <a class="btn sm" href="compose.html">我也出一题</a>
+  </div>
+</header>
+
+<main>
+
+<section class="head">
+  <div class="wrap">
+    <span class="lbl-lg">猜 题 单 · NO. 1管5-128</span>
+    <h1 class="tk">这堆 emoji 是什么？</h1>
+    <div class="from">
+      <div class="fromcard">
+        <span class="av">🐦</span>
+        <span class="lbl">阿 野 出 的 题</span>
+      </div>
+      <span class="tag-out">共 4 个 字</span>
+      <span class="tag-out">成 语</span>
+    </div>
+  </div>
+</section>
+
+<section class="solve wrap">
+
+  <!-- ================= 谜面 + 交卷 ================= -->
+  <div class="puzzle">
+    <div class="sheet">
+      <div class="sheet-hd">
+        <span class="tag-no blue">谜 面</span>
+        <span class="lbl">已 被 猜 212 次</span>
+        <span class="lbl" style="margin-left:auto">猜 中 率 38%</span>
+      </div>
+      <div class="sheet-bd">
+        <div class="snap" id="canvas" role="img" aria-label="谜面：三枚 emoji 组成的图案"></div>
+        <div class="meta">
+          <span class="lbl">用 了 3 张 牌</span><span class="sep">·</span>
+          <span class="lbl">张 贴 于 10.02</span><span class="sep">·</span>
+          <span class="lbl">还 有 3 天 过 期</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="guessbox">
+      <div class="row">
+        <input type="text" id="ans" placeholder="你觉得这是什么" maxlength="12"
+               autocomplete="off" aria-label="你的答案">
+        <button class="btn" id="submit">交 卷</button>
+      </div>
+      <div class="under">
+        <span class="slip" id="slip">
+          <span class="hole" style="position:static;width:11px;height:11px"></span>
+          交卷后不可更改 · 猜歪也会入册
+        </span>
+      </div>
+    </div>
+
+    <!-- 揭晓 -->
+    <div class="verdict" id="verdict" hidden>
+      <div class="line">
+        <span class="big" id="vBig"></span>
+        <span class="stamp round" id="vSeal"></span>
+      </div>
+      <div class="ans">
+        <div class="k">正 解</div>
+        <div class="v" id="vAns"></div>
+      </div>
+      <div class="btn-row" style="margin-top:18px">
+        <button class="btn sm ghost" id="tellBtn">把 结 果 发 给 阿 野</button>
+        <a class="btn sm ghost" href="plaza.html">看 别 的 题</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 歪解榜 ================= -->
+  <aside class="wrong">
+    <div class="sheet">
+      <div class="sheet-hd">
+        <span class="tag-no">歪 解 榜</span>
+        <span class="lbl" id="wrongCount">9 条</span>
+      </div>
+      <div class="sheet-bd" style="padding:0">
+        <div class="locked" id="locked">
+          交 卷 后 才 能 看<br>
+          <b>先猜，再看别人的</b><br>
+          <span style="font-size:11px">否则你会被别人的答案带走</span>
+        </div>
+        <div class="board" id="board" hidden></div>
+      </div>
+    </div>
+
+    <div class="sheet" style="margin-top:16px">
+      <div class="sheet-bd">
+        <div class="lbl" style="margin-bottom:10px">这 一 题 的 数 据</div>
+        <div class="stats" style="border:none">
+          <div class="st" style="padding:8px 16px 8px 0">
+            <div class="v blue">212</div><div class="k">被 猜</div></div>
+          <div class="st" style="padding:8px 0 8px 16px;border-right:none">
+            <div class="v red">38%</div><div class="k">猜 中 率</div></div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+</section>
+
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <span>你拼我猜 · 猜题单</span>
+    <span>1管51 站 · 收发处</span>
+  </div>
+</footer>
+
+<script>
+const $=id=>document.getElementById(id);
+
+/* ============================================================
+   谜面：emoji 保留原来的大小与角度 —— 那是出题人的笔迹
+   ============================================================ */
+const LAYOUT=[
+  {x:50,y:66,s:2.5,r:-5},
+  {x:26,y:32,s:1.6,r:-16},
+  {x:76,y:40,s:1.45,r:22}
+];
+const MARKS=["🔥","⛽","💧"];
+$("canvas").innerHTML=MARKS.map((g,k)=>{
+  const L=LAYOUT[k];
+  return `<span class="pc" style="left:${L.x}%;top:${L.y}%;--s:${L.s};--r:${L.r}deg">${g}</span>`;
+}).join("");
+
+/* ============================================================
+   音效：Web Audio 合成盖章（与拼图台同一套，不加载音频文件）
+   ============================================================ */
+let AC=null;
+function stampSound(power){
+  let c; try{ c=AC||(AC=new (window.AudioContext||window.webkitAudioContext)()); }catch(e){ return; }
+  if(c.state==="suspended") c.resume();
+  const t=c.currentTime, p=power||1;
+  const o=c.createOscillator(), g=c.createGain();
+  o.type="sine";
+  o.frequency.setValueAtTime(190*p,t);
+  o.frequency.exponentialRampToValueAtTime(46,t+.11);
+  g.gain.setValueAtTime(.26*p,t);
+  g.gain.exponentialRampToValueAtTime(.0008,t+.17);
+  o.connect(g).connect(c.destination); o.start(t); o.stop(t+.19);
+  const n=Math.floor(c.sampleRate*.045);
+  const buf=c.createBuffer(1,n,c.sampleRate), d=buf.getChannelData(0);
+  for(let i=0;i<n;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/n,3.2);
+  const src=c.createBufferSource(); src.buffer=buf;
+  const bp=c.createBiquadFilter(); bp.type="bandpass"; bp.frequency.value=1700; bp.Q=.85;
+  const ng=c.createGain(); ng.gain.value=.16*p;
+  src.connect(bp).connect(ng).connect(c.destination); src.start(t);
+}
+
+/* ============================================================
+   数据：正解 + 歪解（按票数排）
+   ============================================================ */
+const ANSWER="火上浇油";
+const WRONG=[
+  {t:"烧开水",     w:"小舟", v:12},
+  {t:"灭火器广告", w:"Lina", v:8},
+  {t:"厨房事故",   w:"访客", v:6},
+  {t:"火锅底料",   w:"阿麦", v:4},
+  {t:"天然气泄漏", w:"老陈", v:3}
+];
+let done=false, myVote=null;
+
+/* ============================================================
+   交卷 → 盖章 → 揭晓
+   ============================================================ */
+$("submit").addEventListener("click",submit);
+$("ans").addEventListener("keydown",e=>{ if(e.key==="Enter") submit(); });
+
+function submit(){
+  if(done) return;
+  const raw=$("ans").value.trim();
+  if(!raw){ $("ans").focus(); $("ans").placeholder="总得写点什么"; return; }
+  done=true;
+
+  const hit = raw.replace(/\s/g,"")===ANSWER;
+
+  // 猜歪 → 自己的答案入册（这就是这个产品最值钱的地方）
+  // 和别人撞了同一个歪解要**合并计票**，而不是并排插两条 ——
+  // 榜是按票数排的，同名答案分开就永远排不到前面去
+  if(!hit){
+    const key=raw.replace(/\s/g,"");
+    const same=WRONG.find(g=>g.t===key);
+    if(same){ same.v++; same.you=true; }
+    else WRONG.push({t:key, w:"你", v:1, you:true});
+    WRONG.sort((a,b)=>b.v-a.v);
+  }
+
+  // 交卷的小票打孔
+  $("slip").innerHTML='<span style="color:var(--blue)">✓ 已交卷</span> · 收据留在收发处';
+
+  $("ans").disabled=true;
+  $("submit").disabled=true;
+  $("submit").textContent="已 交 卷";
+
+  // 揭晓
+  const v=$("verdict"); v.hidden=false;
+  $("vBig").textContent = hit ? "猜 中 了" : "猜 歪 了";
+  $("vBig").style.color = hit ? "var(--red)" : "var(--ink)";
+  const seal=$("vSeal");
+  seal.textContent = hit ? "验\n讫" : "存\n档";
+  seal.className = "stamp round " + (hit ? "" : "blue");
+  requestAnimationFrame(()=>seal.classList.add("stamping"));
+  stampSound(hit?1.4:1);
+  $("vAns").textContent=ANSWER;
+
+  // 谜面右上角打归档孔
+  const h=document.createElement("span");
+  h.className="hole"; h.style.right="10px"; h.style.top="10px";
+  $("canvas").appendChild(h);
+  requestAnimationFrame(()=>h.classList.add("punching"));
+
+  // 开榜
+  $("locked").hidden=true;
+  renderBoard();
+  $("verdict").scrollIntoView({behavior:"smooth",block:"center"});
+}
+
+/* ============================================================
+   歪解榜：按票数排，头名用朱印
+   ============================================================ */
+function renderBoard(){
+  const b=$("board"); b.hidden=false;
+  $("wrongCount").textContent=WRONG.length+" 条";
+  b.innerHTML=WRONG.map((g,i)=>`
+    <div class="row${i===0?" top":""}${g.you?" you":""}">
+      <div class="c1">${String(i+1).padStart(2,"0")}</div>
+      <div class="c2">${g.t}</div>
+      <div class="c3">${g.w}${g.you?' <span class="tag-no red" style="font-size:9.5px">刚交</span>':''}</div>
+      <div class="c4">
+        <button class="vote${myVote===i?" on":""}" data-i="${i}"
+                ${myVote!==null?"disabled":""}>${g.v} 票</button>
+      </div>
+    </div>`).join("");
+}
+$("board").addEventListener("click",e=>{
+  const btn=e.target.closest(".vote");
+  if(!btn||myVote!==null) return;
+  myVote=+btn.dataset.i;
+  WRONG[myVote].v++;
+  renderBoard();
+});
+
+/* ============================================================
+   把结果发给出题人
+   ============================================================ */
+$("tellBtn").addEventListener("click",()=>{
+  const mine=$("ans").value.trim();
+  const txt=`我在「${ANSWER}」那道题上猜了「${mine}」`;
+  if(navigator.clipboard) navigator.clipboard.writeText(txt).catch(()=>{});
+  $("tellBtn").textContent="已 复 制 · 去 粘 给 他";
+});
+</script>
+</body>
+</html>

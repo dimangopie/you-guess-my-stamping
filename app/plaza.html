@@ -11,9 +11,9 @@
    任务：发现内容。别人拼的题都贴在这儿。
    与「大厅 /lobby」分工：广场是"有什么好玩的"，大厅是"我要玩哪个模式"。
 
-   物理动作：张贴 · 盖章（封存／揭晓）· 打孔归档 · 调阅卷宗 · 装订 · 撕口
+   物理动作：张贴 · 盖章（封存／揭晓）· 打孔归档 · 调阅卷宗 · 撕口
    材质：公告 = 纸；榜单 = 屏；导航／页脚 = 牌
-   简化律：印章只留 4 枚（主章／封存／揭晓／已阅），
+   简化律：印章只留 3 枚（主章／封存／揭晓），
            其余状态一律 .pip；甜区一律 .gauge；说明性小字删净。
    ============================================================ */
 
@@ -142,27 +142,6 @@
 .bankrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(232px,1fr));gap:16px}
 .idx .gauge{margin-top:10px}
 .idx .gauge .val{font-size:15px}
-
-/* ---------- 张贴须知：装订的打孔文件 ---------- */
-.terms-wrap{padding-top:12px;scroll-margin-top:104px}
-.terms-slip{padding-left:34px}
-.terms{max-height:232px;overflow:auto;font-family:var(--mono);font-size:12.5px;color:var(--ink-2);
-  line-height:2;padding-right:12px;border-bottom:1.5px dashed var(--ink-4);margin-bottom:12px}
-.terms h4{font-family:var(--sans);font-size:13.5px;color:var(--ink);letter-spacing:.08em;margin:14px 0 4px}
-.terms h4:first-child{margin-top:0}
-/* 滚到底才盖章：滚动进度本身就是那把刻度 */
-.terms-end{font-family:var(--mono);font-size:11px;color:var(--ink-3);display:flex;
-  align-items:center;gap:10px;flex-wrap:wrap}
-.terms-end .gauge{flex:1}
-
-/* ---------- 回执：签收后收走 ---------- */
-.receipt{position:fixed;left:0;right:0;bottom:0;z-index:120;
-  transform:translateY(110%);transition:transform .4s cubic-bezier(.2,.9,.3,1)}
-.receipt.up{transform:none}
-.receipt .sheet{border-bottom:none;box-shadow:0 -5px 0 rgba(23,23,27,.14)}
-.rc-in{display:flex;gap:20px;align-items:center;flex-wrap:wrap;padding:16px 22px 18px}
-.rc-in .l{flex:1 1 320px;min-width:0}
-@media(max-width:700px){.rc-in .btn-row .btn{flex:1 1 auto;text-align:center}}
 </style>
 </head>
 <body>
@@ -225,7 +204,7 @@
       </div>
       <div class="right">
         <div class="cd">距 换 题<b id="cd">--:--:--</b></div>
-        <a class="btn" href="#">去猜</a>
+        <a class="btn" href="guess.html">去猜</a>
       </div>
     </div>
   </div>
@@ -297,44 +276,6 @@
   </div>
 </section>
 
-<!-- ============ 张贴须知（装订的打孔文件） ============ -->
-<section class="terms-wrap" id="termsSec">
-  <div class="wrap-nar">
-    <div class="sec-head">
-      <h2>张贴须知</h2>
-      <span class="tag-out">共 3 条</span>
-    </div>
-    <div class="sheet">
-      <div class="sheet-hd">
-        <span class="pip on">已 生 效</span>
-        <button class="bl-x" id="ckReset" type="button" style="margin-left:auto">回 执</button>
-      </div>
-      <div class="sheet-bd">
-        <div class="terms-slip bind">
-          <div class="terms" id="termsBox" tabindex="0" aria-label="张贴须知摘要，可滚动">
-            <h4>第 1 条 · 自己拼的东西</h4>
-            你拼的题、你写的歪解、你盖的章，都算你自愿张贴在公告栏上的。本站只提供浆糊和墙面，
-            不提供品位，也不为谜底是否说得通负责。若有人因为你的题笑到岔气，本站概不赔偿。
-            <h4>第 2 条 · 猜中率甜区</h4>
-            甜区（40%~60%）是统计结果，不是承诺。你把题出得太直白，会收到「没意思」的章；
-            出得太偏，会收到「这啥」的章。两种章都不可申诉。
-            <h4>第 3 条 · 回执</h4>
-            本站只留一样东西：你签收的那张回执。你可以只签必要的一项，
-            我们只会少赚一点，功能一点不少。回执丢了也不补，
-            这属于工艺问题，不属于技术问题。
-          </div>
-          <div class="terms-end" id="termsEnd">
-            <span class="gauge">
-              <span class="track"><i class="pin" id="termsPin" style="left:0%"></i></span>
-              <b class="val" id="termsVal">0%</b>
-            </span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
 </main>
 
 <footer class="site">
@@ -344,26 +285,9 @@
   </div>
 </footer>
 
-<!-- 回执：签收后收走（条款第 3 条说过的，不再复述） -->
-<div class="receipt" id="receipt" hidden>
-  <div class="wrap">
-    <div class="sheet">
-      <div class="rc-in">
-        <div class="l">
-          <span class="lbl-lg">回 执</span>
-        </div>
-        <div class="btn-row" id="rcActs">
-          <button class="btn sm" type="button" data-ck="all">签 收 · 全 部</button>
-          <button class="btn sm ghost" type="button" data-ck="min">仅 收 必 要</button>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
 <script>
 /* ============================================================
-   广场脚本：数据 → 公告流 / 榜单 / 词库 ＋ 那张回执
+   广场脚本：数据 → 公告流 / 榜单 / 词库
    ============================================================ */
 const $=id=>document.getElementById(id);
 
@@ -472,9 +396,9 @@ function noticeHtml(p,appended){
         ${p.wrong?`<div class="wrong"><span class="tag-no red">最佳歪解</span>
           <span class="q">「${p.wrong}」</span><span class="v">${p.votes} 票</span></div>`:""}
         <div class="n-act">
-          ${open?`<a class="btn sm" href="#">去猜</a>`
-                 :`<a class="btn sm ghost" href="#">时间线</a>
-                   <a class="ibtn" href="#" title="试着重拼" aria-label="试着重拼">🔁</a>`}
+          ${open?`<a class="btn sm" href="guess.html">去猜</a>`
+                 :`<a class="btn sm ghost" href="works.html">时间线</a>
+                   <a class="ibtn" href="compose.html" title="试着重拼" aria-label="试着重拼">🔁</a>`}
         </div>
       </div>
     </div>
@@ -492,7 +416,7 @@ function mountAd(){
   ad.innerHTML=`
     <span class="tag-no red">夹 页</span>
     <span class="txt">开通会员可以撤掉这张纸，<b>以及下一张</b>。</span>
-    <a class="btn sm ghost" href="#">了 解 一 下</a>
+    <a class="btn sm ghost" href="index.html">了 解 一 下</a>
     <button class="ad-x" type="button" title="撕掉这张广告纸" aria-label="撕掉这张广告纸">✕</button>`;
   second.insertAdjacentElement("afterend",ad);
   ad.querySelector(".ad-x").addEventListener("click",()=>{
@@ -620,8 +544,9 @@ function tick(){
 tick();setInterval(tick,1000);
 
 /* ============================================================
-   通告 · 回执 · 须知
-   （「来访登记」计数器已按简化律整条删除，页脚不再重复导航）
+   通告
+   （「来访登记」计数器已按简化律整条删除，页脚不再重复导航；
+     《张贴须知》与底部回执条已整块删除，不留引用）
    ============================================================ */
 
 /* ---------- 平台通告：撕得下来 ---------- */
@@ -640,50 +565,6 @@ addEventListener("online",syncOnline);
 addEventListener("offline",syncOnline);
 $("offlineX").addEventListener("click",()=>offlineBar.hidden=true);
 syncOnline();
-
-/* ---------- 回执：签收（一个蓝方块）→ 收走；再看时状态还在 ---------- */
-const receipt=$("receipt"), rcActs=$("rcActs"), ckReset=$("ckReset");
-const RC_ACTS=`<button class="btn sm" type="button" data-ck="all">签 收 · 全 部</button>
-  <button class="btn sm ghost" type="button" data-ck="min">仅 收 必 要</button>`;
-let ckChoice=null;
-function openReceipt(){
-  rcActs.innerHTML = ckChoice
-    ? `<span class="pip on">已 签 收 · ${ckChoice}</span>
-       <button class="btn sm ghost" type="button" id="rcClose">收 起</button>`
-    : RC_ACTS;
-  if(ckChoice) $("rcClose").addEventListener("click",closeReceipt);
-  receipt.hidden=false;
-  requestAnimationFrame(()=>receipt.classList.add("up"));
-  document.body.style.paddingBottom="118px";
-}
-function closeReceipt(){
-  receipt.classList.remove("up");
-  document.body.style.paddingBottom="";
-  setTimeout(()=>{receipt.hidden=true},420);
-}
-receipt.addEventListener("click",e=>{
-  const b=e.target.closest("[data-ck]"); if(!b) return;
-  ckChoice = b.dataset.ck==="all"?"全部":"仅必要";
-  rcActs.innerHTML=`<span class="pip on">已 签 收 · ${ckChoice}</span>`;
-  ckReset.textContent=`回 执（${ckChoice}）`;
-  console.log(`[回执] 已签收：${ckChoice}。`+
-    (ckChoice==="全部"?"广告纸照旧。":"广告纸少一点，功能一点没少。"));
-  setTimeout(closeReceipt,1400);
-});
-ckReset.addEventListener("click",e=>{e.preventDefault();openReceipt();});
-openReceipt();
-
-/* ---------- 张贴须知：滚到末页才盖章（进度就是那条刻度） ---------- */
-const termsBox=$("termsBox"), termsEnd=$("termsEnd");
-termsBox.addEventListener("scroll",()=>{
-  const span=Math.max(1,termsBox.scrollHeight-termsBox.clientHeight);
-  const k=Math.min(1,termsBox.scrollTop/span);
-  const pin=$("termsPin"), val=$("termsVal");
-  if(pin){pin.style.left=(k*100).toFixed(0)+"%";val.textContent=Math.round(k*100)+"%";}
-  if(termsBox.scrollTop+termsBox.clientHeight>=termsBox.scrollHeight-8){
-    termsEnd.innerHTML=`<span class="stamp bar blue stamping">已 阅</span>`;
-  }
-});
 
 /* ---------- 进场 ---------- */
 const io=new IntersectionObserver(es=>es.forEach(e=>{

@@ -10,7 +10,7 @@
    我的作品 /me/works —— 归档票根册（v3）
    v1 物料：票根 · 存根 · 硬投影 · 等宽 · 几乎全直角
    轴 8：.bind 装订 / .hole 归档孔 / .tearline 撕线 /
-        .struck 红笔划掉 / .slot-draw 递出回执
+        .struck 红笔划掉 / .slot-draw 递出凭条
    本页只写自己的版面，零件一律取自 base.css。
    ============================================================ */
 
@@ -192,17 +192,8 @@
 .tail .meta{margin-right:auto}
 .empty{padding:34px 22px;text-align:center}
 
-/* ---------- 回执：一张纸，签收就收走（Cookie 条的替身） ---------- */
-.receipt{position:fixed;left:0;right:0;bottom:0;z-index:900;display:flex;align-items:center;
-  gap:14px;flex-wrap:wrap;padding:14px 18px;background:var(--paper-4);
-  border-top:3px solid var(--ink);box-shadow:0 -5px 0 rgba(23,23,27,.10)}
-.receipt .rc-t{flex:1;min-width:220px;font-family:var(--mono);font-size:12px;color:var(--ink-2);
-  line-height:1.85;letter-spacing:.02em}
-.receipt .rc-t a{color:var(--blue)}
-.receipt .btn[disabled]{opacity:.4}
-
-/* ---------- 柜台递出来的回执条 ---------- */
-.slip{position:fixed;left:18px;bottom:calc(18px + var(--rch,0px));z-index:890;
+/* ---------- 柜台递出来的提示条：交互反馈（注销 / 复印 / 筛选） ---------- */
+.slip{position:fixed;left:18px;bottom:18px;z-index:890;
   max-width:min(440px,calc(100vw - 36px));display:flex;gap:12px;align-items:flex-start;
   background:var(--paper-4);border:2px solid var(--ink);border-left:6px solid var(--blue);
   border-radius:2px;box-shadow:var(--sh-2);padding:12px 14px;
@@ -235,8 +226,6 @@
   .bind{padding-left:26px}
   .bind::before{left:7px}
   .bind-strip{left:3px;width:20px}
-  .receipt{padding:12px 14px}
-  .receipt .rc-t{font-size:11.5px}
 }
 </style>
 </head>
@@ -289,7 +278,6 @@
       <div class="sheet-hd">
         <span class="tag-no">归档册 NO. 1管5</span>
         <span class="meta">出题人 阿野 · 1管51-051</span>
-        <span class="meta mla">全册 128 件 · 平均猜中率 47%</span>
       </div>
       <div class="sheet-bd ctrl-bd">
         <div class="ctrl-row">
@@ -354,7 +342,6 @@
 
         <div id="copyRun" hidden style="margin-top:16px">
           <div class="copybar"><span>复 印 中</span><span class="bar"><i id="copyBar"></i></span><b id="expPct">0%</b></div>
-          <p class="meta" style="margin-top:10px">正在读取 128 件作品 …</p>
         </div>
 
         <div id="copyDone" hidden>
@@ -388,7 +375,7 @@
       <span class="meta">本册 128 件 · 收录 <b id="tailN">8</b> 件 · 每卷 4 件</span>
       <button class="btn ghost sm" id="psBack" type="button">调阅驳回单</button>
       <a class="btn ghost sm" href="me.html">回通行证</a>
-      <a class="btn sm" href="#">再拼一题</a>
+      <a class="btn sm" href="compose.html">再拼一题</a>
     </div>
   </div>
 </section>
@@ -402,18 +389,10 @@
   </div>
 </footer>
 
-<!-- ============ 回执（Cookie 条的替身：签收就收走） ============ -->
-<div class="receipt" id="receipt" hidden>
-  <span class="tag-no">回 执</span>
-  <span class="rc-t">小纸条记住你翻到第几卷 · <a href="#" id="rcMore">《账号协议》</a>在通行证背面</span>
-  <button class="btn sm" id="rcOk" type="button">签 收</button>
-  <button class="btn ghost sm" id="rcNo" type="button">拒 签</button>
-</div>
-
-<!-- ============ 柜台递出来的回执条 ============ -->
+<!-- ============ 柜台递出来的提示条（交互反馈：注销 / 复印 / 筛选） ============ -->
 <div class="slip" id="slip" hidden role="status">
   <span class="tx" id="slipTx"></span>
-  <button class="x3" id="slipX" type="button" aria-label="收起回执">✕</button>
+  <button class="x3" id="slipX" type="button" aria-label="收起提示">✕</button>
 </div>
 
 <script>
@@ -503,7 +482,7 @@ const visName=v=>v==="all"?"全部":v==="public"?"公开":"私密";
 const isLimited=w=>!!w.limit;
 const isSweet=r=>r>=40&&r<=60;
 
-/* ---------- 回执条：柜台递出来的那张小纸 ---------- */
+/* ---------- 提示条：柜台递出来的那张小纸（只是交互反馈） ---------- */
 const slipEl=$("#slip");
 let slipT=null;
 function slip(html,ms){
@@ -856,39 +835,6 @@ $("#copyUrge").onclick=()=>{
   $("#expUrge").innerHTML=`催办记录 · <b>${urgeN}</b> 次。${lines[Math.min(urgeN,lines.length)-1]}`;
   slip(`催办第 <b>${urgeN}</b> 次已登记 · 顺序不变`);
 };
-
-/* ============================================================
-   回执：一张纸，签收就收走（原 Cookie 同意条）
-   ============================================================ */
-const rc=$("#receipt");
-function setRch(){document.documentElement.style.setProperty("--rch",(rc.hidden?0:rc.offsetHeight+8)+"px");}
-(function(){
-  let ok=false;
-  try{ok=sessionStorage.getItem("ypwc_receipt")==="1"}catch(e){}
-  if(!ok)rc.hidden=false;
-  setRch();
-})();
-function signRc(kind){
-  try{sessionStorage.setItem("ypwc_receipt","1")}catch(e){}
-  const s=document.createElement("span");
-  s.className="pip "+(kind==="ok"?"on":"lock");
-  s.textContent=kind==="ok"?"已签收":"拒签";
-  rc.appendChild(s);
-  requestAnimationFrame(()=>s.classList.add("stamping"));
-  rc.querySelectorAll("button").forEach(b=>b.disabled=true);
-  setTimeout(()=>{
-    rc.hidden=true;setRch();
-    slip(kind==="ok"?"回执已签收 · 归入本册第 1 卷":"回执已拒签 · 仍记入本册第 1 卷");
-  },780);
-}
-$("#rcOk").onclick=()=>signRc("ok");
-$("#rcNo").onclick=()=>signRc("no");
-$("#rcMore").onclick=e=>{
-  e.preventDefault();
-  slip("《账号协议》在通行证背面，共 12 条");
-  setTimeout(()=>{location.href="me.html#agr"},700);
-};
-window.addEventListener("resize",setRch);
 
 /* ---------- 控制台留言 ---------- */
 console.log("%c你拼我猜 · 归档票根册 NO. 1管5（v3）","background:#F2EFE4;color:#D33A2C;border:2px solid #17171B;font-family:monospace;padding:4px 10px;letter-spacing:.2em");
