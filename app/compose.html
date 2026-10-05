@@ -18,8 +18,17 @@
    ④ 缩放 / 旋转 / 图层都由控制点决定，不用滑杆
    ============================================================ */
 
-.head{padding:46px 0 6px}
-.head h1{margin:12px 0 14px}
+/* 抬头压成一条 56px 横带。
+   原来 padding:46px 0 6px + 两行大标题 = 224px，占屏幕 25%，
+   而它只装了三件信息（台名 / 单号 / 一句操作提示）。
+   游戏页的抬头不该是一块版位，该是一条状态带 —— 信息一条不少，横着排。 */
+.head{flex:0 0 auto;height:56px;padding:0;background:var(--paper-2);
+  border-bottom:2px solid var(--ink);display:flex;align-items:center}
+.head .wrap{display:flex;align-items:center;gap:18px;height:100%}
+.head .lbl-lg{white-space:nowrap;flex:0 0 auto}
+.head h1{margin:0;font-size:13.5px;font-weight:400;color:var(--ink-2);letter-spacing:.02em;
+  border-left:1.5px solid var(--ink-4);padding-left:18px;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis}
 
 /* 子元素解除 min-width 下限：grid 的 1fr 是 minmax(auto,1fr)，
    那个 auto 等于内容的 min-content，窄屏下列会被顶住不缩。 */
@@ -27,8 +36,6 @@
 .bench{display:grid;grid-template-columns:300px minmax(0,1fr) 244px;gap:22px;align-items:start;
   padding-top:26px}
 @media(max-width:1120px){.bench{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.bench .order{grid-column:1/-1}}
-@media(max-width:820px){.bench{grid-template-columns:minmax(0,1fr)}
-  .bench .canvas-box{order:1}.bench .wheel-box{order:2}.bench .order{order:3}}
 
 /* ---------- 转盘（静止）---------- */
 .wheel-box{text-align:center}
@@ -59,8 +66,38 @@
 .wheel-note{margin-top:12px;display:flex;gap:10px;justify-content:center;align-items:center}
 
 /* ---------- 画板 ---------- */
-.canvas-box{min-width:0}
-.canvas{position:relative;width:100%;max-width:520px;aspect-ratio:1/1;margin:0 auto;
+/* ── 工作台骨架 ──
+   body 是列方向 flex：站牌 / 抬头带 固定，main 吃掉剩余高度，bench 撑满 main。
+   body{overflow:hidden} —— 游戏里没有翻页这回事。
+   不写任何 calc(100dvh - Npx) 的魔数：数字一改就悄悄错位，flex 不会。 */
+html,body{height:100%}
+body{display:flex;flex-direction:column;overflow:hidden}
+.nav{flex:0 0 auto}
+main{flex:1 1 auto;min-height:0;display:flex;flex-direction:column}
+/* ⚠ .wrap 带 margin:0 auto —— 放进 flex 容器后，auto margin 会吸收自由空间、
+   使 align-self:stretch 失效，元素退化成 fit-content（.bench 只剩 640 而非 1180，
+   画布列随之塌成 4px）。这与当初 .bay 踩的是同一个坑。
+   给显式 width:100% 让宽度确定，max-width 再截住、auto margin 只负责居中。 */
+main>*{width:100%}
+.head .wrap{flex:1 1 auto;min-width:0}
+.bench{flex:1 1 auto;min-height:0;align-items:stretch}
+/* 三列各自消化溢出的部分，绝不推高整页；画布那列靠缩小而不是滚动 */
+.bench>*{min-height:0}
+.bench .sheet.wheel-box,.bench .sheet.order{overflow:auto}
+/* 画布盒：成为「尺寸容器」，让画布能用 cqw/cqh 拿到盒子的实际宽高。
+   为什么非得这样：画布要的是 min(盒宽, 盒高)。
+   只给 max-height，浏览器不会拿它反推宽度（1440x620 下会得到 544x368 的长方）；
+   只给 height:100%+width:auto，盒子偏高时又会溢出被 max-width 截成非正方形。
+   cqw/cqh 是唯一能直接表达「两轴取小」的单位。 */
+.canvas-box{container-type:size;display:grid;place-items:center;
+  min-height:0;min-width:0;overflow:hidden}
+/* 画布：取「能放下的最大正方形」——
+   height:100% 定高、width:auto 让 aspect-ratio 反推宽，max-width 再兜住过宽 */
+
+.canvas{position:relative;width:min(100cqw,100cqh);height:min(100cqw,100cqh);
+  aspect-ratio:1/1;margin:0;   /* 两轴取小 = 盒子里能放下的最大正方形 */
+     /* 高度定、宽度由 aspect-ratio 反推，max-* 兜住过宽过高 */
+  
   overflow:hidden;background:var(--paper-4);border:2px solid var(--ink);border-radius:var(--rad);
   box-shadow:var(--sh-soft);touch-action:none;
   background-image:
@@ -129,6 +166,25 @@
 .od .d{flex:1;border-bottom:1px dotted var(--ink-4);transform:translateY(-4px)}
 .od b{color:var(--ink);white-space:nowrap}
 .od b.blue{color:var(--blue)}
+
+/* ⚠ 必须排在所有基础规则之后：媒体查询不提升优先级，同权重下靠后的赢。
+   放在前面时 .canvas 的基础规则会把它整个盖掉。 */
+@media(max-width:820px){
+  /* 竖排时整页退出「工作台高度锁」——只解 height 不够：
+     .bench 仍是 flex:1 1 auto;min-height:0 的 flex item，照样被压扁。
+     这里把 body/main 都还原成普通块级文档流，高度交给内容。 */
+  html,body{height:auto}
+  body{display:block;overflow:auto}
+  main{display:block}
+  .bench{display:grid;height:auto;min-height:0;flex:none;
+    grid-template-columns:minmax(0,1fr);gap:14px;align-items:start}
+  /* 画布排最前：竖排时打开就能看到画布和操作，签筒在下面 */
+  .bench .canvas-box{order:-1}
+  .bench .sheet.order{order:0}
+  .bench .sheet.wheel-box{order:1}
+  .canvas-box{container-type:normal;display:block;overflow:visible}
+  .canvas{width:100%;height:auto;max-width:520px;margin:0 auto;aspect-ratio:1/1}
+}
 </style>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#22304F">
@@ -160,7 +216,7 @@
 <section class="head">
   <div class="wrap">
     <span class="lbl-lg">拼 图 台 · 制 作 单 NO. 1管5-129</span>
-    <h1 class="tk">从转盘上拖一张牌，<br>放到画布上</h1>
+    <h1 class="tk">从转盘上拖一张牌，放到画布上</h1>
   </div>
 </section>
 
