@@ -207,6 +207,7 @@ ANCESTRY = {
     #   深色的是它里面的 <div class="board" id="rk-wrong">。
     #   这一条猜错，让普查静默放过了两条 2.0:1 的文字（票数与副标题）。
     ".rk .c3 b": ".board", ".rk .sub": ".board", ".rk .c1": ".board",
+    ".flap": ".cd-box", ".cd-v": ".cd-box", ".cd-u": ".cd-box",   # 倒计时数字在深色屏里
     ".rk .row.top1 .c2": ".board",   # 复合类（.row.top1）让 .rk .row 匹配不到
     ".rk .row.top1 .c1": ".board", ".rk .row .c2": ".board",
     "#score": ".board", ".srow": ".board", ".throw": ".board",

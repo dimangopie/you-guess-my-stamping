@@ -122,10 +122,34 @@
 .cd-strip{display:flex;align-items:flex-end;justify-content:space-between;gap:16px}
 .cd-box{background:var(--screen);border-radius:2px;padding:8px 18px;text-align:right}
 .cd-box .k{font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:var(--screen-ink)}
-/* 字号交给 .flap 控制 */.cd-v{font-size:inherit;font-family:var(--mono);font-weight:700;font-size:clamp(32px,4.4vw,50px);line-height:.95;
-  color:var(--amber-ink);font-variant-numeric:tabular-nums;transition:color .25s}
+
+/* ── 倒计时翻牌 ──────────────────────────────────────────────
+   ⚠ 这里原来**一条样式都没有**。
+   翻牌 JS（room.html 底部）把每个数字渲染成 `<i>4</i>4` ——
+   `<i>` 是翻牌的动层，本该**叠在**静态数字之上；
+   但没有 CSS 去叠它，两层就并排显示，`47` 渲染成 `4477`，
+   而且 `<i>` 默认斜体，正是 K3 说的
+   「5 倍放大确认是两组斜体数字（44 与 77）叠印在同一位置，静态截图下读作坏字」。
+   结构在、样式缺 —— 这是半成品，不是坏值。 */
+.flap{display:inline-flex;gap:1px;font-family:var(--mono);font-weight:700;
+  font-size:clamp(32px,4.4vw,50px);line-height:.95;color:var(--amber-lit);
+  font-variant-numeric:tabular-nums}   /* --amber-ink 在 --screen 上只有 2.02:1 */
+.flap .d{position:relative;display:inline-grid;place-items:center;min-width:.62em}
+.flap .d i{position:absolute;inset:0;display:grid;place-items:center;
+  font-style:normal;font-weight:inherit;color:inherit;backface-visibility:hidden}
+.flap .d.go i{animation:flapTurn .32s ease-out}
+@keyframes flapTurn{
+  from{transform:rotateX(-88deg);opacity:.25}
+  to{transform:rotateX(0);opacity:1}
+}
+/* ⚠ #cd 被 JS 藏成 1px 数据源；可见的是旁边的 .flap。
+   这条留着只为「JS 没跑起来」时兜底。 */
+.cd-v{font-family:var(--mono);font-weight:700;font-size:clamp(32px,4.4vw,50px);
+  line-height:.95;color:var(--amber-lit);   /* 在 .cd-box(--screen) 上，纸面档只有 2.02:1 */
+  font-variant-numeric:tabular-nums;transition:color .25s}
 .cd-v.urgent{color:var(--red-ink)}
-.cd-u{font-family:var(--mono);font-size:11.5px;color:var(--ink-3);margin-left:7px;letter-spacing:.1em}
+.cd-u{font-family:var(--mono);font-size:11.5px;color:var(--screen-ink);margin-left:7px;
+  letter-spacing:.1em}   /* 在 .cd-box(--screen) 里：--ink-3 只有 1.93:1 */
 .tick{height:10px;border:1.5px solid var(--ink);background:var(--paper-3);border-radius:2px;
   margin-top:10px;overflow:hidden}
 .tick i{display:block;height:100%;background:var(--amber);transition:width .95s linear,background .3s}
@@ -345,7 +369,7 @@ footer.site a[aria-current]{color:var(--amber-lit)}
               <span class="hint" title="本题时限">⏱ <b id="limitTxt">60</b>s</span>
               <span class="cd-box">
                 <span class="k">本 题 剩 余</span>
-                <span class="cd-v" id="cd">47</span><span class="cd-u" style="color:var(--screen-ink)">秒</span>
+                <span class="cd-v" id="cd">47</span><span class="cd-u">秒</span>
               </span>
             </div>
             <div class="tick" id="tick"><i id="tickFill" style="width:78%"></i></div>
