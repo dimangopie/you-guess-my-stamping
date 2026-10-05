@@ -44,7 +44,7 @@
   font-size:15.5px;letter-spacing:.02em;color:var(--ink);padding:5px 2px;border-radius:0;
   -webkit-appearance:none;appearance:none}
 .find input:focus{outline:none}
-.find input::placeholder{color:var(--ink-4);font-size:13px;letter-spacing:.1em}
+.find input::placeholder{color:var(--ink-3);font-size:13px;letter-spacing:.1em}
 .find input::-webkit-search-cancel-button,.find input::-webkit-search-decoration{-webkit-appearance:none}
 /* 检索次数用完：单子上盖一枚朱红细边（原来是荧光） */
 .find.spent{border-bottom-color:var(--red-ink)}
@@ -81,7 +81,7 @@
 .cat-bar{display:flex;align-items:center;gap:9px;flex-wrap:wrap;
   border-bottom:1.5px dashed var(--ink-3);padding-bottom:14px;margin-bottom:24px}
 .cat-bar b{font-family:var(--mono);font-size:15px;font-weight:700;font-variant-numeric:tabular-nums}
-.cat-bar .sp{color:var(--ink-4)}
+.cat-bar .sp{color:var(--ink-3)}
 
 /* 单据上本来就有的抬头 / 字段名 / 附注：都读得到，不靠 .lbl
    （.lbl 与 .hint 已降级为最浅一档灰，只配承载可删的说明） */
@@ -116,7 +116,7 @@
 /* ---- 星级 ---- */
 .stars{font-family:var(--sans);font-size:.96em;letter-spacing:.14em;white-space:nowrap}
 .stars b{font-weight:400;color:var(--ink)}
-.stars i{font-style:normal;color:var(--ink-4)}
+.stars i{font-style:normal;color:var(--ink-3)}
 .cat-ft .stars{margin-left:auto}
 
 /* ---- 猜中率：一条刻度（零件一律取自 base.css 第 17 节） ----
@@ -145,7 +145,7 @@
 .mc-n{font-size:19px;font-weight:900;letter-spacing:.12em;line-height:1.35}
 .mc-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;
   font-family:var(--mono);font-size:11.5px;color:var(--ink-3);letter-spacing:.04em}
-.mc-meta i{font-style:normal;color:var(--ink-4)}
+.mc-meta i{font-style:normal;color:var(--ink-3)}
 .mc-acts{margin-top:auto;display:flex;gap:16px;flex-wrap:wrap;
   border-top:1.5px dashed var(--ink-4);padding-top:11px}
 .mc-acts a{font-family:var(--mono);font-size:11.5px;letter-spacing:.1em;color:var(--ink-3);
@@ -161,7 +161,7 @@
 .idx.newcard:hover{transform:translate(-3px,-3px);box-shadow:9px 9px 0 rgba(23,23,27,.12);
   border-color:var(--ink)}
 .idx.newcard:hover::before{border-color:var(--ink);border-style:solid}
-.newcard .plus{font-family:var(--mono);font-size:42px;line-height:1;font-weight:700;color:var(--ink-4);transition:.16s}
+.newcard .plus{font-family:var(--mono);font-size:42px;line-height:1;font-weight:700;color:var(--ink-3);transition:.16s}
 .newcard .nc-t{font-size:16px;font-weight:900;letter-spacing:.22em;color:var(--ink-2)}
 .idx.newcard:hover .plus{color:var(--blue)}
 
@@ -182,8 +182,8 @@
 .rank .row .mk{text-align:center;padding:10px 4px}
 .rank .row .mk .pip{font-size:10px;letter-spacing:0}
 .rank .row.is-off .nm{color:var(--ink-3);font-weight:400}
-.rank .row.is-off .nm .by{color:var(--ink-4)}
-.rank .row.is-off .rt,.rank .row.is-off .pl{color:var(--ink-4)}
+.rank .row.is-off .nm .by{color:var(--ink-3)}
+.rank .row.is-off .rt,.rank .row.is-off .pl{color:var(--ink-3)}
 .rank .row.is-off .rt{font-weight:400}
 .rank-ft{margin-top:14px;display:flex;justify-content:center}
 @media(max-width:1080px){
@@ -251,7 +251,7 @@
 .lcard .row .df .stars{letter-spacing:.06em}
 .lcard .row .hit{font-size:13.5px;font-weight:700;font-variant-numeric:tabular-nums}
 .lcard .row .hit.sweet{color:var(--red-ink)}
-.lcard .row .hit.off{color:var(--ink-4);font-weight:400}
+.lcard .row .hit.off{color:var(--ink-3);font-weight:400}
 @media(max-width:520px){
   .lcard .row{grid-template-columns:34px minmax(0,1fr) 74px;
     grid-template-areas:"no wd wd" "no df hit";row-gap:2px;padding:8px 0}

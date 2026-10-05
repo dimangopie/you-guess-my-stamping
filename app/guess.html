@@ -31,7 +31,7 @@
 
 .meta{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:16px;
   padding-top:14px;border-top:1.5px dashed var(--ink-3)}
-.meta .sep{color:var(--ink-4)}
+.meta .sep{color:var(--ink-3)}
 
 /* ---------- 交卷 ---------- */
 .guessbox{margin-top:20px}
@@ -39,7 +39,7 @@
 .guessbox input{flex:1;min-width:0;border:none;border-bottom:2.5px solid var(--ink);
   background:transparent;font-family:var(--mono);font-size:22px;padding:8px 2px;color:var(--ink);
   outline:none;letter-spacing:.14em;border-radius:0}
-.guessbox input::placeholder{color:var(--ink-4);letter-spacing:.06em;font-size:17px}
+.guessbox input::placeholder{color:var(--ink-3);letter-spacing:.06em;font-size:17px}
 .guessbox input:focus{border-bottom-color:var(--blue)}
 .guessbox input[disabled]{opacity:.5;border-bottom-style:dashed}
 .guessbox .under{display:flex;gap:12px;align-items:center;margin-top:10px;flex-wrap:wrap}
@@ -81,6 +81,8 @@
 /* .lbl 提到 --ink-2 之后，落在这块深色统计条上只有 1.43:1 ——
    「已被猜 212 次」「猜中率 38%」等于没画。
    深面要配深面专用的那一档（base.css 里 nav/footer 用的就是它）。 */
+
+</style>
 
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#22304F">

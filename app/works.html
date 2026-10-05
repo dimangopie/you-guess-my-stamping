@@ -103,7 +103,7 @@
 .kvs{font-family:var(--mono);font-size:12.5px;color:var(--ink-3);letter-spacing:.06em;
   display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .kvs b{color:var(--ink);font-weight:700}
-.kvs .sep{color:var(--ink-4)}
+.kvs .sep{color:var(--ink-3)}
 
 /* 被调阅到的那张票根：打一下朱红高亮（不闪荧光） */
 .work.flash .snap{animation:flash .9s ease-out 2}
@@ -112,7 +112,7 @@
 
 /* 已注销：红笔划掉，票根留在册上 */
 .work.is-void .snap{filter:grayscale(.55);opacity:.72}
-.work.is-void .kvs{color:var(--ink-4)}
+.work.is-void .kvs{color:var(--ink-3)}
 .work.is-void .kvs b{color:var(--ink-3)}
 .work.is-void .best{opacity:.72}
 /* 最佳歪解：整页最该被看到的东西 */
@@ -172,7 +172,7 @@
 .vol.now{background:var(--paper-2);color:var(--ink);font-weight:700;cursor:default;
   box-shadow:inset 0 -4px 0 var(--red)}
 .vol:disabled{opacity:.38;cursor:not-allowed;box-shadow:none}
-.vol.dots{border:none;box-shadow:none;background:none;cursor:default;color:var(--ink-4);min-width:14px}
+.vol.dots{border:none;box-shadow:none;background:none;cursor:default;color:var(--ink-3);min-width:14px}
 .vol-jump{display:flex;align-items:center;gap:8px;flex-wrap:wrap;
   border-top:1.5px dashed var(--ink-4);padding-top:11px}
 .vol-jump input{width:52px;border:2px solid var(--ink);border-radius:2px;background:var(--paper-4);
@@ -516,7 +516,7 @@ function rowHTML(r){
   const dot=r.hit?"guessing":(r.best?"solved":"offline");
   const mark=r.hit?`<span class="tl-mark hit">✓ 猜中 · 用时 ${r.ms}</span>`
            :r.best?`<span class="tl-mark best">★ 最佳歪解</span>`
-           :`<span class="tl-mark" style="color:var(--ink-4)">未 中</span>`;
+           :`<span class="tl-mark" style="color:var(--ink-3)">未 中</span>`;
   return `<div class="tl-row ${cls}">
     <span class="tl-t">${r.t}</span>
     <span class="tl-x"><i class="dot ${dot}"></i></span>

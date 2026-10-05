@@ -26,6 +26,23 @@ for f in app/*.html; do
 done
 [ "$miss" -eq 0 ] && ok "无悬空链接" || no "悬空链接 $miss 处"
 
+echo "── 1.5 标签配平 ──"
+python3 - <<'PY' || fail=1
+import pathlib, re, sys
+bad=[]
+for f in sorted(pathlib.Path("app").glob("*.html")):
+    s=f.read_text(encoding="utf-8")
+    for tag in ("style","script","head","body","html"):
+        o=len(re.findall(r'<'+tag+r'[\s>]', s)); c=len(re.findall(r'</'+tag+r'>', s))
+        if o!=c: bad.append(f"{f.name}: <{tag}> {o} 开 / {c} 闭")
+# 未闭合的 <style> 会把后面整个文档当 CSS —— 这类错误浏览器会「恢复」，
+# 页面看起来正常，但结构与作者意图完全不同。作者自己踩过一次
+# （用 str.replace("</style>", X) 往前面插内容，把闭合标签替换掉了）。
+for b in bad: print("     "+b)
+if not bad: print("  \033[32m✓\033[0m 13 页的 style/script/head/body/html 全部配平")
+sys.exit(1 if bad else 0)
+PY
+
 echo "── 2. 引用完整性（死 id / 死锚点）──"
 python3 - <<'PY' || fail=1
 import re, pathlib, sys
@@ -97,6 +114,15 @@ python3 "$(dirname "$0")/tools/layout_invariants.py" || fail=1
 
 echo "── 7. PWA 接线 ──"
 python3 "$(dirname "$0")/tools/pwa_selectors.py" || fail=1
+
+echo "── 8. 整改台账 ──"
+python3 "$(dirname "$0")/tools/build_ledger.py" >/dev/null 2>&1 || { echo "    build_ledger.py 跑不起来"; fail=1; }
+if [ -f app/issues.html ]; then
+  n=$(grep -c 'class="s-' app/issues.html 2>/dev/null || echo 0)
+  [ "$n" -gt 0 ] && ok "整改台账 app/issues.html（$n 条）" || no "台账页为空"
+else
+  no "缺 app/issues.html"
+fi
 
 echo
 [ "$fail" -eq 0 ] && printf '\033[32m全部通过\033[0m\n' || printf '\033[31m有检查未通过\033[0m\n'

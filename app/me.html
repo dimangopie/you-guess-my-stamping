@@ -71,7 +71,7 @@
 .pass-stats{border-top:1.5px dashed var(--ink-3);border-bottom:1.5px dashed var(--ink-3);
   background:var(--paper-2);padding:0 10px}
 .pass-stats .st{flex:1 1 132px;padding:16px 18px}
-.pass-stats .n{font-family:var(--mono);font-size:9.5px;letter-spacing:.24em;color:var(--ink-4)}
+.pass-stats .n{font-family:var(--mono);font-size:9.5px;letter-spacing:.24em;color:var(--ink-3)}
 
 /* 证尾：条形码 + 机读行 + 来访登记 + 翻面 */
 .pass-foot{padding:16px 24px 20px;display:grid;gap:9px}
@@ -81,7 +81,7 @@
 .foot-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:4px}
 .foot-row .stamp{margin-right:auto}
 .cutline{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:10px;
-  letter-spacing:.2em;color:var(--ink-4);margin-top:2px}
+  letter-spacing:.2em;color:var(--ink-3);margin-top:2px}
 .cutline::before,.cutline::after{content:"";flex:1;border-top:1.5px dashed var(--ink-4)}
 
 /* ---------- 二、驳回通知单（纸 + 章，取代 v2 系统条） ---------- */
@@ -105,7 +105,7 @@
 /* ---------- 四、印章墙（base 的 .sealwall：章 + 名 + 日期，未得留空框） ---------- */
 .sealwall .s>span{display:block;position:relative;width:100%}
 .sealwall .s .mk-code{position:absolute;right:0;bottom:-2px;font-family:var(--mono);font-size:9px;
-  letter-spacing:.1em;color:var(--ink-4)}
+  letter-spacing:.1em;color:var(--ink-3)}
 .sealwall .s.got .mk-code{color:var(--ink-3)}
 .sealwall .s .stamp{width:100%;font-size:10px;padding:5px 6px;letter-spacing:.06em}
 .sealwall .s .n{font-weight:700;margin-top:7px}
@@ -117,7 +117,7 @@
 .mklegend .sq.red{color:var(--red-ink)}
 .mklegend .sq.amber{color:var(--amber-ink)}
 .mklegend .sq.blue{color:var(--blue)}
-.mklegend .sq.off{border-style:dashed;border-color:var(--ink-4)}
+.mklegend .sq.off{border-style:dashed;border-color:var(--ink-3)}
 .mklegend #tally{margin-left:auto;color:var(--ink-2)}
 
 /* ---------- 五、三个入口 ---------- */
@@ -146,7 +146,7 @@
 .wtxt{display:grid;gap:3px;min-width:0}
 .wtxt b{font-size:15px;letter-spacing:.16em;font-weight:700}
 .wtxt i{font-style:normal;font-family:var(--mono);font-size:10.5px;color:var(--ink-3);letter-spacing:.04em}
-.wrow .wid{margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--ink-4);
+.wrow .wid{margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--ink-3);
   white-space:nowrap;letter-spacing:.06em}
 button.wrow{background:none;border:none;padding:0;font:inherit;text-align:left;cursor:pointer}
 button.wrow:hover .wtxt b{color:var(--blue)}
@@ -168,7 +168,7 @@ button.wrow:hover .wtxt b{color:var(--blue)}
   background:var(--paper-2);display:grid;place-items:center;font-family:var(--mono);
   font-weight:700;font-size:15px;color:var(--ink)}
 .mate .dot{position:absolute;top:-2px;right:-2px;box-shadow:0 0 0 2px var(--paper-4)}
-.mate.more{border-style:dashed;border-color:var(--ink-4);color:var(--ink-3);font-size:13px}
+.mate.more{border-style:dashed;border-color:var(--ink-3);color:var(--ink-3);font-size:13px}
 .legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-family:var(--mono);font-size:10.5px;
   letter-spacing:.08em;color:var(--ink-3)}
 .legend span{display:inline-flex;align-items:center;gap:5px}
