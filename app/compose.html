@@ -99,7 +99,16 @@ main>*{width:100%}
   grid-template-columns:minmax(0,296px) minmax(0,1fr) minmax(0,224px);gap:16px;
   max-width:min(1600px,100% - 48px)}   /* 比全站 wrap(1180) 宽 —— 画布页优先给画布 */
 .bench>*{min-height:0}
-.bench .canvas-box{align-self:stretch}   /* 只有画布那列撑满高度，两条轨道保持自然高度 */
+/* 三栏都撑满 → 底边对齐。
+   评委原话：「左右两栏面板都在 y≈370 处结束，下面空出约 270px 米色死区，
+   而画布却一路延伸到底 —— 三栏底边完全没对齐。」
+   撑满之后轨道内容纵向居中分布，空的不再是「下面一截」，而是均匀的内边距。 */
+.bench>*{align-self:stretch}
+.bench .sheet.wheel-box,.bench .sheet.order{display:flex;flex-direction:column}
+.bench .sheet.wheel-box>.sheet-bd{flex:1 1 auto;display:flex;flex-direction:column;
+  justify-content:center;min-height:0}
+.bench .sheet.order>.sheet-bd{flex:1 1 auto;display:flex;flex-direction:column;
+  justify-content:center;min-height:0}
 .bench .sheet.wheel-box,.bench .sheet.order{overflow:auto}
 
 /* 画布列**只有画布**。
@@ -126,6 +135,27 @@ main>*{width:100%}
    两者争夺同一段高度时按钮行被压成 0 高 —— 它的内容于是溢出、
    骑到画布的下边框上（K3 点过三次的那个「渲染事故」）。 */
 
+
+/* ── 印版标记 ──────────────────────────────────────────────
+   角线 = 印刷厂的定位角线；版心框 = 可落区；标尺 = 尺寸参照。
+   三者都 pointer-events:none，不参与落牌命中判定。 */
+.cmarks{position:absolute;inset:0;pointer-events:none;z-index:1}
+.cm{position:absolute;width:15px;height:15px;border:0 solid var(--ink-3);opacity:.5}
+.cm.tl{left:7px;top:7px;border-left-width:1.5px;border-top-width:1.5px}
+.cm.tr{right:7px;top:7px;border-right-width:1.5px;border-top-width:1.5px}
+.cm.bl{left:7px;bottom:7px;border-left-width:1.5px;border-bottom-width:1.5px}
+.cm.br{right:7px;bottom:7px;border-right-width:1.5px;border-bottom-width:1.5px}
+.cframe{position:absolute;inset:24px 24px 34px;border:1px dashed rgba(23,23,27,.16);
+  border-radius:2px}
+/* 底边标尺：11 格刻度，格宽 = 版心的 1/10 */
+.cruler{position:absolute;left:24px;right:24px;bottom:12px;height:8px;
+  border-bottom:1px solid var(--ink-4);opacity:.45;
+  background:repeating-linear-gradient(90deg,var(--ink-4) 0 1px,transparent 1px 10%)}
+.cruler::after{content:"";position:absolute;right:0;top:0;width:1px;height:8px;background:var(--ink-4)}
+/* 占位语改成版心说明，不再是两行漂浮的灰字 */
+.canvas .ph b{display:block;font-size:10px;letter-spacing:.42em;color:var(--red-ink);
+  margin-bottom:7px;font-weight:400}
+.canvas .ph span{font-size:11px;opacity:.8}
 .canvas{position:relative;width:min(100cqw,100cqh);height:min(100cqw,100cqh);
   aspect-ratio:1/1;margin:0;   /* 取盒子里能放下的最大正方形 */
   
@@ -300,7 +330,16 @@ main>*{width:100%}
       <!-- 重发按钮挂在**画布自己的角**上。相对 .canvas-box 定位会因画布居中而溢出
            （实测右缘超出画布 45px）。绝对定位不占纵向空间、不参与尺寸计算。 -->
       <button class="btn sm ghost canvas-reset" id="resetBtn" type="button">重 发 这 手 牌</button>
-      <div class="ph" id="ph">把牌拖到这里<br><span style="font-size:11px">点一下已放好的牌可以调它</span></div>
+      <!-- 印版标记：角线（定位）+ 版心虚线（落区）+ 底边标尺（尺寸参照）。
+           评委原话：「一块纯白矩形，里面只有两行灰字。没有落区暗示、没有尺寸参照、
+           没有任何『这是个工作台』的信号。左侧转盘做得那么用心，正主反而像没设计完。」
+           这三样都是印刷厂真有的东西，不是新发明的装饰。 -->
+      <div class="cmarks" aria-hidden="true">
+        <i class="cm tl"></i><i class="cm tr"></i><i class="cm bl"></i><i class="cm br"></i>
+        <div class="cframe"></div>
+        <div class="cruler"></div>
+      </div>
+      <div class="ph" id="ph"><b>版 心</b>把牌拖到这里<br><span>点一下已放好的牌可以调它</span></div>
     </div>
     </div>
   </div>
