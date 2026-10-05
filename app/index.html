@@ -32,7 +32,10 @@ section[id]{scroll-margin-top:130px}
 /* ---------- 首屏 ---------- */
 .hero{padding:46px 0 36px}
 .hero-grid{display:grid;grid-template-columns:1fr 1.02fr;gap:52px;align-items:center}
-@media(max-width:960px){.hero-grid{grid-template-columns:1fr;gap:44px}}
+/* 1240 是「右列刚好能给满 568px」的位置。
+   低于它继续用两列的话，画布会被挤到 399~487 —— 比更窄的 960 还小，
+   缩小窗口画布反而变大。提到 1240 之后曲线单调。 */
+@media(max-width:1240px){.hero-grid{grid-template-columns:1fr;gap:44px}}
 
 .eyebrow{display:inline-block;font-family:var(--mono);font-size:12px;letter-spacing:.2em;
   color:var(--ink-2);border:1.5px dashed var(--ink-3);border-radius:2px;
@@ -51,8 +54,8 @@ section[id]{scroll-margin-top:130px}
    而 .stage 是 aspect-ratio:1，宽度一变高度跟着变，整个 hero 随之重排。
    用户看到的就是「这块大小会突变」。
    justify-self:end 只做对齐、不参与尺寸计算，宽度从此与内容无关。 */
-.bay{display:grid;gap:10px;width:100%;max-width:456px;justify-self:end}
-@media(max-width:960px){.bay{max-width:520px;margin:0 auto}}
+.bay{display:grid;gap:10px;width:100%;max-width:568px;justify-self:end}
+@media(max-width:1240px){.bay{justify-self:center}}   /* 不能再用 margin:0 auto —— 会让宽度退化成 fit-content */
 .bay-hd{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 
 /* 机头：深色 = 牌（设备面板），不是强调 */
@@ -79,7 +82,7 @@ section[id]{scroll-margin-top:130px}
 .gate-slot i{position:absolute;left:14px;right:14px;top:3px;height:2px;background:rgba(255,255,255,.14)}
 
 /* 样张：从出票口里出来的那张纸，两侧是走纸齿孔 */
-.tpaper{--pp:24px;position:relative;z-index:2;margin-top:-4px;background:var(--paper-4);
+.tpaper{--pp:18px;position:relative;z-index:2;margin-top:-4px;background:var(--paper-4);
   border:2px solid var(--ink);padding:0 var(--pp) 12px;
   box-shadow:var(--sh-soft),inset 0 12px 15px -16px rgba(10,10,12,.9)}
 .tpaper::before,.tpaper::after{content:"";position:absolute;top:10px;bottom:10px;width:13px;
@@ -95,11 +98,15 @@ section[id]{scroll-margin-top:130px}
 .tpaper>.sheet-hd{flex-wrap:nowrap;overflow:hidden;margin:0 calc(var(--pp) * -1)}
 .tpaper.fed{animation:feed-out 1s cubic-bezier(.18,.85,.25,1) both}
 @keyframes feed-out{from{transform:translateY(-36px);opacity:.4}to{transform:none;opacity:1}}
-.tpaper .sheet-bd{padding:18px}
+.tpaper .sheet-bd{padding:12px}
 .ans-lbl{margin-left:auto;white-space:nowrap;min-width:0;overflow:hidden;text-overflow:ellipsis}
 .ans-lbl b{color:var(--ink-3)}
 .tear-full{margin:14px calc(var(--pp) * -1) 8px}
-@media(max-width:520px){.tpaper{--pp:18px}}
+/* 内边距必须跟着屏幕缩。
+   它们是固定 px，在 390px 手机上 pp18×2 + sheet-bd12×2 = 60px，
+   占 .bay 的 17% —— 画布只剩 274px。缩到 11/9 之后能拿回约 20px。 */
+@media(max-width:560px){.tpaper{--pp:11px}.tpaper .sheet-bd{padding:9px}}
+@media(max-width:400px){.tpaper{--pp:9px}.tpaper .sheet-bd{padding:7px}}
 
 /* ---------- 演示台：虚线框 + 一个下指的 emoji，替代「把牌拖进画布」 ---------- */
 .stage{position:relative;width:100%;aspect-ratio:1;border:2px solid var(--ink);border-radius:2px;
@@ -146,6 +153,12 @@ section[id]{scroll-margin-top:130px}
 .tile{position:relative;width:auto;height:100%;min-width:0;
   border-radius:2px;display:grid;place-items:center;font-family:var(--emoji);font-size:19px;
   background:var(--paper-2);border:1.5px solid var(--ink-4);transition:.3s}
+
+/* 牌高跟着屏幕缩。⚠ 必须排在 .hand-row 基础规则**之后** ——
+   媒体查询不提升优先级，同权重下靠后的赢。
+   之前这条写在基础规则之前，手机上牌高一直是 53px，静默没生效。 */
+@media(max-width:560px){.hand-row{height:46px}}
+@media(max-width:400px){.hand-row{height:42px}}
 .tile.used{border-color:var(--blue);background:var(--paper-4);transform:translateY(-4px);
   box-shadow:0 0 0 3px rgba(31,78,156,.13)}
 .tile .hole{width:9px;height:9px;right:4px;top:4px}   /* 检票打孔：这张牌已经上画布了 */
