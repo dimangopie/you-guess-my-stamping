@@ -148,6 +148,15 @@ else
   echo "     （无浏览器，跳过）"
 fi
 
+echo "── 7.5 路由单元测试 ──"
+# routeTo 是纯函数，可以直接断言。跳转本身没法截图验证 ——
+# Firefox headless 的 --screenshot 抓不到「加载期就 location.replace」的页面（截图直接失败）。
+if [ -x /snap/firefox/current/usr/lib/firefox/firefox ] || command -v firefox >/dev/null 2>&1; then
+  python3 "$(dirname "$0")/tools/route_test.py" || fail=1
+else
+  echo "     （无浏览器，跳过）"
+fi
+
 echo
 [ "$fail" -eq 0 ] && printf '\033[32m全部通过\033[0m\n' || printf '\033[31m有检查未通过\033[0m\n'
 exit $fail

@@ -1,0 +1,14 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"></head><body>
+<script src="pwa.js"></script>
+<script>
+var cases=[["room","room.html"],["/room","room.html"],["#/compose","compose.html"],
+           ["COMPOSE","compose.html"],["nosuch",null],["",null],["  /plaza  ","plaza.html"]];
+var out=cases.map(function(c){
+  var got=window.YPWC_ROUTE_TO(c[0]);
+  var ok=(got===c[1]);
+  return (ok?"PASS":"FAIL")+"  routeTo("+JSON.stringify(c[0])+") = "+JSON.stringify(got)+"  期望 "+JSON.stringify(c[1]);
+});
+var bad=out.filter(function(s){return s.indexOf("FAIL")===0}).length;
+document.body.style.cssText="margin:0;font:13px/1.7 monospace;padding:10px;white-space:pre;background:"+(bad?"#FF0000":"#00CC00");
+document.body.textContent="routeTo 单元测试："+(cases.length-bad)+"/"+cases.length+" 通过\n\n"+out.join("\n");
+</script></body></html>

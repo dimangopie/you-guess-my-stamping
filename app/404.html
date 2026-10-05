@@ -65,6 +65,14 @@
 /* 出口区：与通告纸同宽、同轴 */
 .exits{max-width:760px;margin:0 0 0 7%;padding-top:22px}
 @media(max-width:900px){.paper404, .exits{margin-left:0;margin-right:0}}
+
+/* 站台导向图：认错路的人最需要看到全部站台。 */
+.routemap{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.routemap a{font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-decoration:none;
+  color:var(--ink);background:var(--paper-4);border:1.5px solid var(--ink);border-radius:2px;
+  padding:5px 10px;box-shadow:2px 2px 0 var(--ink)}
+.routemap a:hover{background:var(--amber);border-color:var(--amber-ink)}
+.routemap a i{font-style:normal;color:var(--ink-3);margin-left:6px}
 </style>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#22304F">
@@ -129,11 +137,19 @@
 
     <!-- ==================== 出口 ==================== -->
     <div class="exits">
+      <!-- 出路由 pwa.js 的站台导向图（YPWC_ROUTES）渲染 ——
+           一个真的线路图，而不是手写的两个按钮。
+           认不到路的人才最需要看到全部 14 个站台。
+           手写按钮作为**无 JS 回退**保留。 -->
+      <!-- 三个主出路。导向图是**补充**，不是替换 ——
+           最常用的两条路不该让人在一堆站台里找。 -->
       <div class="btn-row">
         <a class="btn blue" href="plaza.html">回站前广场</a>
         <a class="btn ghost" href="index.html">回站台首页</a>
         <button class="btn ghost" type="button" id="back">按原路退回</button>
       </div>
+      <div id="routeMap" class="routemap" aria-label="站台导向图"></div>
+    </div>
     </div>
 
   </div>
@@ -221,5 +237,18 @@ console.log("%c这张通告上被划掉的，就是你刚才输的那一行。\n
   "color:#4A4841;line-height:1.75;font-family:monospace");
 </script>
 <script src="pwa.js"></script>
+<script>
+/* 用 pwa.js 的同一张路由表渲染出路 —— 表只有一份，改了不会两边不一致。 */
+addEventListener("DOMContentLoaded", function () {
+  var box = document.getElementById("routeMap");
+  if (!box || !window.YPWC_ROUTES) return;
+  var here = location.pathname.split("/").pop();
+  box.innerHTML = window.YPWC_ROUTES
+    .filter(function (r) { return r[1] !== here; })      /* 不给自己出路 */
+    .map(function (r) {
+      return '<a href="' + r[1] + '">' + r[2] + '<i>' + r[3] + '</i></a>';
+    }).join("");
+});
+</script>
 </body>
 </html>
