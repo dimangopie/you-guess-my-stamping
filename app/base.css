@@ -48,6 +48,8 @@
      规则：大块深色填充 → --screen；文字与线条 → --ink。 */
   --screen:#22304F;
   --screen-2:#18233B;   /* 更深一档：边框、凹槽 */
+  /* 纸纤维：一层极淡的噪声，让「纸」不是纯色 */
+  --fiber:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='p'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='160' height='160' filter='url(%23p)' opacity='.12'/></svg>");
   /* 字体 */
   --mono:"Noto Sans Mono CJK SC",ui-monospace,"DejaVu Sans Mono",monospace;
   --sans:"Noto Sans CJK SC","Source Han Sans SC",system-ui,sans-serif;
@@ -79,8 +81,9 @@ body{
   background-color:var(--paper);
   background-image:
     linear-gradient(rgba(23,23,27,.045) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(23,23,27,.045) 1px,transparent 1px);
-  background-size:var(--grid) var(--grid);
+    linear-gradient(90deg,rgba(23,23,27,.045) 1px,transparent 1px),
+    var(--fiber);
+  background-size:var(--grid) var(--grid),var(--grid) var(--grid),160px 160px;
   overflow-x:hidden;
 }
 .wrap{max-width:var(--wrap);margin:0 auto;padding:0 24px}
@@ -220,6 +223,19 @@ p.lead{color:var(--ink-2);font-size:16.5px;max-width:34em}
 .sealwall .s .n{font-family:var(--mono);font-size:11px;letter-spacing:.1em;line-height:1.5}
 .sealwall .s .d{font-family:var(--mono);font-size:9.5px;color:var(--ink-3);margin-top:5px;line-height:1.4}
 
+/* —— 油墨扩散（材质滤镜）——
+   ⚠ 三条坑，全是实测踩出来的，别再踩：
+   ① **不要用 CSS 自定义属性中转**：filter:var(--x) 里若 --x 是 data-URI 的
+      SVG 滤镜，Firefox 完全不渲染 —— 而 getComputedStyle 会返回正确的 url。
+   ② **不要用 data-URI**：同一个 data-URI 滤镜，有时渲染有时不渲染，无法预测。
+      外部表、内联 <style>、变量中转都试过，全都不稳。
+   ③ **唯一可靠的路径是页面内联 <svg><defs><filter> + filter:url(#id)**。
+      代价是每页多一段 6 行的 svg（见各页 <body> 之后）。
+   另：作用域（x/y/width/height）必须给足 260% —— 给 140% 时位移几乎不可见。
+   参数：低频噪声 + scale 6~9 → 轮廓摆动但笔画不糊。 */
+.stamp, .wet{filter:url(#ink-soft)}
+.seal, .stamp.deep, .wet-hard{filter:url(#ink-hard)}
+
 /* 圆形压印（头像/钢印用） */
 .seal{width:96px;height:96px;border:3px solid var(--red);border-radius:50%;
   display:grid;place-items:center;font-family:var(--serif);font-weight:900;font-size:15px;
@@ -258,7 +274,11 @@ p.lead{color:var(--ink-2);font-size:16.5px;max-width:34em}
   .meters .m:nth-child(1),.meters .m:nth-child(2){border-bottom:1.5px dashed var(--ink-3)}}
 
 /* ---------- 10. 表格（时刻表 / 调度单 / 时间线共用） ---------- */
-.board{border:2px solid var(--screen-2);border-radius:var(--rad);overflow:hidden;background:var(--screen)}
+.board{position:relative;border:2px solid var(--screen-2);border-radius:var(--rad);
+  overflow:hidden;background:var(--screen)}
+/* 屏就该有扫描线 —— 深色面是「显示屏」，不是「深色块」 */
+.board::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:1;
+  background:repeating-linear-gradient(0deg,rgba(255,255,255,.05) 0 1px,transparent 1px 3px)}
 .board .row{display:grid;align-items:center;border-bottom:1px solid rgba(242,239,228,.13)}
 .board .row:last-child{border-bottom:none}
 .board .row>div{padding:14px 16px;font-family:var(--mono);font-size:13.5px;min-width:0}
