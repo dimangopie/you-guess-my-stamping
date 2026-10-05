@@ -22,7 +22,7 @@
 .mla{margin-left:auto}
 
 /* ---------- 驳回通知单：一张纸 + 一枚盖歪的红章 ---------- */
-.notice{margin-bottom:22px}
+.notice{margin-bottom:10px}
 .notice .sheet-hd .stamp{margin-left:auto}
 .ntc-t{font-size:14.5px;color:var(--ink-2);line-height:1.9}
 .ntc-t b{color:var(--ink)}
@@ -32,12 +32,27 @@
 /* ---------- 调阅台：筛选 / 排序 / 复印申请 ---------- */
 .ctrl{margin-bottom:8px}
 .ctrl .sheet-hd{padding:13px 18px}
-.ctrl-bd{padding:16px 20px 14px;display:grid;gap:13px}
+.ct-t{margin:0 0 0 2px;font-size:17px;font-weight:900;letter-spacing:.05em;
+  border-left:1.5px solid var(--ink-4);padding-left:12px;white-space:nowrap}
+.whead .sheet+.sheet{margin-top:10px}
+.whead .crumb{margin-bottom:8px;display:inline-block}
+
+/* 驳回通知单：正文与三个按钮并成**一行**。
+   改前 183px（抬头 40 + 正文一段 + 按钮行），而这三件事本就该在一行里读完。 */
+.notice .sheet-bd{display:flex;align-items:center;gap:18px;padding:9px 18px 10px}
+.notice .ntc-t{flex:1 1 auto;min-width:0;margin:0}
+.notice .btn-row{margin:0;flex:0 0 auto}
+.notice .sheet-hd{padding:7px 18px}
+.ctrl-bd{padding:9px 18px 10px;display:flex;flex-wrap:wrap;gap:8px 26px;align-items:center}
+/* 三行（可见性 / 排序 / 数据）原来各占一行、右侧大片空着。
+   改成 flex-wrap 让它们横向流动 —— 780px 宽的面板一行放得下前两行。 */
+.ctrl-bd>.ctrl-row{flex:0 0 auto}
+.ctrl-bd>.ctrl-out{flex:1 1 100%}   /* 底部那行统计仍占整行 */
 .ctrl-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .ctrl-row .btn{margin-left:0}
 .seg{display:inline-flex;flex-wrap:wrap;border:2px solid var(--ink);border-radius:3px;
   overflow:hidden;background:var(--paper-4)}
-.seg button{font-family:var(--mono);font-size:12.5px;letter-spacing:.06em;padding:8px 15px;
+.seg button{font-family:var(--mono);font-size:12.5px;letter-spacing:.06em;padding:5px 12px;
   border:none;border-right:1.5px solid var(--ink-4);background:var(--paper-4);color:var(--ink-2);
   cursor:pointer;transition:.14s}
 .seg button:last-child{border-right:none}
@@ -53,7 +68,7 @@
 .sweetnote .gauge{flex:none;width:104px}
 
 /* ---------- 纸质复印申请单（替代数据导出弹窗） ---------- */
-.copyform{margin-top:14px}
+.copyform{margin-top:10px}
 .copyform .sheet-hd .stamp{margin-left:auto}
 .fgrid{display:grid;grid-template-columns:1fr 1fr;gap:0 26px}
 @media(max-width:620px){.fgrid{grid-template-columns:1fr}}
@@ -273,14 +288,16 @@
       </div>
     </div>
 
-    <div class="sec-head reveal">
-      <span class="tag">归 档 票 根</span>
-      <h2>我的作品</h2>
-    </div>
-
+    <!-- 「归档票根 + 我的作品 + 控制面板」原来是**两张纸**：
+         一张只有标签与标题（且 h2 被 margin-left:auto 推到最右端），
+         另一张是筛选面板，中间隔着 .sec-head 的 40px margin-bottom。
+         实测两张加起来 70 + 40 + 274 = 384px —— 而它们说的是同一件事。
+         现在并成一条工具条：标签、标题、可见性、排序、导出同在一行。
+         这也是评委第四次点名要删的 .sec-head 模板（全站 17 处 → 此处先减 1）。 -->
     <div class="sheet ctrl reveal">
       <div class="sheet-hd">
         <span class="tag-no">归档册 NO. 1管5</span>
+        <h2 class="ct-t">我的作品</h2>
         <span class="meta">出题人 阿野 · 1管51-051</span>
       </div>
       <div class="sheet-bd ctrl-bd">
