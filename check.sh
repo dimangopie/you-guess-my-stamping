@@ -124,6 +124,14 @@ else
   no "缺 app/issues.html"
 fi
 
+echo "── 3.5 对比度普查（按底色）──"
+python3 "$(dirname "$0")/tools/contrast_audit.py" >/tmp/_ct.txt 2>&1 || {
+  grep -E '✗|画在' /tmp/_ct.txt | sed 's/^/  /' | head -12; fail=1; }
+if grep -q '全部达标' /tmp/_ct.txt; then
+  n=$(grep -o '普查 [0-9]* 条' /tmp/_ct.txt | head -1)
+  ok "对比度全部达标（$n）"
+fi
+
 echo
 [ "$fail" -eq 0 ] && printf '\033[32m全部通过\033[0m\n' || printf '\033[31m有检查未通过\033[0m\n'
 exit $fail

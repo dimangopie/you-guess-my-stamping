@@ -127,21 +127,41 @@ def effective_bg(sel):
           全判成了「页面默认 --paper」，一口气误报十几条。）
     """
     for one in sel.split(","):
-        parts = re.split(r'\s+', one.strip())
-        for n in range(len(parts), 0, -1):
-            head = parts[:n]
-            # ① 原样
-            cands = [" ".join(head)]
-            # ② 把最后一段逐级剥连字符
-            last = head[-1]
-            stem = re.sub(r':{1,2}[\w-]+(\([^)]*\))?', '', last)
+        one_s = one.strip()
+        # ① 元素**自己**的背景最优先。
+        #    第一版把祖先表放在最前且用子串匹配，于是 .vote.on{background:var(--amber)}
+        #    与 .logo .no{background:var(--paper)} 自己的底色被祖先覆盖，
+        #    报出两条假警（#17171B 画在深靛上）。优先级错了。
+        own = re.sub(r':{1,2}[\w-]+(\([^)]*\))?', '', one_s)
+        for cand in (one_s, own):
+            if cand in BG:
+                return BG[cand], cand + "（自身）"
+        # ② 显式祖先表：整段相等、或作为后代/前缀出现（不用子串，避免 .vote 命中 .vote.on）
+        for k, v in ANCESTRY.items():
+            if one_s == k or one_s.endswith(" " + k) or one_s.startswith(k + " ") or one_s.startswith(k + ":"):
+                if v in BG:
+                    return BG[v], v + "（显式祖先表）"
+        parts = re.split(r'\s+', one_s)
+        # 分两轮找，顺序很重要：
+        #   第一轮只试**前缀**（从最长到最短），第二轮才试单个祖先。
+        #   第一版把两者混在同一个循环里，于是 ".today .cd b" 在第一轮 n=3 时
+        #   就把单祖先 ".today"（浅色）返回了，根本没走到 n=2 的 ".today .cd"（深色）——
+        #   那条实际上落在深色倒计时块里，被误判成画在浅色纸面上。
+        def _cands(head):
+            out = [" ".join(head)]
+            stem = re.sub(r':{1,2}[\w-]+(\([^)]*\))?', '', head[-1])
             while "-" in stem:
                 stem = stem.rsplit("-", 1)[0]
-                cands.append(" ".join(head[:-1] + [stem]))
-            # ③ 单个祖先：.wrong .board .top .c2 的真正底色来自 .board，
-            #    它不是任何前缀。第二版只试前缀，把这一整类判成了页面默认。
-            for seg in reversed(head):
-                cands.append(seg)
+                out.append(" ".join(head[:-1] + [stem]))
+            return out
+
+        rounds = []
+        for n in range(len(parts), 0, -1):          # ① 前缀，最长优先
+            rounds.append(_cands(parts[:n]))
+        for seg in reversed(parts):                 # ② 单个祖先，最右优先
+            rounds.append([seg])
+
+        for cands in rounds:
             for cand in cands:
                 if cand in BG:
                     return BG[cand], cand
@@ -149,6 +169,30 @@ def effective_bg(sel):
                 if clean in BG:
                     return BG[clean], clean
     return PAGE_BG, "（页面默认 --paper）"
+
+
+# ── 显式祖先表 + 豁免表 ────────────────────────────────────────────
+# 启发式看不出来的两类，都手工核过 HTML/CSS：
+#
+# ① 祖先表：选择器里不含祖先，或元素是 JS 模板生成的。
+#    .feed-no 在 .gate 里（深色机头），但 ".feed-no" 这个选择器本身
+#    没有任何信息说明它落在哪 —— CSS 文本里猜不出来，只能写下来。
+ANCESTRY = {
+    ".feed-no": ".gate", ".gk": ".gate", ".thinbar": ".gate", ".feed": ".gate",
+    ".logo": ".nav", ".nav nav a": ".nav", "body>.nav": ".nav",
+    ".vote": ".board",                      # guess：榜单行由 renderBoard() 生成在深色板里
+    "#score .srow": "#score", "#score .throw": "#score",
+    ".row.top1": ".rk", ".rk .row": ".rk",
+    "#score": ".board", ".srow": ".board", ".throw": ".board",
+}
+# ② 豁免表：真·误报，写明理由。
+#    banks 的 .box 白字只在 :checked 后出现，而那时底色已变成 --blue；
+#    审计只看静态的 background 声明，看不见这个状态切换。
+EXEMPT = {
+    (".cat .box", "banks.html"): "白字只在 .cb:checked 后出现，那时底色是 --blue（状态切换，静态分析看不见）",
+    (".stamp", "base.css"): "印章是「盖上去的图形」不是正文；它的边框与文字同色，改深会失去印章的物理感",
+    (".stamp.amber", "base.css"): "同上",
+}
 
 # ── 普查 ──────────────────────────────────────────────────────────
 rows, fails = [], []
@@ -172,6 +216,8 @@ for f in sorted(APP.glob("*.html")) + [APP / "base.css"]:
             r = contrast(fg, bg)
             if r is None:
                 continue
+            if (sel.strip(), f.name) in EXEMPT:
+                continue                       # 手工核过的误报，理由写在 EXEMPT 里
             rows.append((r, need, f.name, sel.strip()[:52], fg, bg, src[:24], big))
             if r < need:
                 fails.append(rows[-1])

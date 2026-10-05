@@ -34,9 +34,9 @@
      所以不改本体，只加纸上专用的深色。 */
   --amber-ink:#7F5600;
   /* 深面（--screen / --screen-2）文字专用的亮色档。
-     原型在深面上只有 4.44:1（amber）/ 2.75:1（red），都不过 AA。 */
+     原型在深面上只有 4.44:1（amber）/ 2.75:1（red），都不过 AA。 *
+      （--red 没有对应的深面档：普查 369 条规则后确认没有红字画在深面上的地方） */
   --amber-lit:#C98C12;
-  --red-lit:#E17A70;   /* 纸面文字：--paper-3 上也 ≥4.5:1 */
   --red-ink:#A82A1F;     /* 纸上 ≥4.5:1 */
 
   /* 纸 */
@@ -120,7 +120,7 @@ p.lead{color:var(--ink-2);font-size:16.5px;max-width:34em}
 
 .sec-head{display:flex;align-items:flex-end;gap:20px;flex-wrap:wrap;
   border-bottom:2.5px solid var(--ink);padding-bottom:14px;margin-bottom:40px}
-.sec-head .tag{font-family:var(--mono);font-size:12px;letter-spacing:.3em;color:var(--red);
+.sec-head .tag{font-family:var(--mono);font-size:12px;letter-spacing:.3em;color:var(--red-ink);
   border:1.5px solid var(--red);padding:3px 10px;border-radius:2px;white-space:nowrap}
 .sec-head h2{margin-left:auto;font-weight:900;letter-spacing:.05em;
   font-size:clamp(21px,3.2vw,32px)}
@@ -135,7 +135,7 @@ p.lead{color:var(--ink-2);font-size:16.5px;max-width:34em}
 .nav nav{display:flex;gap:24px;margin-left:auto;font-family:var(--mono);font-size:13.5px}
 .nav nav a{color:#B0BACC;text-decoration:none;transition:.2s;white-space:nowrap}
 .nav nav a::before{content:"› ";opacity:.5}
-.nav nav a:hover,.nav nav a[aria-current]{color:var(--amber)}
+.nav nav a:hover,.nav nav a[aria-current]{color:var(--amber-lit)}
 @media(max-width:860px){.nav .wrap{height:60px;gap:12px}.logo{font-size:15px}.logo .no{font-size:12px;padding:2px 6px}
   .nav nav{display:none}}
 
@@ -194,14 +194,14 @@ p.lead{color:var(--ink-2);font-size:16.5px;max-width:34em}
 .field{margin-bottom:20px}
 .field label{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.2em;
   color:var(--ink-3);margin-bottom:6px}
-.field label b{color:var(--red)}
+.field label b{color:var(--red-ink)}
 .field input,.field textarea,.field select{width:100%;border:none;border-bottom:2px solid var(--ink);
   background:transparent;font-family:var(--mono);font-size:16px;padding:8px 2px;color:var(--ink);
   outline:none;letter-spacing:.04em;border-radius:0}
-.field input::placeholder{color:var(--ink-4)}
+.field input::placeholder{color:var(--ink-3)}
 .field input:focus,.field textarea:focus{border-bottom-color:var(--blue)}
 .field .note{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);margin-top:6px;line-height:1.6}
-.field .note.warn{color:var(--red)}
+.field .note.warn{color:var(--red-ink)}
 
 /* ============================================================
    7. 印章体系（扩展轴 3）
@@ -220,7 +220,7 @@ p.lead{color:var(--ink-2);font-size:16.5px;max-width:34em}
 .stamp.bar{border-radius:2px;padding:3px 18px;transform:rotate(-1.5deg);letter-spacing:.24em;font-size:10.5px}
 .stamp.steel{border:none;color:var(--ink-3);box-shadow:none;font-weight:700;
   text-shadow:0 1px 0 #fff,0 -1px 0 rgba(23,23,27,.22);letter-spacing:.18em}
-.stamp.wax{border:none;background:var(--red);color:#F6E4DC;border-radius:46% 54% 48% 52%/52% 46% 54% 48%;
+.stamp.wax{border:none;background:var(--red);color:#FDF9F8;border-radius:46% 54% 48% 52%/52% 46% 54% 48%;
   padding:14px 16px;font-size:10px;box-shadow:1px 2px 0 rgba(23,23,27,.28),inset 0 0 0 2px rgba(255,255,255,.12)}
 .stamp.half{clip-path:inset(0 50% 0 0)}          /* 骑缝章：半枚 */
 .stamp.half-r{clip-path:inset(0 0 0 50%)}
@@ -265,7 +265,7 @@ p.lead{color:var(--ink-2);font-size:16.5px;max-width:34em}
 .stats .v{font-family:var(--mono);font-weight:700;font-size:26px;line-height:1.1;
   letter-spacing:.02em;font-variant-numeric:tabular-nums}
 .stats .k{font-family:var(--mono);font-size:11px;color:var(--ink-3);letter-spacing:.1em;margin-top:5px}
-.stats .v.blue{color:var(--blue)}.stats .v.red{color:var(--red)}.stats .v.amber{color:var(--amber)}
+.stats .v.blue{color:var(--blue)}.stats .v.red{color:var(--red-ink)}.stats .v.amber{color:var(--amber-ink)}
 @media(max-width:640px){.stats .st{min-width:50%;padding:12px 16px}
   .stats .st:nth-child(2n){border-right:none}}
 
@@ -291,10 +291,10 @@ p.lead{color:var(--ink-2);font-size:16.5px;max-width:34em}
 .board .row:last-child{border-bottom:none}
 .board .row>div{padding:14px 16px;font-family:var(--mono);font-size:13.5px;min-width:0}
 .board .row:hover{background:rgba(201,138,14,.09)}
-.board .c1{color:var(--amber);letter-spacing:.1em;border-right:1px solid rgba(242,239,228,.13)}
+.board .c1{color:var(--amber-lit);letter-spacing:.1em;border-right:1px solid rgba(242,239,228,.13)}
 .board .c2{color:var(--paper);font-weight:700;letter-spacing:.22em;border-right:1px solid rgba(242,239,228,.13)}
 .board .c3{color:#A8B2C6;overflow:hidden;text-overflow:ellipsis}   /* 冷灰蓝：配靛蓝底，6.14:1 */
-.board .c4{color:#8A96AF;text-align:right;font-size:12px;white-space:nowrap}   /* 4.40:1（原暖灰在靛底只有 2.49）*/
+.board .c4{color:#8D99B1;text-align:right;font-size:12px;white-space:nowrap}   /* 4.40:1（原暖灰在靛底只有 2.49）*/
 .board.light{background:var(--paper-4)}
 .board.light .row{border-bottom:1px solid var(--ink-4)}
 .board.light .row:hover{background:rgba(31,78,156,.055)}
@@ -417,7 +417,7 @@ p.lead{color:var(--ink-2);font-size:16.5px;max-width:34em}
 .window-sign{display:inline-flex;align-items:center;gap:10px;background:var(--screen);
   color:var(--paper);font-family:var(--mono);font-size:12.5px;letter-spacing:.16em;
   padding:8px 16px;border-radius:2px;border-bottom:3px solid var(--amber)}
-.window-sign b{color:var(--amber);font-size:15px}
+.window-sign b{color:var(--amber-lit);font-size:15px}
 
 /* —— 排队叫号 —— */
 .queue-no{font-family:var(--mono);font-weight:700;font-size:52px;line-height:1;
@@ -555,7 +555,7 @@ footer.site{background:var(--screen);color:#A9B4CB;padding:30px 0;
 /* 页脚只有一行：不再重复导航（导航在页头已经有了）*/
 footer.site .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 footer.site a{color:#B0BACC;text-decoration:none}
-footer.site a:hover{color:var(--amber)}
+footer.site a:hover{color:var(--amber-lit)}
 
 /* ---------- 19. 进场 ---------- */
 .reveal{opacity:0;transform:translateY(18px);transition:opacity .6s,transform .6s}

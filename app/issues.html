@@ -46,7 +46,7 @@
 <main>
 <section class="head">
   <div class="wrap">
-    <span class="lbl-lg">评 审 整 改 台 账 · 截 至 2026-10-05 22:08</span>
+    <span class="lbl-lg">评 审 整 改 台 账 · 截 至 2026-10-05 22:11</span>
     <h1 class="tk">评委提的每一条，和我的处置</h1>
   </div>
 </section>
@@ -56,8 +56,8 @@
   <div class="sum">
     <div class="c"><div class="k">评 委 提 出</div><div class="v">59</div></div>
     <div class="c"><div class="k">我 自 查 出</div><div class="v">7</div></div>
-    <div class="c"><div class="k">已 改</div><div class="v" style="color:var(--blue)">32</div></div>
-    <div class="c"><div class="k">半 改</div><div class="v" style="color:var(--amber-ink)">5</div></div>
+    <div class="c"><div class="k">已 改</div><div class="v" style="color:var(--blue)">33</div></div>
+    <div class="c"><div class="k">半 改</div><div class="v" style="color:var(--amber-ink)">4</div></div>
     <div class="c"><div class="k">未 改</div><div class="v" style="color:var(--red-ink)">29</div></div>
     <div class="c"><div class="k">合 计</div><div class="v">66</div></div>
     <div class="c" hidden><div class="k">评 委 误 报</div><div class="v" style="color:var(--ink-3)">0</div></div>
@@ -287,7 +287,7 @@
     <h2>第三轮 · 7.0 分 —— 净值 ±0.0，「你在验证代码，没有在验证眼睛」</h2>
   </div>
   <div class="meter">
-    <span class="tag-no blue">已改 5</span><span class="tag-no amber">半改 1</span><span class="tag-no red">未改 2</span>
+    <span class="tag-no blue">已改 6</span><span class="tag-no red">未改 2</span>
   </div>
   <div class="board light">
     <table class="ledger">
@@ -312,11 +312,11 @@
   <td><span class="stamp bar red">印红</span></td>
   <td class="ti">.lbl 提到 --ink-2 之后在深底上只有 1.43:1 —— 是「改令牌不看落点」的痕迹<div class="q">「上一轮你说「base.css 在深色面上认认真真标了 6.14:1，却从没在浅色面上量过一次」—— 这一轮你在深色面上也没量。」</div><div class="fix"><b>处置</b>深面改用 #A8B2C6 档。第 4 轮发现问题：那条规则的选择器 .guessstat/.statm 全仓库不存在，且诊断本身也错（那两个标签在浅底上）。已删掉无落点的规则。</div></td>
   <td class="st"><span class="tag-no blue">已改</span><span class="cm">d2d3b39</span></td>
-</tr><tr class="s-partial">
+</tr><tr class="s-fixed">
   <td class="id">R3-05</td>
   <td><span class="stamp bar red">印红</span></td>
-  <td class="ti">--amber-ink 漏在深底上 4 处（2.27:1）<div class="fix"><b>处置</b>.wrong .locked b、plaza 榜单卡已修；但对比度普查显示深面上仍有 7 处用 --amber 原色（4.44:1，差 0.06 不过 AA），2 处用 --amber-ink。**未全部清完**。</div></td>
-  <td class="st"><span class="tag-no amber">半改</span><span class="cm">d2d3b39 + bb17ae5</span></td>
+  <td class="ti">--amber-ink 漏在深底上（2.27:1）<div class="fix"><b>处置</b>全部清完：新增 --amber-lit(#C98C12) 专供深面，14 处深面琥珀改用它；2 处深面灰 #8A96AF 提到 #8D99B1；顺带，普查又抓到两条此前无人发现的真 bug：plaza 榜首答案 color:#fff 画在纸上（1.15:1 等于隐形）、room 窗口牌 #FFE2DA 在印红上只有 3.89:1。</div></td>
+  <td class="st"><span class="tag-no blue">已改</span><span class="cm">未提交（本轮）</span></td>
 </tr><tr class="s-open">
   <td class="id">R3-06</td>
   <td><span class="stamp bar amber">琥珀</span></td>
@@ -364,7 +364,7 @@
 </tr><tr class="s-fixed">
   <td class="id">R4-04</td>
   <td><span class="stamp bar amber">琥珀</span></td>
-  <td class="ti">【到 9 分的第 1 件事】对比度普查脚本 —— 按底色而不是按令牌检查<div class="q">「这一条一次清掉「深底/浅底用错档」整类错误，而且以后不用靠评委的眼睛。」</div><div class="fix"><b>处置</b>新增 tools/contrast_audit.py：读令牌、扫全站规则、用启发式判定底色、算 WCAG 比值。首次运行 365 条里抓出 71 条不合格。</div></td>
+  <td class="ti">【到 9 分的第 1 件事】对比度普查脚本 + 369 条规则全部达标 —— 按底色而不是按令牌检查<div class="q">「这一条一次清掉「深底/浅底用错档」整类错误，而且以后不用靠评委的眼睛。」</div><div class="fix"><b>处置</b>新增 tools/contrast_audit.py（读令牌、扫全站规则、按底色判定、算 WCAG 比值），接入 check.sh 第 3.5 组。首次 71 条不合格 → 现 369 条规则全部达标。过程中修掉审计自身三个 bug：底色优先级、祖先表子串匹配、前缀与单祖先的顺序。</div></td>
   <td class="st"><span class="tag-no blue">已改</span><span class="cm">未提交（本轮）</span></td>
 </tr><tr class="s-open">
   <td class="id">R4-05</td>

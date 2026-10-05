@@ -29,7 +29,10 @@ BANNED = {
     "example.com": "占位域名 —— 虚构世界的破口",
 }
 for kw, why in BANNED.items():
-    hits = [f.name for f in app.glob("*.html") if kw in f.read_text(encoding="utf-8")]
+    # issues.html 是整改台账（元文档），它**必然引用评委原话**，
+    # 那些原话里就含这些关键词。把它排除，否则台账每加一条就误报一次。
+    hits = [f.name for f in app.glob("*.html")
+            if f.name != "issues.html" and kw in f.read_text(encoding="utf-8")]
     if hits:
         bad.append(f"源文件里仍有「{kw}」（{why}）：{', '.join(hits[:4])}")
 
@@ -46,6 +49,7 @@ MAP = {
     "full/index-full.png": "index.html", "full/plaza-full.png": "plaza.html",
     "full/plaza-mobile.png": "plaza.html", "full/compose-mobile.png": "compose.html",
     "full/guess-mobile.png": "guess.html",
+    "issues.png": "issues.html",
 }
 stale, missing = [], []
 for img, src in MAP.items():
