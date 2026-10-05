@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>你拼我猜 · 通行证 NO. 1管51 · 阿野</title>
+<link rel="stylesheet" href="base.css">
+<style>
+/* ============================================================
+   个人主页 /u/:id —— 一张通行证（v3）
+
+   v2 的「网页层」已撤掉：荧光小标签 / 平台通知条 / 双因素弹窗 /
+   验证码 / 通告条 一律不在。留在这里的只有纸、章、孔、塑封。
+   轴 3 印章体系 = 状态与成就；轴 8 物理动作 = 归档打孔 / 过塑 /
+   装订 / 撕线 / 折痕 / 贴标签。
+   本页只写独有版面，base.css 的零件不重定义。
+   ============================================================ */
+
+/* ---------- 一、通行证本体 ---------- */
+.passwrap{padding:34px 0 16px}
+.pass{position:relative;padding:0}
+.pass-hd{padding:18px 24px;gap:14px}
+.pass-hd .kicker{font-family:var(--serif);font-weight:900;font-size:19px;letter-spacing:.3em}
+.pass-hd-r{margin-left:auto;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.passv{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);letter-spacing:.1em}
+.passv s{color:var(--red);text-decoration-thickness:1px}
+/* 归档孔：打孔机打出来的，孔留纸上（轴 8） */
+.pass .hole{right:16px;top:14px;width:15px;height:15px}
+
+/* 钢印：只有边框的压印圆章 */
+.press{width:112px;height:112px;flex:none;position:relative;
+  border:3px solid var(--ink-2);border-radius:50%;display:grid;place-items:center;
+  color:var(--ink-2);opacity:.42;transform:rotate(-11deg)}
+.press::after{content:"";position:absolute;inset:7px;border:1px dashed var(--ink-2);border-radius:50%}
+.press-in{display:grid;gap:3px;text-align:center;font-family:var(--mono);font-size:8.5px;
+  letter-spacing:.14em;line-height:1.3}
+.press-in b{font-family:var(--serif);font-size:13px;letter-spacing:.14em;font-weight:900}
+.press-in i,.press-in em{font-style:normal}
+.press-in em{font-size:7.5px;letter-spacing:.2em}
+
+/* 身份块 */
+.pass-bd{padding:22px 24px}
+.idcard{display:grid;grid-template-columns:auto 1fr auto;gap:24px;align-items:center}
+.seal.av{width:104px;height:104px;position:relative;display:block;padding:0;overflow:hidden;
+  background:var(--paper-3)}
+.seal.av .em{position:absolute;left:50%;top:47%;font-family:var(--emoji);font-size:42px;
+  line-height:1;filter:grayscale(.75) contrast(1.05);transform:translate(-50%,-50%) rotate(10deg)}
+.seal.av .no{position:absolute;bottom:8px;left:0;right:0;text-align:center;
+  font-family:var(--mono);font-size:9px;letter-spacing:.16em;color:var(--red);opacity:.8}
+/* 头像上的一枚小圆印 = 待办件数的角标（不是红点） */
+.idslot{position:relative;display:block}
+.avstamp{position:absolute;right:-12px;top:-10px;width:52px;height:52px;font-size:9px;
+  padding:2px;display:grid;place-items:center;cursor:pointer;background:var(--paper-4);
+  border-radius:50%;line-height:1.15}
+.avstamp:hover{transform:rotate(-2deg) scale(1.05)}
+.avstamp.none{box-shadow:none;opacity:.55}
+.idmain h1{font-size:clamp(24px,3.4vw,34px);font-weight:900;letter-spacing:.3em;text-indent:.3em}
+.idtags{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;align-items:center}
+.idmain .sig{margin-top:12px;font-size:12px;color:var(--ink-2);letter-spacing:.04em}
+
+/* 档案行 */
+.facts{margin:0;display:grid;grid-template-columns:repeat(2,minmax(146px,1fr));gap:12px 28px;
+  border-left:1.5px dashed var(--ink-3);padding-left:26px}
+.facts>div{min-width:0}
+.facts dt{font-family:var(--mono);font-size:10px;letter-spacing:.18em;color:var(--ink-3)}
+.facts dd{font-size:13.5px;color:var(--ink);letter-spacing:.04em}
+
+/* 统计条：5 个数字，撑满整条 */
+.pass-stats{border-top:1.5px dashed var(--ink-3);border-bottom:1.5px dashed var(--ink-3);
+  background:var(--paper-2);padding:0 10px}
+.pass-stats .st{flex:1 1 132px;padding:16px 18px}
+.pass-stats .n{font-family:var(--mono);font-size:9.5px;letter-spacing:.24em;color:var(--ink-4)}
+
+/* 证尾：条形码 + 机读行 + 来访登记 + 翻面 */
+.pass-foot{padding:16px 24px 20px;display:grid;gap:9px}
+.pass-foot .barcode{height:32px;opacity:.85}
+.mrz{font-size:10.5px;letter-spacing:.16em;color:var(--ink-3);white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis}
+.foot-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:4px}
+.foot-row .stamp{margin-right:auto}
+.cutline{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:10px;
+  letter-spacing:.2em;color:var(--ink-4);margin-top:2px}
+.cutline::before,.cutline::after{content:"";flex:1;border-top:1.5px dashed var(--ink-4)}
+
+/* ---------- 二、驳回通知单（纸 + 章，取代 v2 系统条） ---------- */
+.noticesec{padding:0 0 6px}
+.deny{position:relative}
+.deny .sheet-hd{padding:12px 20px;gap:12px}
+.deny-bd{padding:14px 20px 20px;display:grid;gap:12px}
+.deny p{font-family:var(--mono);font-size:12.5px;color:var(--ink-2);line-height:2;
+  max-width:62em}
+.deny p b{color:var(--ink)}
+.deny .stamp{position:absolute;right:22px;bottom:16px}
+.deny .deny-row{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+
+/* ---------- 三、背面：持证须知（滚到底才解锁签字） ---------- */
+.backsec{padding:0 0 8px}
+.backsheet{position:relative}
+.back-hd{padding:14px 22px}
+.back-hd .kicker{font-family:var(--serif);font-weight:900;font-size:16px;letter-spacing:.28em}
+.agr-meta{display:flex;flex-wrap:wrap;gap:6px 22px;padding:12px 22px 0;font-family:var(--mono);
+  font-size:10.5px;letter-spacing:.1em;color:var(--ink-3)}
+.agr-meta b{color:var(--ink-2);font-weight:400}
+.back-bd{padding:14px 22px 20px;display:grid;gap:14px}
+/* 本页独有的须知纸：默认 .terms 不在 base.css 里，这里自绘一张纸 */
+.terms.agr{height:238px;overflow-y:auto;background:var(--paper-4);
+  border:1.5px dashed var(--ink-3);border-radius:2px;padding:16px 18px;outline:none}
+.terms.agr:focus-visible{border-color:var(--blue);border-style:solid}
+.terms.agr h4{font-family:var(--mono);font-size:12px;letter-spacing:.16em;color:var(--red);
+  margin:14px 0 6px}
+.terms.agr h4:first-child{margin-top:0}
+.terms.agr p{font-size:12.5px;color:var(--ink-2);line-height:2}
+.terms.agr .fine{color:var(--ink-3);font-size:11.5px}
+.terms.agr .mk-red{color:var(--red)}
+/* 须知滚动进度：一条刻度（.gauge）代替三句状态文字 —— 律一 · 一事一表 */
+.agr-gauge{margin-top:4px}
+.agr-gauge .val{min-width:3.4em;text-align:right}
+.agr-tools{display:grid;gap:12px}
+.agr-check{display:flex;align-items:flex-start;gap:10px;font-size:13px;color:var(--ink-2);
+  cursor:not-allowed;user-select:none}
+.agr-check.ok{cursor:pointer;color:var(--ink)}
+.agr-check input{appearance:none;width:19px;height:19px;flex:none;margin-top:2px;
+  border:2px solid var(--ink);border-radius:2px;background:var(--paper-4);cursor:inherit;
+  position:relative;transition:.14s}
+.agr-check input:checked{background:var(--blue);border-color:var(--blue)}
+.agr-check input:checked::after{content:"✓";position:absolute;inset:0;color:#fff;font-size:14px;
+  line-height:15px;text-align:center;font-family:var(--mono);font-weight:700}
+.agr-check input:disabled{opacity:.5}
+/* 签字状态块：一个色块 + 一个词（律一），日期由脚本填。
+   只保留签字按钮旁那一处 —— 勾选框自身的勾/未勾已经说明了读到哪一步。 */
+.signslot .pip::after{content:"未签"}
+.signslot .pip.warm::after{content:"待签"}
+.agr-tools .btn[disabled]{opacity:.45;cursor:not-allowed;transform:none;box-shadow:var(--sh-1)}
+.agr-done{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;color:var(--blue)}
+.agr-done::before{content:"✓ "}
+/* 签章位：签字之后才盖上去的一枚章 */
+.signslot{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.signslot .stamp{opacity:0;transition:opacity .2s}
+.signslot .stamp.on{opacity:.88}
+.firewall{display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap;padding:12px 14px;
+  background:var(--paper-2);border:1.5px dashed var(--ink-3);border-radius:2px}
+.firewall .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--ink-3);
+  white-space:nowrap}
+.firewall .v{font-family:var(--mono);font-size:11.5px;color:var(--ink-2);flex:1;min-width:180px;
+  line-height:1.7}
+.firewall .v b{color:var(--red)}
+.firewall.closed .v b{color:var(--blue)}
+
+/* ---------- 四、印章墙（base 的 .sealwall：章 + 名 + 日期，未得留空框） ---------- */
+.sealwall .s>span{display:block;position:relative;width:100%}
+.sealwall .s .mk-code{position:absolute;right:0;bottom:-2px;font-family:var(--mono);font-size:9px;
+  letter-spacing:.1em;color:var(--ink-4)}
+.sealwall .s.got .mk-code{color:var(--ink-3)}
+.sealwall .s .stamp{width:100%;font-size:10px;padding:5px 6px;letter-spacing:.06em}
+.sealwall .s .n{font-weight:700;margin-top:7px}
+.mklegend{display:flex;flex-wrap:wrap;gap:8px 20px;align-items:center;margin-top:20px;
+  padding-top:14px;border-top:1.5px dashed var(--ink-3);font-family:var(--mono);
+  font-size:10.5px;letter-spacing:.1em;color:var(--ink-3)}
+.mklegend span{display:inline-flex;align-items:center;gap:7px}
+.mklegend .sq{width:10px;height:10px;border:2px solid currentColor;border-radius:2px;display:inline-block}
+.mklegend .sq.red{color:var(--red)}
+.mklegend .sq.amber{color:var(--amber)}
+.mklegend .sq.blue{color:var(--blue)}
+.mklegend .sq.off{border-style:dashed;border-color:var(--ink-4)}
+.mklegend #tally{margin-left:auto;color:var(--ink-2)}
+
+/* ---------- 五、三个入口 ---------- */
+.entry{display:flex;flex-direction:column}
+.entry .sheet-bd{padding:16px 18px 18px;display:flex;flex-direction:column;gap:12px;flex:1}
+.elist{list-style:none;display:flex;flex-direction:column}
+.elist>*{display:flex;align-items:center;gap:12px;padding:11px 0;
+  border-bottom:1.5px dashed var(--ink-4);min-width:0}
+.elist>*:first-child{padding-top:0}
+.elist>*:last-child{border-bottom:none;padding-bottom:0}
+.elist .en{font-weight:700;font-size:14px;letter-spacing:.06em;color:var(--ink);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.elist .ek{margin-left:auto;font-size:11px;color:var(--ink-3);white-space:nowrap;letter-spacing:.04em}
+.more{margin-top:auto;display:flex;align-items:center;gap:8px;padding-top:11px;
+  border-top:1.5px solid var(--ink);font-family:var(--mono);font-size:12px;letter-spacing:.1em;
+  color:var(--blue);text-decoration:none}
+.more:hover{color:var(--red)}
+.more .ct{margin-left:auto;color:var(--ink-3);font-size:11px}
+
+/* 作品行：小快照保留笔迹；私密件要核对照片 */
+.wrow{display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit;
+  width:100%;min-width:0}
+.snap.mini{width:56px;height:56px;flex:none}
+.snap.mini .pc{font-size:7.5px}
+.snap.mini.locked{filter:grayscale(.5) opacity(.62)}
+.wtxt{display:grid;gap:3px;min-width:0}
+.wtxt b{font-size:15px;letter-spacing:.16em;font-weight:700}
+.wtxt i{font-style:normal;font-family:var(--mono);font-size:10.5px;color:var(--ink-3);letter-spacing:.04em}
+.wrow .wid{margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--ink-4);
+  white-space:nowrap;letter-spacing:.06em}
+button.wrow{background:none;border:none;padding:0;font:inherit;text-align:left;cursor:pointer}
+button.wrow:hover .wtxt b{color:var(--blue)}
+
+/* 核对照片窗口：私密作品前的一道柜台手续（原位展开，不弹窗） */
+.photocheck{margin-top:10px;background:var(--paper-2);border:1.5px dashed var(--ink-3);
+  border-radius:2px;padding:12px 14px}
+.photocheck .prow{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.photocheck .pbox{width:62px;height:74px;flex:none;border:2px solid var(--ink);border-radius:2px;
+  background:var(--paper-4);display:grid;place-items:center;font-family:var(--emoji);font-size:30px}
+.photocheck .pinfo{font-family:var(--mono);font-size:11px;color:var(--ink-2);line-height:1.95;
+  flex:1;min-width:170px}
+.photocheck .pinfo b{color:var(--ink)}
+.photocheck .passtip{font-family:var(--mono);font-size:11px;color:var(--blue);margin-top:8px}
+
+/* 同乘记录：头像列 + 四态灯 */
+.mates{display:flex;flex-wrap:wrap;gap:10px}
+.mate{position:relative;width:44px;height:44px;border-radius:50%;border:2px solid var(--ink);
+  background:var(--paper-2);display:grid;place-items:center;font-family:var(--mono);
+  font-weight:700;font-size:15px;color:var(--ink)}
+.mate .dot{position:absolute;top:-2px;right:-2px;box-shadow:0 0 0 2px var(--paper-4)}
+.mate.more{border-style:dashed;border-color:var(--ink-4);color:var(--ink-3);font-size:13px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-family:var(--mono);font-size:10.5px;
+  letter-spacing:.08em;color:var(--ink-3)}
+.legend span{display:inline-flex;align-items:center;gap:5px}
+
+/* ---------- 六、证尾小字 ---------- */
+.tailnote{display:flex;gap:8px 22px;flex-wrap:wrap;margin-top:34px;padding-top:16px;
+  border-top:2.5px solid var(--ink);font-family:var(--mono);font-size:10.5px;
+  letter-spacing:.1em;color:var(--ink-3)}
+.tailnote .r{margin-left:auto}
+
+/* 页脚当前页高亮：base.css 未定义 footer 的 aria-current 状态，这里补一条 */
+footer.site a[aria-current]{color:var(--amber)}
+
+@media(max-width:900px){
+  .idcard{grid-template-columns:auto 1fr}
+  .facts{grid-column:1/-1;border-left:none;padding-left:0;border-top:1.5px dashed var(--ink-3);
+    padding-top:16px}
+}
+@media(max-width:700px){
+  .passwrap{padding:24px 0 8px}
+  .press{width:86px;height:86px}
+  .press::after{inset:5px}
+  .press-in{font-size:7px}
+  .press-in b{font-size:11px}
+  .pass-hd,.pass-bd,.pass-foot,.back-hd,.back-bd{padding-left:16px;padding-right:16px}
+  .agr-meta{padding-left:16px;padding-right:16px}
+  .idcard{gap:16px}
+  .seal.av{width:82px;height:82px}
+  .seal.av .em{font-size:33px}
+  .avstamp{width:44px;height:44px;font-size:8px;right:-8px;top:-8px}
+  .pass-stats{padding:0}
+  .pass-stats .st{flex:1 1 50%;padding:13px 14px}
+  .pass-stats .st:nth-child(n+3){border-top:1.5px dashed var(--ink-3)}
+  .pass-stats .st:nth-child(5){flex-basis:100%;border-right:none}
+  .mrz{font-size:9.5px;letter-spacing:.1em}
+  .terms.agr{height:206px}
+  .foot-row .hint{margin-right:0;flex-basis:100%}
+  .deny .stamp{position:static;margin-top:12px;display:inline-block}
+}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="logo" href="index.html">你拼我猜<span class="no">1管51</span></a>
+    <nav>
+      <a href="plaza.html">广场</a>
+      <a href="banks.html">词库</a>
+      <a href="works.html">我的作品</a>
+      <a href="me.html" aria-current="page">我的主页</a>
+      <a href="login.html">退出</a>
+    </nav>
+    <a class="btn sm" href="#">开始拼一题</a>
+  </div>
+</header>
+
+<main>
+
+<!-- ============ 〇、驳回通知单（纸 + 章） ============ -->
+<section class="noticesec" id="notices">
+  <div class="wrap">
+    <div class="sheet deny" id="denySheet">
+      <div class="sheet-hd">
+        <span class="tag-no red">驳 回</span>
+        <span class="lbl">1 管 51 站 · 审 核 科</span>
+        <span class="lbl" id="denyNo" style="margin-left:auto">NO. 1管51-B-003</span>
+      </div>
+      <div class="deny-bd">
+        <p id="denyTxt">
+          <b>事项：</b>你名下「被猜中率低于 25%」的作品共 1 件，已按《冷门内容管理办法》<b>限流处理</b>。
+        </p>
+        <div class="deny-row">
+          <span class="hint" id="denyState">本单共 1 条 · 未归档</span>
+          <button class="btn sm ghost" id="denyArchive" type="button" title="归档此单">归 档</button>
+        </div>
+      </div>
+      <span class="stamp round" id="denyStamp">限 流<br>驳 回</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 一、通行证（过塑 · 已归档） ============ -->
+<section class="passwrap">
+  <div class="wrap">
+    <div class="pass sheet laminated">
+
+      <!-- 证件头 -->
+      <div class="sheet-hd pass-hd">
+        <span class="kicker">通 行 证</span>
+        <span class="tag-no">NO. 1管51</span>
+        <span class="lbl">你 拼 我 猜 · 制 证 处</span>
+        <div class="pass-hd-r">
+          <span class="lbl">有效期 · 长期</span>
+          <span class="label" style="transform:rotate(-1.4deg)">此 件 已 归 档</span>
+          <div class="press" aria-hidden="true">
+            <span class="press-in">
+              <b>你拼我猜</b>
+              <i>制 证 专 用 章</i>
+              <em>1 管 51</em>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 身份块 -->
+      <div class="sheet-bd pass-bd">
+        <div class="idcard">
+          <span class="idslot">
+            <span class="seal av">
+              <span class="em">🦆</span>
+              <span class="no">051</span>
+            </span>
+            <button class="stamp round avstamp" id="avStamp" type="button"
+                    title="1 条驳回单">1<br>件</button>
+          </span>
+          <div class="idmain">
+            <h1 class="tk-sm">阿野</h1>
+            <div class="idtags">
+              <span class="tag-no red">出题人</span>
+              <span class="tag-out">加入 2025.04</span>
+              <span class="tag-out">印章 8 / 12</span>
+              <span class="stamp bar faded">须知未签</span>
+            </div>
+            <p class="sig">「拼得歪，猜得更歪。」</p>
+          </div>
+          <dl class="facts">
+            <div><dt>永 久 编 号</dt><dd class="mono">1管51-051</dd></div>
+            <div><dt>常 驻 词 库</dt><dd>成语俗语 · 网络热梗</dd></div>
+            <div><dt>出 没 时 段</dt><dd class="mono">23:00 – 02:00</dd></div>
+            <div><dt>证 件 状 态</dt><dd>正常 · 已过塑</dd></div>
+          </dl>
+        </div>
+      </div>
+
+      <!-- 统计条：只放 5 个数字 -->
+      <div class="pass-stats">
+        <div class="stats">
+          <div class="st"><div class="n">0 1</div><div class="v">128</div><div class="k">出 题 数</div></div>
+          <div class="st"><div class="n">0 2</div><div class="v amber">47%</div><div class="k">被 猜 中 率</div></div>
+          <div class="st"><div class="n">0 3</div><div class="v blue">302</div><div class="k">猜 中 数</div></div>
+          <div class="st"><div class="n">0 4</div><div class="v blue">8.2s</div><div class="k">最 快 纪 录</div></div>
+          <div class="st"><div class="n">0 5</div><div class="v red">36</div><div class="k">最 佳 歪 解</div></div>
+        </div>
+      </div>
+
+      <!-- 证尾 -->
+      <div class="pass-foot">
+        <div class="barcode" aria-hidden="true"></div>
+        <div class="mrz mono">1GUAN51&lt;&lt;051&lt;&lt;AYE&lt;&lt;CHUTIREN&lt;&lt;2025.04&lt;&lt;&lt;&lt;&lt;128</div>
+        <div class="cutline">沿 虚 线 撕 开 · 背 面 为 持 证 须 知</div>
+        <div class="foot-row">
+          <span class="stamp crooked" aria-hidden="true">本 件 复 印 有 效</span>
+          <span class="hint">今日 +2 · 上次来访 2025.10.03 23:47 · 就在本机</span>
+          <a class="ibtn" href="#agr" title="翻到背面 · 持证须知" aria-label="翻到背面 · 持证须知">🔄</a>
+        </div>
+        <div class="passv">证件版本 v3.0 · <s>v2.1</s> 已于 2025.10.04 作废 · 纸 80g · 单面覆膜</div>
+      </div>
+
+      <!-- 归档打孔：孔留纸上 -->
+      <span class="hole" id="passHole" aria-hidden="true"></span>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============ 二、背面：持证须知（不读到底不给签） ============ -->
+<section class="backsec" id="agr">
+  <div class="wrap">
+    <div class="sheet backsheet creased">
+      <div class="sheet-hd back-hd">
+        <span class="kicker">持 证 须 知</span>
+        <span class="tag-no">背 面</span>
+        <span class="lbl">第 7 版</span>
+        <span class="lbl" style="margin-left:auto">共 1 屏</span>
+      </div>
+      <div class="agr-meta">
+        <span>出具时间 <b class="mono" id="printAt">2025.10.04 22:18</b></span>
+        <span>用纸 <b>A4 / 80g / 单面</b></span>
+        <span>经手窗口 <b class="mono">1 号窗口 · 登记</b></span>
+        <span>工本费 <b class="mono">免费</b></span>
+      </div>
+      <div class="back-bd">
+        <div class="terms agr" id="agrBox" tabindex="0" role="region"
+             aria-label="持证须知全文">
+          <h4>一、持证人与发证方</h4>
+          <p>本须知由持证人「阿野」（证件编号 1管51-051）与「你拼我猜 · 制证处」在柜台前口头订立、当场打印，一式一份，由本站留存。持证人保留一份复印件，复印件与原件具有同等模糊的法律效力。</p>
+          <h4>二、编号</h4>
+          <p>通行证编号 1管51-051 为永久编号，不随昵称、头像、心情变化。编号可赠予他人，但需双方同时到场，并携带本证件原件及复印件各一份；复印费按柜台公示收取。</p>
+          <h4>三、被猜中率</h4>
+          <p>持证人知悉并同意：被猜中率低于 <span class="mk-red">25%</span> 的作品，可能被判定为「过于冷门」并限流；高于 60% 的作品，可能被判定为「过于直白」并降权。本条是本站唯一一条真的会执行的条款。</p>
+          <h4>四、最佳歪解</h4>
+          <p>持证人在他人题目下留下的歪解，一经收录即为本站藏品，本站有权装裱、展示、朗读、在年会播放。持证人保留「那是我先说的」之权利。</p>
+          <h4>五、印章</h4>
+          <p>已获得的 8 枚印章不可退还、不可折现、不可赠送。未获得的 4 枚印章不会因为反复点击而增加获得概率，但持证人仍可反复点击 —— 那是他自己的事。</p>
+          <h4>六、数据与备份</h4>
+          <p>持证人的全部作品数据存放在柜台那台电脑的 D 盘。本站已做备份，备份介质为一张写有「备份」二字的便利贴，贴在显示器边框右侧。</p>
+          <h4>七、隐私</h4>
+          <p>本站尊重持证人隐私。本站仅收集持证人主动提供的信息，以及其余全部信息。</p>
+          <h4>八、证件保管</h4>
+          <p>本证件已单面覆膜，可防泼溅，不防折叠。右上角的归档孔由打孔机打出，孔一旦打出不可修补 —— 那是归档的凭证，不是瑕疵。</p>
+          <h4>九、服务变更与终止</h4>
+          <p>本站可在不事先通知的情况下，随时新增、修改、隐藏、下架任何功能，包括本须知本身。修改后的须知一经打印即生效，打印费由持证人承担。</p>
+          <h4>十、不可抗力</h4>
+          <p>因停电、断网、打印机卡纸、老板外出吃饭、楼上装修等原因造成的服务中断，本站不承担任何责任，但会赠送一枚「纸没了」安慰章（虚拟，不可展示）。</p>
+          <h4>十一、争议解决</h4>
+          <p>因本须知引起的争议，双方应友好协商；协商不成的，提交柜台对面的面馆，边吃边聊，聊到店打烊为止。</p>
+          <h4>十二、其他</h4>
+          <p class="fine">本须知全文共 12 条。读到底部本身不构成同意，在下方签字才构成同意。签字后仍可反悔，反悔入口在第 12 条第 3 款，该款不存在。</p>
+          <p class="fine">— 以上文字由制证处以 6 号字打印，字号偏小属正常现象 —</p>
+        </div>
+
+        <!-- 读到底了没有：一条刻度，文字全删（律一 · 一事一表） -->
+        <span class="gauge agr-gauge" id="agrGauge">
+          <span class="track">
+            <i class="band" style="left:0;right:0"></i>
+            <i class="pin" id="agrPin" style="left:6%"></i>
+          </span>
+          <b class="val" id="agrPct">6%</b>
+        </span>
+
+        <div class="agr-tools">
+          <label class="agr-check" id="agrLabel">
+            <input type="checkbox" id="agrChk" disabled>
+            <span>我已读完《持证须知》全文，并承认我其实没有读。</span>
+          </label>
+          <div class="btn-row signslot">
+            <button class="btn dark" id="agrSign" disabled>签 字 确 认</button>
+            <span class="stamp round blue" id="agrSeal" aria-hidden="true">已 签<br>存 档</span>
+            <button class="btn ghost sm" id="agrAgain" hidden title="反悔并重新阅读">↺</button>
+            <span class="pip lock" id="agrState"></span>
+          </div>
+          <div class="agr-done" id="agrDone" hidden></div>
+        </div>
+
+        <div class="firewall" id="firewall">
+          <span class="v" id="fwTxt">🔒 私密作品通道 · <b>关闭</b></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 三、印章墙 ============ -->
+<section id="stamps">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="tag">印 章 墙</span>
+      <h2>十二枚，已得八枚</h2>
+    </div>
+    <div class="sealwall reveal" id="stampGrid"></div>
+    <div class="mklegend reveal">
+      <span><i class="sq red"></i>朱 印</span>
+      <span><i class="sq amber"></i>金 印</span>
+      <span><i class="sq blue"></i>蓝 叉</span>
+      <span><i class="sq off"></i>未 得</span>
+      <span id="tally"></span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 四、三个入口 ============ -->
+<section id="entries" style="padding-top:0">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <h2>词库 · 作品 · 同乘</h2>
+    </div>
+    <div class="g3 reveal">
+
+      <!-- 我的词库 -->
+      <div class="sheet entry">
+        <div class="sheet-hd">
+          <span class="tag-no blue">我的词库</span>
+          <span class="lbl" style="margin-left:auto">12 个</span>
+        </div>
+        <div class="sheet-bd">
+          <ul class="elist" id="bankList"></ul>
+          <a class="more" href="banks.html">全部词库<span class="ct">12 个 →</span></a>
+        </div>
+      </div>
+
+      <!-- 我的作品 -->
+      <div class="sheet entry">
+        <div class="sheet-hd">
+          <span class="tag-no red">我的作品</span>
+          <span class="lbl" style="margin-left:auto">128 件</span>
+        </div>
+        <div class="sheet-bd">
+          <ul class="elist" id="workList"></ul>
+          <p class="hint" id="lockNote">🔒 需核对</p>
+          <a class="more" href="works.html">全部作品<span class="ct">128 件 →</span></a>
+        </div>
+      </div>
+
+      <!-- 同乘记录 -->
+      <div class="sheet entry">
+        <div class="sheet-hd">
+          <span class="tag-no">同乘记录</span>
+          <span class="lbl" style="margin-left:auto">12 人</span>
+        </div>
+        <div class="sheet-bd">
+          <div class="mates" id="mateList"></div>
+          <div class="legend">
+            <span><i class="dot composing"></i>拼图中</span>
+            <span><i class="dot guessing"></i>猜题中</span>
+            <span><i class="dot solved"></i>已猜中</span>
+            <span><i class="dot offline"></i>离线</span>
+          </div>
+          <a class="more" href="plaza.html">全部同乘<span class="ct">12 人 →</span></a>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="tailnote">
+      <span class="r mono" id="buildNo">build 2025.10.04 · 第 4 次重印</span>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <span>你拼我猜 · 用 emoji 说话</span>
+    <span>1管51 站 · 制证处当场发证</span>
+  </div>
+</footer>
+
+<script>
+/* 通行证 051 · 页面脚本：柜台的物理动作 + 两条真实行为 */
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+
+/* ---------- 落点表：前 u 个生效，保留原始 --s / --r ---------- */
+const LAYOUT=[
+  {x:50,y:70,s:2.5,r:-5},{x:52,y:44,s:1.5,r:4},{x:75,y:58,s:1.35,r:24},
+  {x:25,y:30,s:1.15,r:-15},{x:78,y:22,s:1.05,r:18},{x:24,y:76,s:1.25,r:-24}
+];
+
+/* ---------- 最近 3 件作品（与 works.html 同源） ---------- */
+const RECENT=[
+  {id:"1管5-128",a:"火上浇油",u:3,rate:38,vis:"public",
+   d:["🔥","⛽","💧","🪵","🌫️","🧯","🕯️","☀️","🥵","🚒"]},
+  {id:"1管5-127",a:"让子弹飞",u:4,rate:24,vis:"public",
+   d:["🔫","🎯","💨","🕊️","🎬","🎥","🍿","🏃","🪶","🧨"]},
+  {id:"1管5-126",a:"一剪梅",u:3,rate:51,vis:"public",
+   d:["✂️","🌸","🌺","🎵","🏮","❄️","🌿","🖌️","📜","🍃"]},
+  {id:"1管5-112",a:"加班到天亮",u:3,rate:19,vis:"public",
+   d:["💻","🌙","🌅","☕","😵","🕛","📊","🍜","🔋","🛋️"]},
+  {id:"1管5-119",a:"海底捞月",u:4,rate:41,vis:"private",
+   d:["🌊","⬇️","🥄","🌙","🐟","🪣","⛵","🕳️","✨","🎣"]},
+  {id:"1管5-104",a:"亡羊补牢",u:6,rate:29,vis:"private",
+   d:["🐑","💨","🕳️","🧱","🔨","🏠","🚧","🪚","🐺","🌾"]}
+];
+
+/* ---------- 我的词库 ---------- */
+const BANKS=[
+  {n:"深夜成语",c:"42 条",s:"★★★☆☆"},
+  {n:"打工人日常",c:"28 条",s:"★★☆☆☆"},
+  {n:"老歌金曲",c:"19 条",s:"★★★★☆"}
+];
+
+/* ---------- 同乘记录 ---------- */
+const MATES=[
+  {n:"舟",s:"composing"},{n:"L",s:"guessing"},{n:"陈",s:"solved"},
+  {n:"九",s:"offline"},{n:"白",s:"guessing"},{n:"鹿",s:"composing"}
+];
+
+/* ---------- 印章墙：朱印 / 金印 / 蓝叉（轴 3，一章一义） ---------- */
+const TNAME={red:"朱 印",amber:"金 印",blue:"蓝 叉"};
+const STAMPS=[
+  {n:"两张开局", t:"red",   d:"只用 2 张牌就拼出一道题", got:"2025.05.11"},
+  {n:"连中三元", t:"red",   d:"连续三题都被一次猜中",       got:"2025.07.02"},
+  {n:"一字不差", t:"red",   d:"有人答案与你分毫不差",       got:"2025.08.19"},
+  {n:"手速在线", t:"red",   d:"三分钟内出完一题",           got:"2025.09.03"},
+  {n:"歪解之王", t:"amber", d:"收藏满 30 条最佳歪解",       got:"2025.09.28"},
+  {n:"秒破纪录", t:"amber", d:"单题最快被 8.2 秒猜中",      got:"2025.10.01"},
+  {n:"十张全下", t:"blue",  d:"十张牌一张不落地全用上",     got:"2025.06.14"},
+  {n:"一题百猜", t:"blue",  d:"同一题被猜满 100 次",        got:"2025.08.30"},
+  {n:"全勤一月", t:"red",   d:"一个月里每天出一道题",       got:"", todo:"再出 6 天"},
+  {n:"冷门题王", t:"amber", d:"猜中率低到 20% 以下",        got:"", todo:"还差 2 个百分点"},
+  {n:"同题同中", t:"amber", d:"同一题被三个人先后猜中",     got:"", todo:"再等 1 次"},
+  {n:"百题出题人", t:"blue",d:"累计出题满 100 道",          got:"", todo:"还差 28 道"}
+];
+
+/* ---------- 渲染 ---------- */
+function snapHTML(w,lim,cls){
+  return `<span class="snap ${cls}">`+w.d.slice(0,lim).map((e,i)=>
+    `<span class="pc" style="left:${LAYOUT[i].x}%;top:${LAYOUT[i].y}%;--s:${LAYOUT[i].s};--r:${LAYOUT[i].r}deg">${e}</span>`
+  ).join("")+`</span>`;
+}
+function reanim(el,cls){if(!el)return;el.classList.remove(cls);void el.offsetWidth;el.classList.add(cls);}
+
+$("#bankList").innerHTML=BANKS.map(b=>`
+  <li><span class="en">${b.n}</span><span class="ek mono">${b.c} · ${b.s}</span></li>`).join("");
+
+/* 作品行：私密件挂了锁，点了在窗口核对照片 */
+$("#workList").innerHTML=RECENT.map(w=>{
+  if(w.vis==="private"){
+    return `<li><button class="wrow" data-private="${w.id}" data-name="${w.a}" title="私密作品 · 需核对照片">
+      ${snapHTML(w,3,"mini locked")}
+      <span class="wtxt"><b>${w.a}</b><i>🔒 私密 · 用 ${w.u} 张 · 猜中 ${w.rate}%</i></span>
+      <span class="wid">${w.id}</span>
+    </button></li>`;
+  }
+  return `<li><a class="wrow" href="works.html#w-${w.id}">
+    ${snapHTML(w,3,"mini")}
+    <span class="wtxt"><b>${w.a}</b><i>用 ${w.u} 张 · 猜中 ${w.rate}%</i></span>
+    <span class="wid">${w.id}</span>
+  </a></li>`;
+}).join("");
+
+$("#mateList").innerHTML=
+  MATES.map(m=>`<span class="mate" title="同乘伙伴">${m.n}<i class="dot ${m.s}"></i></span>`).join("")
+  +`<span class="mate more" title="其余 6 人">+6</span>`;
+
+/* 印章墙：v3 用 base 的 .sealwall；未得的留虚线空框，一枚章只写一个意思 */
+$("#stampGrid").innerHTML=STAMPS.map((s,i)=>`
+  <div class="s ${s.got?"got":"off"}" title="${s.d}${s.got?" · "+s.got+" 得":" · 未得（"+s.todo+"）"}">
+    <span>
+      <span class="mk-code">${String(i+1).padStart(2,"0")}</span>
+      <span class="stamp ${s.t==="red"?"":s.t}${s.got?"":" faded"}"
+            style="transform:rotate(${(i%2?3:-3)}deg)">${TNAME[s.t]}</span>
+      <span class="n">${s.n}</span>
+      <span class="d">${s.got?s.got+" 得":"未 得"}</span>
+    </span>
+  </div>`).join("");
+
+const cnt={red:0,amber:0,blue:0},ttl={red:0,amber:0,blue:0};
+STAMPS.forEach(s=>{ttl[s.t]++;if(s.got)cnt[s.t]++});
+$("#tally").innerHTML=
+  `朱印 ${cnt.red}/${ttl.red} · 金印 ${cnt.amber}/${ttl.amber} · 蓝叉 ${cnt.blue}/${ttl.blue} · 合计 ${STAMPS.filter(s=>s.got).length}/${STAMPS.length}`;
+
+/* ============================================================
+   轴 8 · 归档打孔：证件右上角冲一个孔，孔留纸上
+   ============================================================ */
+requestAnimationFrame(()=>{
+  const h=$("#passHole");
+  h.classList.add("punching");
+});
+
+/* ============================================================
+   一、驳回通知单（纸 + 章）：盖章落下 → 可归档打孔
+   ============================================================ */
+const denyStamp=$("#denyStamp");
+requestAnimationFrame(()=>denyStamp.classList.add("stamping"));
+
+$("#avStamp").onclick=()=>{
+  $("#notices").scrollIntoView({block:"center"});
+  reanim(denyStamp,"stamping");
+};
+$("#denyArchive").onclick=()=>{
+  const sheet=$("#denySheet");
+  if(sheet.dataset.archived){return;}
+  sheet.dataset.archived="1";
+  const h=document.createElement("span");
+  h.className="hole";
+  h.style.right="18px";h.style.top="16px";
+  sheet.appendChild(h);
+  reanim(h,"punching");
+  $("#denyState").textContent="本单共 1 条 · 已归档";
+  $("#denyArchive").disabled=true;
+  $("#denyArchive").textContent="已 归 档";
+  const b=$("#avStamp");
+  b.innerHTML="0<br>件";
+  b.classList.add("none");
+  b.title="没有待办件";
+};
+
+/* ============================================================
+   二、持证须知：滚到底才解锁签字（真实检测滚动位置）
+       签字之后才盖那枚「已签存档」章
+   ============================================================ */
+const agrBox=$("#agrBox"), agrChk=$("#agrChk"), agrSign=$("#agrSign");
+let agrScrolled=false, agrSigned=false;
+
+/* 读到底了没有：只用一条刻度说（.pin 位置 + 百分比数字），不用文字 */
+function agrTrack(){
+  const max=Math.max(1,agrBox.scrollHeight-agrBox.clientHeight);
+  const p=Math.max(0,Math.min(1,agrBox.scrollTop/max));
+  const pct=Math.round(p*100);
+  const pin=$("#agrPin"), val=$("#agrPct");
+  pin.style.left=(6+p*88).toFixed(1)+"%";
+  /* 走完那一下：指针与数字变蓝（三色铁律内），不再用文字报「已到底」 */
+  pin.style.background=pct>=100?"var(--blue)":"";
+  val.style.color=pct>=100?"var(--blue)":"";
+  const v=pct+"%";
+  if(val.textContent!==v){val.textContent=v;reanim(val,"flip");}
+}
+
+function agrCheckScroll(){
+  agrTrack();
+  const atEnd = agrBox.scrollTop + agrBox.clientHeight >= agrBox.scrollHeight - 8;
+  if(atEnd && !agrScrolled){
+    agrScrolled=true;
+    $("#agrState").className="pip warm";     /* 待签：一个色块，一处指示（律一） */
+    $("#agrLabel").classList.add("ok");
+    agrChk.disabled=false;
+  }
+}
+agrBox.addEventListener("scroll",agrCheckScroll,{passive:true});
+agrTrack();
+/* 兜底：内容不够长、根本滚不动时，也算「读完了」 */
+if(agrBox.scrollHeight<=agrBox.clientHeight+8) agrCheckScroll();
+
+agrChk.onchange=()=>{
+  agrSign.disabled=!agrChk.checked||agrSigned;
+  $("#agrState").className=agrChk.checked?"pip warm":"pip lock";
+};
+agrSign.onclick=()=>{
+  if(!agrChk.checked||agrSigned)return;
+  agrSigned=true;
+  agrSign.disabled=true;
+  agrSign.textContent="已 签 字";
+  $("#agrAgain").hidden=false;
+  $("#agrDone").hidden=false;
+  /* 已签 + 日期：颜色与形状说状态，日期是内容 */
+  $("#agrState").className="pip on";
+  $("#agrState").textContent="2025.10.04";
+  /* 签字落定，章跟着落下来 */
+  reanim($("#agrSeal"),"stamping");
+  $("#agrSeal").classList.add("on");
+  $("#fwTxt").innerHTML="🔓 私密作品通道 · <b>恢复</b>";
+  $("#firewall").classList.add("closed");
+  const tag=$(".idtags .stamp.bar");
+  if(tag){tag.className="stamp bar blue";tag.textContent="须知已签";}
+  $("#lockNote").textContent="🔒 需核对";
+};
+$("#agrAgain").onclick=()=>{
+  agrSigned=false;agrScrolled=false;
+  agrChk.checked=false;agrChk.disabled=true;agrSign.disabled=true;
+  agrSign.textContent="签 字 确 认";
+  $("#agrAgain").hidden=true;$("#agrDone").hidden=true;
+  $("#agrState").className="pip lock";
+  $("#agrState").textContent="";
+  $("#agrLabel").classList.remove("ok","done");
+  $("#agrSeal").classList.remove("on");
+  $("#fwTxt").innerHTML="🔒 私密作品通道 · <b>关闭</b>";
+  $("#firewall").classList.remove("closed");
+  const tag=$(".idtags .stamp.bar");
+  if(tag){tag.className="stamp bar faded";tag.textContent="须知未签";}
+  agrBox.scrollTop=0;
+  agrTrack();
+};
+
+/* ============================================================
+   三、领证时核对照片：私密作品前的一道柜台手续
+       原位展开一张核对单，不弹窗、不遮屏
+   ============================================================ */
+let checking=null;
+function closePhotoCheck(){
+  if(checking){checking.remove();checking=null;}
+}
+$("#workList").addEventListener("click",e=>{
+  const b=e.target.closest("[data-private]");if(!b)return;
+  const li=b.closest("li");
+  if(checking && checking.parentNode===li){closePhotoCheck();return;}
+  closePhotoCheck();
+  const id=b.dataset.private, name=b.dataset.name;
+  const box=document.createElement("div");
+  box.className="photocheck";
+  box.innerHTML=`
+    <div class="prow">
+      <span class="pbox" aria-hidden="true">🦆</span>
+      <span class="pinfo">
+        <b>私密作品</b> · ${id} ·「${name}」
+      </span>
+      <span style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn sm" type="button" id="pcOk" title="照片是我">✓</button>
+        <button class="btn sm ghost" type="button" id="pcNo" title="照片不对">✕</button>
+      </span>
+    </div>
+    <div class="passtip" id="pcTip" hidden></div>`;
+  li.appendChild(box);
+  checking=box;
+  box.querySelector("#pcOk").onclick=()=>{
+    const tip=box.querySelector("#pcTip");
+    tip.hidden=false;
+    tip.textContent="✓ 照片已核对";
+    box.querySelector("#pcOk").disabled=true;
+    const t=$("#lockNote");
+    t.textContent="✓ 已核对";
+    t.style.color="var(--blue)";
+    reanim(box.querySelector(".pbox"),"stamping");
+  };
+  box.querySelector("#pcNo").onclick=()=>{
+    const tip=box.querySelector("#pcTip");
+    tip.hidden=false;
+    tip.style.color="var(--red)";
+    tip.textContent="✕ 照片不符";
+  };
+});
+
+/* 来访登记计数器：全站重复的装饰（v2 遗留），本次简化删除 —— 见 docs/07 病灶④ */
+
+/* ============================================================
+   五、零碎：打印时间戳 + F5 重印提示 + 控制台
+   ============================================================ */
+(function(){
+  let armed=false;
+  window.addEventListener("keydown",e=>{
+    const k=e.key||"";
+    if(k==="F5"||((e.ctrlKey||e.metaKey)&&(k==="r"||k==="R"))){
+      e.preventDefault();
+      if(!armed){
+        armed=true;
+        $("#denyNo").textContent="正在重新打印本证件… 再按一次确认";
+      }else{ location.reload(); }
+    }
+  });
+})();
+(function(){
+  const d=new Date(),p=n=>String(n).padStart(2,"0");
+  $("#printAt").textContent=`${d.getFullYear()}.${p(d.getMonth()+1)}.${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
+  $("#buildNo").textContent=`build ${d.getFullYear()}.${p(d.getMonth()+1)}.${p(d.getDate())} · 第 ${1+(d.getDate()%7)} 次重印`;
+})();
+console.log("%c你拼我猜 · 制证处","background:#17171B;color:#F2EFE4;font-family:monospace;padding:4px 10px;letter-spacing:.2em;border-bottom:3px solid #C98A0E");
+console.log("%c通行证 NO. 1管51 是柜台那台电脑打印出来的。纸是你自己的，签字也是。","color:#4A4841;font-family:monospace");
+console.log("%c柜台在你手边：滚一滚背面的须知，进度条会告诉你读到哪儿了。","color:#1F4E9C;font-family:monospace;font-weight:700");
+
+/* ---------- 进场 ---------- */
+const io=new IntersectionObserver(es=>es.forEach(e=>{
+  if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target)}}),{threshold:.08});
+$$(".reveal").forEach(el=>io.observe(el));
+</script>
+</body>
+</html>

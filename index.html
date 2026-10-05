@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>你拼我猜 · 项目原型</title>
+<link rel="stylesheet" href="app/base.css">
+<style>
+/* 项目入口页 —— 用同一套设计系统，本身就是"目录" */
+.head{padding:64px 0 8px}
+.head h1{margin-bottom:18px}
+.head .lead{margin-bottom:0}
+.pages{display:grid;grid-template-columns:repeat(auto-fit,minmax(268px,1fr));gap:20px}
+.pg{background:var(--paper-4);border:2px solid var(--ink);border-radius:var(--rad);
+  box-shadow:var(--sh-soft);padding:20px;text-decoration:none;color:inherit;display:block;transition:.16s}
+.pg:hover{transform:translate(-3px,-3px);box-shadow:9px 9px 0 rgba(23,23,27,.16)}
+.pg .top{display:flex;align-items:center;gap:9px;margin-bottom:14px}
+.pg h3{font-size:20px;letter-spacing:.14em;font-weight:900;margin-bottom:8px}
+.pg p{font-size:13.5px;color:var(--ink-2);line-height:1.75;min-height:3.4em}
+.pg .roles{margin-top:12px;display:flex;gap:6px;flex-wrap:wrap}
+.pg .roles span{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--ink-3);
+  border:1px solid var(--ink-4);border-radius:2px;padding:2px 7px}
+.pg.big{grid-column:span 2}
+@media(max-width:640px){.pg.big{grid-column:span 1}}
+.mini{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.mini a{background:var(--paper-4);border:2px solid var(--ink);border-radius:var(--rad);
+  box-shadow:3px 3px 0 rgba(23,23,27,.12);padding:16px 18px;text-decoration:none;color:inherit;
+  display:flex;align-items:center;gap:12px;transition:.16s;font-size:14.5px}
+.mini a:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 rgba(23,23,27,.16)}
+.mini a .sw{width:11px;height:11px;border-radius:2px;border:1px solid var(--ink);flex:none}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="logo" href="index.html">你拼我猜<span class="no">v0.1</span></a>
+    <nav>
+      <a href="#app">产品原型</a>
+      <a href="#styles">风格探索</a>
+      <a href="#docs">文档</a>
+    </nav>
+    <a class="btn sm" href="app/index.html">进入产品原型</a>
+  </div>
+</header>
+
+<main>
+
+<section class="head">
+  <div class="wrap">
+    <h1 class="tk">系统发你十张 emoji，<br>拼出一句话，让朋友猜</h1>
+    <p class="lead">设计语言取自 <b>「1管51」</b> —— 机构感 / 票务 / 编号 / 等宽 / 硬投影。
+      每个页面在语言里对应一种真实文件：房间是调度单，主页是通行证，作品是归档票根，词库是目录册。</p>
+  </div>
+</section>
+
+<section id="app">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="tag">产 品 原 型</span>
+      <h2>五个页面</h2>
+    </div>
+    <div class="pages" id="pgGrid"></div>
+  </div>
+</section>
+
+<section id="styles" style="padding-top:8px">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="tag">风 格 探 索</span>
+      <h2>五案与对照板</h2>
+    </div>
+    <div class="mini">
+      <a href="landing/compare.html"><span class="sw" style="background:#C8A96B"></span>五案并置对照板</a>
+      <a href="landing/1-jiuqi.html"><span class="sw" style="background:#D9A04A"></span>01 明牌酒馆</a>
+      <a href="landing/2-neon.html"><span class="sw" style="background:#FF2D95"></span>02 4-1-0 夜市</a>
+      <a href="landing/3-ticket.html"><span class="sw" style="background:#1F4E9C"></span>03 1管51 <b style="color:var(--red);font-family:var(--mono);font-size:10px;margin-left:auto">已选用</b></a>
+      <a href="landing/4-ink.html"><span class="sw" style="background:#B0344E"></span>04 雾间轻帆</a>
+      <a href="landing/5-hexin.html"><span class="sw" style="background:#E8452A"></span>05 和心 · 独热</a>
+    </div>
+  </div>
+</section>
+
+<section id="errors" style="padding-top:8px">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="tag">错 误 页</span>
+      <h2>出错的时候，也是这套语言最纯的时候</h2>
+    </div>
+    <p class="hint" style="margin:-22px 0 18px;max-width:52em">
+      整页都属于「平台」，不属于用户 —— 所以整页用荧光。三个都有真实行为，不是好看的静态页。
+    </p>
+    <div class="mini" id="errGrid"></div>
+  </div>
+</section>
+
+<section id="docs" style="padding-top:8px">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="tag">文 档</span>
+      <h2>推导过程</h2>
+    </div>
+    <div class="mini">
+      <a href="docs/01-discovery.md">01 · 发现期：种子解构与用户画像</a>
+      <a href="docs/02-style-directions.md">02 · 设计语言方向池 I（114 条）</a>
+      <a href="docs/03-product-structure.md">03 · 产品结构与页面定义</a>
+      <a href="docs/04-style-directions-2.md">04 · 风格池 II（90 条流派）</a>
+      <a href="docs/05-language-v2.md">05 · 设计语言 v2：「打印店」（已撤回）</a>
+      <a href="docs/06-language-v3.md">06 · 设计语言 v3：回到 1管51，然后往外长</a>
+      <a href="docs/07-simplification.md">07 · 简化律：一次只说一件事</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <span>你拼我猜 · 原型 v0.3</span>
+    <span>语言：「1管51」机构感 + 印章体系 + 物理动作 · 设计系统：app/base.css v3</span>
+  </div>
+</footer>
+
+<script>
+const PAGES=[
+  {f:"app/index.html", no:"PAGE 01", n:"落地页", roles:["营销","说明白"],
+   d:"讲清楚三件事：怎么玩（十张牌 · 拖缩转）、有哪七种玩法、词库能自定义。首屏有一块实时演示的画布，发牌用抽签筒。"},
+  {f:"app/login.html", no:"PAGE 02", n:"办证处", roles:["登录","注册"],
+   d:"办一张拼图许可证，凭证进站。三个办理窗口、申请表、当场照相、防伪核对样张、盖章发证 —— 发证时盖钢印并在证件上打归档孔。"},
+  {f:"app/plaza.html", no:"PAGE 03", n:"广场", roles:["公告栏","发现"],
+   d:"别人拼的题都贴在这儿。置顶是每日一题（真实倒计时），主体是公告流（封存态/已揭晓态），右侧三块榜单大屏 —— 其中「最佳歪解榜」排第一，那是这个产品区别于所有同类的地方。"},
+  {f:"app/room.html", no:"PAGE 04", n:"游戏房间", roles:["调度单","实时"],
+   d:"房间的本质是调度「谁什么时候拼、谁什么时候猜」。三栏并置：玩家状态、当前谜面、猜测流，底部常驻得分板。画布上可右键叫出柜台操作。"},
+  {f:"app/me.html", no:"PAGE 05", n:"个人主页", roles:["通行证","档案"],
+   d:"一张过塑的证件。带钢印的头像、永久编号、护照机读区样式的条形码、五个关键数字、一面印章墙，右上角打归档孔。"},
+  {f:"app/works.html", no:"PAGE 06", n:"我的作品", roles:["归档票根","收藏"],
+   d:"装订成册的票根。emoji 快照保留原来的大小与角度 —— 那是笔迹。可展开猜测时间线，最佳歪解最该被看到。「删除」是红笔划掉，不是移除。"},
+  {f:"app/banks.html", no:"PAGE 07", n:"词库", roles:["目录册","自定义"],
+   d:"图书馆卡片目录。官方十类可勾选、自建词库一行一条、词库卡配权限章，广场榜按「猜中率 40~60% 甜区」推荐。"}
+];
+const ERRS=[
+  {f:"app/404.html", n:"404", d:"查无此站 —— 站名被红笔划掉的站台通告"},
+  {f:"app/500.html", n:"500", d:"设备故障 —— 正在抢修，进度卡在 92%"},
+  {f:"app/offline.html", n:"离线", d:"线路中断 —— 在线时反而显示「线路正常」"},
+  {f:"app/full.html", n:"满员", d:"限乘通告 —— 满员，可登记候补"}
+];
+document.getElementById("pgGrid").innerHTML=PAGES.map(p=>`
+  <a class="pg" href="${p.f}">
+    <div class="top"><span class="tag-no">${p.no}</span></div>
+    <h3>${p.n}</h3>
+    <p>${p.d}</p>
+    <div class="roles">${p.roles.map(r=>`<span>${r}</span>`).join("")}</div>
+  </a>`).join("");
+document.getElementById("errGrid").innerHTML=ERRS.map(e=>`
+  <a href="${e.f}"><span class="sw" style="background:#E8368F"></span>
+    <b style="font-family:var(--mono)">${e.n}</b> ${e.d}</a>`).join("");
+</script>
+</body>
+</html>

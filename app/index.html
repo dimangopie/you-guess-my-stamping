@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>你拼我猜 · 1管51</title>
+<link rel="stylesheet" href="base.css">
+<style>
+/* ============================================================
+   落地页 /  —— 站前招贴 + 1 号口取票台（设计语言 v3 = v1 物料 + 两条扩展轴）
+   物理动作：取号 · 出票 · 抽签发牌 · 检票打孔 · 归档装订 · 撕存根 · 折痕 · 撕口
+   简化律：说明性文字各留一行，状态改 .pip / .gauge / emoji
+   本页只写版面，零件全部来自 base.css，不重定义任何零件
+   ============================================================ */
+
+/* ---------- 取号通告：挂在招牌底下的一张纸 ---------- */
+.noticebar{position:sticky;top:68px;z-index:90;background:var(--paper-4);
+  border-bottom:2px solid var(--ink);box-shadow:0 4px 0 rgba(23,23,27,.10)}
+.nb-in{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding-top:9px;padding-bottom:9px}
+.nb-txt{font-size:13.5px}
+.nb-no{font-size:24px}                      /* 叫号数字：本页用中等字号 */
+.nb-note{margin-left:auto}
+.nb-x{background:var(--paper-2);border:1.5px solid var(--ink);border-radius:2px;cursor:pointer;
+  font-family:var(--mono);font-size:11px;letter-spacing:.12em;padding:3px 10px;color:var(--ink);
+  transition:.15s}
+.nb-x:hover{background:var(--ink);color:var(--paper)}
+@media(max-width:860px){.noticebar{top:60px}.nb-note{display:none}}
+/* 跳锚点时别被招牌和通告压住 */
+section[id]{scroll-margin-top:130px}
+@media(max-width:860px){section[id]{scroll-margin-top:112px}}
+
+/* ---------- 首屏 ---------- */
+.hero{padding:46px 0 36px}
+.hero-grid{display:grid;grid-template-columns:1fr 1.02fr;gap:52px;align-items:center}
+@media(max-width:960px){.hero-grid{grid-template-columns:1fr;gap:44px}}
+
+.eyebrow{display:inline-block;font-family:var(--mono);font-size:12px;letter-spacing:.2em;
+  color:var(--ink-2);border:1.5px dashed var(--ink-3);border-radius:2px;
+  padding:6px 14px;margin-bottom:26px}
+.hero h1{margin-bottom:20px}
+.hero .lead{margin-bottom:26px}
+.hero .meta{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:18px}
+/* 并排的状态短语：一块颜色一条，不再写成整句 */
+.pips{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+
+/* ---------- 取票台：机头（牌）+ 从出票口吐出来的样张（纸） ---------- */
+.bay{display:grid;gap:10px;max-width:456px;margin-left:auto}
+@media(max-width:960px){.bay{max-width:520px;margin:0 auto}}
+.bay-hd{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+
+/* 机头：深色 = 牌（设备面板），不是强调 */
+.gate{position:relative;z-index:3;background:var(--ink);border:2px solid var(--ink);
+  border-radius:3px 3px 0 0;padding:11px 14px 0}
+.gate-top{display:flex;align-items:center;gap:10px;padding-bottom:8px}
+.gate-top .gk{font-family:var(--mono);font-size:12.5px;letter-spacing:.22em;color:var(--paper)}
+/* 出票读数：编号是内容，进度是那条细实线 */
+.feed{display:flex;align-items:center;gap:12px;padding-bottom:10px}
+.feed-no{font-family:var(--mono);font-size:12px;letter-spacing:.1em;color:#B9B5A8;white-space:nowrap}
+.thinbar{flex:1;height:2px;background:rgba(242,239,228,.18);min-width:80px}
+/* 细实线进度：一格一格跳，不做缓动 —— 机器是机械的 */
+.thinbar i{display:block;height:2px;width:0;background:var(--amber)}
+.gate-slot{height:9px;background:#000;margin:0 -14px;position:relative}
+.gate-slot i{position:absolute;left:14px;right:14px;top:3px;height:2px;background:rgba(255,255,255,.14)}
+
+/* 样张：从出票口里出来的那张纸，两侧是走纸齿孔 */
+.tpaper{--pp:24px;position:relative;z-index:2;margin-top:-4px;background:var(--paper-4);
+  border:2px solid var(--ink);border-top:none;padding:0 var(--pp) 12px;
+  box-shadow:var(--sh-soft),inset 0 12px 15px -16px rgba(10,10,12,.9)}
+.tpaper::before,.tpaper::after{content:"";position:absolute;top:10px;bottom:10px;width:13px;
+  pointer-events:none;
+  background-image:radial-gradient(circle at 50% 50%,var(--paper-3) 0 3px,
+    rgba(23,23,27,.36) 3.2px 3.9px,transparent 4.1px);
+  background-size:13px 16px;background-repeat:repeat-y}
+.tpaper::before{left:4px}
+.tpaper::after{right:4px}
+.tpaper>.sheet-hd{margin:0 calc(var(--pp) * -1)}
+.tpaper.fed{animation:feed-out 1s cubic-bezier(.18,.85,.25,1) both}
+@keyframes feed-out{from{transform:translateY(-36px);opacity:.4}to{transform:none;opacity:1}}
+.tpaper .sheet-bd{padding:18px}
+.ans-lbl{margin-left:auto;white-space:nowrap}
+.ans-lbl b{color:var(--ink-3)}
+.tear-full{margin:14px calc(var(--pp) * -1) 8px}
+@media(max-width:520px){.tpaper{--pp:18px}}
+
+/* ---------- 演示台：虚线框 + 一个下指的 emoji，替代「把牌拖进画布」 ---------- */
+.stage{position:relative;width:100%;aspect-ratio:1;border:2px solid var(--ink);border-radius:2px;
+  background:var(--paper-4);overflow:hidden;
+  background-image:
+    repeating-linear-gradient(0deg,rgba(23,23,27,.075) 0 1px,transparent 1px 33.4%),
+    repeating-linear-gradient(90deg,rgba(23,23,27,.075) 0 1px,transparent 1px 33.4%),
+    repeating-linear-gradient(0deg,rgba(23,23,27,.03) 0 1px,transparent 1px 8px)}
+.stage .drop{position:absolute;inset:15%;border:2px dashed var(--ink-4);border-radius:2px;
+  display:grid;place-items:center;transition:opacity .4s}
+.stage .drop i{font-size:34px;line-height:1;filter:grayscale(.25);animation:dip 1.8s ease-in-out infinite}
+@keyframes dip{0%,100%{transform:translateY(-4px)}50%{transform:translateY(4px)}}
+.stage .drop.off{opacity:0}
+.stage .pc{position:absolute;font-family:var(--emoji);font-size:34px;line-height:1;
+  transform:translate(-50%,-50%) scale(var(--s)) rotate(var(--r));
+  filter:drop-shadow(1px 2px 0 rgba(23,23,27,.16));opacity:0;transition:opacity .45s}
+.stage .pc.on{opacity:1;animation:drop-in .5s cubic-bezier(.2,1.4,.4,1)}
+@keyframes drop-in{
+  from{opacity:0;transform:translate(-50%,-50%) scale(calc(var(--s) * .3)) rotate(var(--r))}
+  to{opacity:1;transform:translate(-50%,-50%) scale(var(--s)) rotate(var(--r))}}
+@media(prefers-reduced-motion:reduce){.stage .drop i{animation:none}}
+
+/* ---------- 抽签筒：十张牌是从筒里一支一支抽出来的 ---------- */
+.draw{display:flex;align-items:flex-end;gap:14px;margin:14px 0 10px}
+.draw-kv{display:flex;flex-direction:column;gap:3px;padding-bottom:6px}
+.draw-kv b{font-family:var(--mono);color:var(--ink);letter-spacing:.06em}
+.tube i{display:inline-block;width:3px;height:20px;margin:0 1px;vertical-align:bottom;
+  background:var(--paper-4);border:1.5px solid var(--ink);border-radius:1px;
+  transition:opacity .3s,background .3s}
+.tube i.out{opacity:.1;background:transparent}
+
+.hand-row{display:flex;gap:5px;flex-wrap:wrap;min-height:46px}
+.tile{position:relative;flex:0 0 auto;width:calc((100% - 44px) / 10);aspect-ratio:5/6.4;
+  border-radius:2px;display:grid;place-items:center;font-family:var(--emoji);font-size:19px;
+  background:var(--paper-2);border:1.5px solid var(--ink-4);transition:.3s}
+.tile.used{border-color:var(--blue);background:var(--paper-4);transform:translateY(-4px);
+  box-shadow:0 0 0 3px rgba(31,78,156,.13)}
+.tile .hole{width:9px;height:9px;right:4px;top:4px}   /* 检票打孔：这张牌已经上画布了 */
+@media(max-width:520px){.stage .pc{font-size:24px}.tile{font-size:12px}
+  .tile .hole{width:7px;height:7px}}
+
+/* ---------- 三步 / 模式卡 / 词库 ---------- */
+.steps{max-width:760px;margin:0 auto}
+.mode .who .tag-out{font-size:10px}
+.bank-col .sheet-bd{padding:18px 20px}
+.bank-col h3{margin-bottom:8px}
+.cats{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+.cats span{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;color:var(--ink-2);
+  border:1.5px solid var(--ink-4);border-radius:2px;padding:4px 9px;background:var(--paper-4)}
+.cats span:hover{border-color:var(--ink);color:var(--ink)}
+.bank-col .gauge{margin:12px 0 2px}
+.bank-col .btn-row{align-items:center}
+
+/* ---------- 作品墙：装订成册的归档票根 ---------- */
+.archive{padding:22px 22px 22px 34px}
+.wall{display:grid;grid-template-columns:repeat(auto-fit,minmax(272px,1fr));gap:20px}
+.work{display:grid;grid-template-columns:108px 1fr;gap:16px}
+.work .snap{width:108px;height:108px}
+.work .snap .pc{font-size:22px}
+.work h3{font-size:17px;letter-spacing:.18em;margin-bottom:8px}
+.work .kv{font-family:var(--mono);font-size:11.5px;color:var(--ink-3);letter-spacing:.04em;line-height:1.9}
+.work .kv b{color:var(--ink-2);font-weight:700}
+.wrong{margin-top:10px;border-top:1.5px dashed var(--ink-4);padding-top:9px;
+  display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.wrong .q{font-family:var(--mono);font-size:13px;color:var(--red);font-weight:700;letter-spacing:.04em}
+
+/* ---------- 尾屏 ---------- */
+.final{text-align:center;padding:96px 0}
+.final h2{margin-bottom:30px}
+
+/* ---------- 页脚：只剩站点标识 + 一句落款 ---------- */
+footer.site .wrap{align-items:center}
+@media(max-width:700px){footer.site .wrap{flex-direction:column;align-items:flex-start;gap:12px}}
+
+/* ---------- 存根：从存根册上撕下来的那张，填完归档打孔 ---------- */
+.slip{position:fixed;left:0;right:0;bottom:0;z-index:120;
+  transform:translateY(110%);transition:transform .4s cubic-bezier(.2,.9,.3,1)}
+.slip.up{transform:none}
+.slip .sheet{border-bottom:none;box-shadow:0 -5px 0 rgba(23,23,27,.14)}
+.slip-bd{display:flex;gap:20px;align-items:flex-end;flex-wrap:wrap;padding:16px 22px 18px}
+.slip .l{flex:1 1 240px;min-width:0}
+.slip .field{flex:1 1 260px;margin-bottom:0}
+.slip .btn-row{flex:0 0 auto}
+.slip .tearline{margin:0 0 6px}
+@media(max-width:700px){.slip .btn-row .btn{flex:1 1 auto;text-align:center}}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="logo" href="index.html">你拼我猜<span class="no">1管51</span></a>
+    <nav>
+      <a href="#how">怎么玩</a>
+      <a href="#modes">模式</a>
+      <a href="#banks">词库</a>
+      <a href="plaza.html">广场<span style="color:var(--amber);font-size:11px"> 118 新</span></a>
+    </nav>
+    <a class="btn sm" href="login.html">开始拼一题</a>
+  </div>
+</header>
+
+<!-- 取号通告：纸的，挂在招牌底下，叫完号自己撤 -->
+<div class="noticebar" id="callbar">
+  <div class="wrap nb-in">
+    <span class="tag-no red">通 告</span>
+    <span class="nb-txt">叫到 <b class="queue-no nb-no" id="callNo">A130</b> · 前方还有 <b id="callLeft">7</b> 位</span>
+    <span class="say nb-note" id="callNote"></span>
+    <button class="nb-x" id="callX" type="button">已 知 悉</button>
+  </div>
+</div>
+
+<main>
+
+<!-- ============ 首屏：站前招贴 + 1 号口取票台 ============ -->
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <div class="eyebrow">站 前 招 贴 · 1 号 口</div>
+      <h1 class="tk">十张号码牌，<br>换一张别人的答案</h1>
+      <p class="lead">系统发十张 emoji，拼一句话，让朋友猜。</p>
+      <a class="btn" href="login.html">开始拼一题</a>
+      <div class="meta pips">
+        <span class="pip on">免 费</span>
+        <span class="pip on">免 注 册</span>
+        <span class="pip">📱 手 机 直 开</span>
+      </div>
+    </div>
+
+    <!-- 取票台：机头在上，样张从出票口里出来 -->
+    <div class="bay">
+      <div class="bay-hd">
+        <span class="label">3 号 机 · 请 勿 拍 打</span>
+      </div>
+
+      <div class="gate">
+        <div class="gate-top">
+          <span class="dot composing"></span>
+          <span class="gk">1 号 口 · 出 票 中</span>
+        </div>
+        <div class="feed">
+          <span class="feed-no" id="outNo">NO. 1管5-2043</span>
+          <span class="thinbar"><i id="fill"></i></span>
+        </div>
+        <div class="gate-slot"><i></i></div>
+      </div>
+
+      <div class="tpaper" id="paper">
+        <div class="sheet-hd">
+          <span class="tag-no" id="tagNo">NO. 1管5-2043</span>
+          <span class="stamp bar blue">样 张</span>
+          <span class="lbl ans-lbl"><i class="ico">🔑</i><b id="ans">— — — —</b></span>
+        </div>
+        <div class="sheet-bd">
+          <div class="stage" id="stage"><div class="drop" id="hint"><i class="ico-solo">👇</i></div></div>
+
+          <div class="draw">
+            <div class="slot tube" id="tube" aria-hidden="true"></div>
+            <div class="draw-kv">
+              <span class="lbl">已 抽 <b id="drawn">00</b> / 10</span>
+            </div>
+          </div>
+          <div class="hand-row" id="hand"></div>
+        </div>
+        <hr class="tearline tear-full">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 三步 ============ -->
+<section id="how">
+  <div class="wrap-nar">
+    <div class="sec-head reveal">
+      <span class="tag">时 刻 表</span>
+      <h2>三站坐到底</h2>
+    </div>
+    <div class="board reveal steps">
+      <div class="row" style="grid-template-columns:78px 1fr 92px">
+        <div class="c1">0 1</div>
+        <div class="c3" style="padding-left:0">发十张牌 · 拖 · 缩 · 转</div>
+        <div class="c4">本站</div>
+      </div>
+      <div class="row" style="grid-template-columns:78px 1fr 92px">
+        <div class="c1">0 2</div>
+        <div class="c3" style="padding-left:0">一条链接丢进群里</div>
+        <div class="c4">即发</div>
+      </div>
+      <div class="row" style="grid-template-columns:78px 1fr 92px">
+        <div class="c1">0 3</div>
+        <div class="c3" style="padding-left:0">猜歪的，进你的作品集</div>
+        <div class="c4">终点</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 数字 ============ -->
+<section class="meters" style="padding:0">
+  <div class="wrap" style="padding:0">
+    <div class="m"><div class="v">10</div><div class="k">张手牌</div></div>
+    <div class="m"><div class="v">3</div><div class="k">拖 · 缩 · 转</div></div>
+    <div class="m"><div class="v">7</div><div class="k">种玩法</div></div>
+    <div class="m"><div class="v">∞</div><div class="k">个词库</div></div>
+  </div>
+</section>
+
+<!-- ============ 模式 ============ -->
+<section id="modes">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="tag">玩 法 目 录</span>
+      <h2>七种玩法</h2>
+    </div>
+    <div class="auto reveal" id="modeGrid"></div>
+  </div>
+</section>
+
+<!-- ============ 词库 ============ -->
+<section id="banks">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="tag">词 库 目 录 册</span>
+      <h2>官方十类</h2>
+    </div>
+    <div class="g3 reveal">
+      <div class="sheet bank-col laminated">
+        <div class="sheet-hd"><span class="tag-no blue">官方</span></div>
+        <div class="sheet-bd">
+          <h3 class="tk-sm">开箱即玩</h3>
+          <div class="pips" style="margin-top:12px">
+            <span class="pip warm">★ 1–5 星</span>
+            <span class="pip">可多选</span>
+          </div>
+          <div class="cats" id="officialCats"></div>
+        </div>
+      </div>
+      <div class="sheet bank-col">
+        <div class="sheet-hd"><span class="tag-no red">我的</span></div>
+        <div class="sheet-bd">
+          <h3 class="tk-sm">自建题库</h3>
+          <div class="btn-row" style="margin-top:16px">
+            <a class="btn sm" href="#">新建</a>
+            <a class="ibtn" href="#" title="导入文本" aria-label="导入文本">📥</a>
+          </div>
+        </div>
+      </div>
+      <div class="sheet bank-col torn-bottom">
+        <div class="sheet-hd"><span class="tag-no">广场</span></div>
+        <div class="sheet-bd">
+          <h3 class="tk-sm">玩别人出的题</h3>
+          <span class="gauge">
+            <span class="track"><i class="band" style="left:40%;right:40%"></i><i class="pin" style="left:52%"></i></span>
+            <b class="val">40–60%</b>
+          </span>
+          <div class="cats">
+            <span>🔥 今日热门</span><span>🆕 最新上架</span><span>甜区推荐</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 作品与歪解 ============ -->
+<section id="works">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="tag">归 档 票 根</span>
+      <h2>猜歪的也是收藏品</h2>
+    </div>
+    <div class="sheet archive bind reveal">
+      <div class="wall" id="wall"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 尾屏 ============ -->
+<section class="final">
+  <div class="wrap-nar">
+    <h2 class="tk reveal">那句话，值不值得一张纸？</h2>
+    <a class="btn reveal" href="login.html">开始拼一题</a>
+  </div>
+</section>
+
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <span>你拼我猜 · 用 emoji 说话</span>
+    <span>已 营 业 <b id="bizDays" style="color:var(--amber)">—</b> 天</span>
+  </div>
+</footer>
+
+<!-- 存根：从存根册上撕下来的那张，填完打孔归档 -->
+<div class="slip" id="slip" hidden>
+  <div class="wrap">
+    <div class="sheet">
+      <div class="slip-bd">
+        <div class="l">
+          <hr class="tearline">
+          <span class="lbl-lg">存 根</span>
+          <div class="say" style="margin-top:6px" id="slipBody">忘了我们的时候，提醒你一次。</div>
+        </div>
+        <div class="field">
+          <label>联 系 地 址</label>
+          <input id="slipMail" type="email" autocomplete="off" placeholder="you@example.com">
+          <div class="note" id="slipNote"></div>
+        </div>
+        <div class="btn-row">
+          <button class="btn sm" id="slipOk" type="button">撕 下 存 根</button>
+          <button class="btn sm ghost" id="slipNo" type="button">不 用 了</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+
+/* ---------- 数据 ---------- */
+const MODES=[
+  {n:"经典", d:"你拼，别人猜", who:["单人","多人","异步"]},
+  {n:"接力", d:"一人猜一段，接下去", who:["多人","异步"]},
+  {n:"同题", d:"同一组牌，同一个词", who:["多人"]},
+  {n:"反向", d:"给答案，猜怎么拼的", who:["单人","多人"]},
+  {n:"合作", d:"一人拖，一人缩放", who:["多人"]},
+  {n:"盲拼", d:"拼完才看得见", who:["单人","多人"]},
+  {n:"每日", d:"一天一题，只比用时", who:["单人"]}
+];
+const CATS=["成语俗语","日常短语","影视","歌名歌词","网络热梗","地名城市",
+            "品牌产品","英文单词","二次元","经典题库"];
+const PUZZLES=[
+  {d:["🔥","⛽","💧","🪵","🌫️","🧯","🕯️","☀️","🥵","🚒"],u:3,a:"火上浇油",
+   hits:212, rate:38, wrong:"烧开水"},
+  {d:["🌊","⬇️","🥄","🌙","🐟","🪣","⛵","🕳️","✨","🎣"],u:4,a:"海底捞月",
+   hits:63, rate:41, wrong:"水里的月亮"},
+  {d:["🐍","🖌️","➕","🦶","👣","🖍️","🎨","➖","🦎","🐛"],u:5,a:"画蛇添足",
+   hits:388, rate:55, wrong:"蛇长脚了"},
+  {d:["🐑","💨","🕳️","🧱","🔨","🏠","🚧","🪚","🐺","🌾"],u:6,a:"亡羊补牢",
+   hits:97, rate:29, wrong:"给羊盖房子"}
+];
+const LAYOUT=[
+  {x:50,y:70,s:2.5,r:-5},{x:52,y:44,s:1.5,r:4},{x:75,y:58,s:1.35,r:24},
+  {x:25,y:30,s:1.15,r:-15},{x:78,y:22,s:1.05,r:18},{x:24,y:76,s:1.25,r:-24}
+];
+
+/* ---------- 模式卡 ---------- */
+$("modeGrid").innerHTML=MODES.map((m,i)=>`
+  <a class="mode" href="#">
+    <div class="no">MODE ${String(i+1).padStart(2,"0")}</div>
+    <h3>${m.n}</h3>
+    <p>${m.d}</p>
+    <div class="who">${m.who.map(w=>`<span class="tag-out">${w}</span>`).join("")}</div>
+  </a>`).join("");
+
+/* ---------- 词库分类 ---------- */
+$("officialCats").innerHTML=CATS.map(c=>`<span>${c}</span>`).join("");
+
+/* ---------- 归档票根：emoji 快照保留笔迹（第一张有折痕） ---------- */
+$("wall").innerHTML=PUZZLES.map((p,i)=>`
+  <div class="sheet stubcard work${i===0?" creased":""}">
+    <div class="snap">${p.d.slice(0,p.u).map((e,k)=>
+      `<span class="pc" style="left:${LAYOUT[k].x}%;top:${LAYOUT[k].y}%;--s:${LAYOUT[k].s};--r:${LAYOUT[k].r}deg">${e}</span>`
+    ).join("")}</div>
+    <div>
+      <h3>${p.a}</h3>
+      <div class="kv">用了 <b>${p.u}</b> 张 · 被猜 <b>${p.hits}</b> 次 · 猜中 <b>${p.rate}%</b></div>
+      <div class="wrong"><span class="tag-no red">最佳歪解</span><span class="q">「${p.wrong}」</span></div>
+    </div>
+  </div>`).join("");
+
+/* ============================================================
+   首屏演示：抽签（十支）→ 出票 → 上画布 → 揭晓 → 循环
+   ============================================================ */
+const stage=$("stage"), hand=$("hand"), ansEl=$("ans"), hint=$("hint"),
+      tube=$("tube"), drawnEl=$("drawn"), outNo=$("outNo"), tagNo=$("tagNo"),
+      fill=$("fill");
+let idx=0, timers=[];
+
+const later=(fn,ms)=>timers.push(setTimeout(fn,ms));
+const clearAll=()=>{timers.forEach(clearTimeout);timers=[]};
+
+function fillTube(){
+  tube.innerHTML="<i></i>".repeat(10);
+  drawnEl.textContent="00";
+  fill.style.width="0";
+}
+function drawStick(){                       /* 抽走一支：从右边起，留筒不变形 */
+  const sticks=tube.querySelectorAll("i:not(.out)");
+  if(sticks.length) sticks[sticks.length-1].classList.add("out");
+}
+
+function play(){
+  const p=PUZZLES[idx%PUZZLES.length];
+  const no="1管5-"+(2043-idx);
+  outNo.textContent="NO. "+no;
+  tagNo.textContent="NO. "+no;
+
+  clearAll();
+  stage.querySelectorAll(".pc").forEach(n=>n.remove());
+  hint.classList.remove("off");
+  hand.innerHTML="";
+  fillTube();
+  ansEl.textContent="— — — —";
+  ansEl.style.color="var(--ink-3)";
+
+  /* ① 从签筒里抽出十张 —— 一张一张出来，不是凭空淡入 */
+  p.d.forEach((e,i)=>{
+    later(()=>{
+      const t=document.createElement("div");
+      t.className="tile slot-draw";
+      t.dataset.i=i;
+      t.textContent=e;
+      hand.appendChild(t);
+      drawStick();
+      drawnEl.textContent=String(i+1).padStart(2,"0");
+      fill.style.width=Math.round((i+1)/p.d.length*100)+"%";
+    },150*i+380);
+  });
+
+  /* ② 用到的牌上画布，牌上打孔（检票） */
+  const T0=380+150*p.d.length+260;
+  p.d.slice(0,p.u).forEach((e,k)=>{
+    later(()=>{
+      hint.classList.add("off");
+      const L=LAYOUT[k],el=document.createElement("span");
+      el.className="pc";el.textContent=e;
+      el.style.cssText=`left:${L.x}%;top:${L.y}%;--s:${L.s};--r:${L.r}deg`;
+      stage.appendChild(el);
+      requestAnimationFrame(()=>el.classList.add("on"));
+
+      const t=hand.querySelector(`.tile[data-i="${k}"]`);
+      if(t){
+        t.classList.add("used");
+        const h=document.createElement("span");
+        h.className="hole";
+        t.appendChild(h);
+        requestAnimationFrame(()=>h.classList.add("punching"));
+      }
+    },620*k+T0);
+  });
+
+  /* ③ 揭晓 */
+  later(()=>{
+    ansEl.textContent=p.a.split("").join(" ");
+    ansEl.style.color="var(--blue)";
+  },T0+620*p.u+900);
+
+  idx++;
+  later(play,Math.max(7000,T0+620*p.u+3000));
+}
+
+/* ---------- 进场：顺便让样张从出票口里出来 ---------- */
+const io=new IntersectionObserver(es=>es.forEach(e=>{
+  if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target)}}),{threshold:.1});
+document.querySelectorAll(".reveal").forEach(el=>io.observe(el));
+new IntersectionObserver((es,o)=>{
+  if(es[0].isIntersecting){$("paper").classList.add("fed");play();o.disconnect();}
+},{threshold:.25}).observe(stage);
+
+/* ============================================================
+   取号通告：号一直在叫，叫完就撤
+   ============================================================ */
+const CALL_FROM=130, CALL_TO=137;
+let callN=CALL_FROM, callTimer=null;
+const callEl=$("callNo"), leftEl=$("callLeft"), noteEl=$("callNote");
+callTimer=setInterval(()=>{
+  if(callN>=CALL_TO){clearInterval(callTimer);callTimer=null;return;}
+  callN++;
+  callEl.textContent="A"+callN;
+  leftEl.textContent=String(CALL_TO-callN);
+  callEl.classList.remove("called");void callEl.offsetWidth;callEl.classList.add("called");
+  if(callN>=CALL_TO){
+    noteEl.textContent="号 已 发 完 · 门 一 直 开 着";
+    clearInterval(callTimer);callTimer=null;
+  }
+},1400);
+$("callX").addEventListener("click",()=>{
+  if(callTimer){clearInterval(callTimer);callTimer=null;}
+  $("callbar").remove();
+});
+
+/* ============================================================
+   存根：留地址用的那张纸，填完打孔归档（一次性，随时能拒）
+   ============================================================ */
+const slip=$("slip"), slipMail=$("slipMail"), slipNote=$("slipNote"),
+      slipBody=$("slipBody"), slipOk=$("slipOk"), slipNo=$("slipNo");
+const esc=s=>String(s).replace(/[&<>"']/g,c=>
+  ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const slipSeen=()=>{try{return sessionStorage.getItem("ypwc_sub")==="1"}catch(e){return false}};
+const slipMark=()=>{try{sessionStorage.setItem("ypwc_sub","1")}catch(e){}};
+function openSlip(){
+  slip.hidden=false;
+  requestAnimationFrame(()=>slip.classList.add("up"));
+  if(window.innerWidth>760)setTimeout(()=>slipMail.focus(),320);
+}
+function closeSlip(){
+  slip.classList.remove("up");
+  slipMark();
+  setTimeout(()=>{slip.hidden=true},420);
+}
+setTimeout(()=>{if(!slipSeen())openSlip();},2500);
+slipNo.addEventListener("click",closeSlip);
+document.addEventListener("keydown",e=>{
+  if(e.key==="Escape"&&!slip.hidden)closeSlip();});
+slipOk.addEventListener("click",()=>{
+  const v=(slipMail.value||"").trim();
+  if(v.indexOf("@")<1||v.indexOf(".")<0){
+    slipNote.textContent="这不太像地址。";
+    slipNote.classList.add("warn");slipMail.focus();return;
+  }
+  slipBody.innerHTML=`<p>记下了：<b>${esc(v)}</b></p>`;
+  slipMail.style.display="none";  slipNote.classList.remove("warn");
+  slipNote.textContent="这张存根只出现这一次";
+  slipOk.disabled=true;slipOk.textContent="已 归 档 ✓";slipNo.textContent="好";
+  /* 归档：在存根右上角打一个孔 */
+  const h=document.createElement("span");
+  h.className="hole";h.style.right="16px";h.style.top="16px";
+  slip.querySelector(".sheet").appendChild(h);
+  requestAnimationFrame(()=>h.classList.add("punching"));
+  setTimeout(closeSlip,1500);
+});
+
+/* ============================================================
+   页脚：营业天数（来访登记计数器已按简化律整条删除）
+   ============================================================ */
+const comma=n=>String(n).replace(/\B(?=(\d{3})+(?!\d))/g,",");
+const OPENED=new Date(2022,5,1);        /* 本站开张 */
+$("bizDays").textContent=comma(
+  Math.max(1,Math.floor((Date.now()-OPENED.getTime())/864e5)));
+
+/* ============================================================
+   只有网页能做的两件事（切后台改标题 / 控制台留言）
+   ============================================================ */
+const TITLE0=document.title;
+document.addEventListener("visibilitychange",()=>{
+  document.title=document.hidden?"(1) 您的号已叫到 · 你拼我猜":TITLE0;
+});
+
+console.log("%c你拼我猜 · 1管51 站","font:700 14px/1.6 monospace;color:#F2EFE4;background:#17171B;padding:4px 10px");
+console.log("%c会按 F12 的，都是自己人。三件事说给你听：\n"+
+  "① 顶上那条通告里的号一直往上叫，叫到头会告诉你「号发完了，门一直开着」—— 号是真的，吓唬人是假的。\n"+
+  "② 把这一页切到后台，标题会变成「(1) 您的号已叫到」。试试。\n"+
+  "③ 本站没有隐藏关卡。隐藏关卡叫「现在就去拼一题」。",
+  "font:12px/1.9 monospace;color:#4A4841");
+</script>
+</body>
+</html>

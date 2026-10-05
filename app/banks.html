@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>词库目录册 NO. 1管51-B — 你拼我猜</title>
+<link rel="stylesheet" href="base.css">
+<style>
+/* ============================================================
+   词库 /banks —— 目录册 + 索引卡抽屉（v3）
+   v1 物料：索引卡 · 单据填空 · 硬投影 · 等宽 · 几乎全直角
+   轴 3：权限章（公开 / 好友 / 仅自己）+ 甜区朱印
+   轴 8：.label 贴标 · .idx 空白索引卡 · .bind 装订
+   本页只写自己的版面，零件一律取自 base.css。
+   ============================================================ */
+
+/* ---- 页头 ---- */
+.hero{padding:52px 0 6px}
+.hero-grid{display:grid;grid-template-columns:1fr 1.04fr;gap:48px;align-items:start}
+@media(max-width:960px){.hero-grid{grid-template-columns:1fr;gap:32px}}
+.eyebrow{display:inline-flex;align-items:center;gap:10px;font-family:var(--mono);
+  font-size:12px;letter-spacing:.2em;color:var(--ink-2);border:1.5px dashed var(--ink-3);
+  padding:6px 14px;border-radius:2px;margin-bottom:24px;background:rgba(255,255,255,.5)}
+.eyebrow b{color:var(--red)}
+.hero h1{margin-bottom:18px}
+.hero .lead{margin-bottom:26px}
+.hero .lead b{color:var(--ink);border-bottom:2px solid var(--amber);font-weight:700}
+.mla{margin-left:auto}
+
+/* ---- 检索单（单据填空行） ---- */
+.dk-row{display:grid;grid-template-columns:74px 1fr;border-bottom:1.5px dashed var(--ink-3)}
+.dk-row:last-child{border-bottom:none}
+.dk-k{font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--ink-3);
+  background:var(--paper-2);border-right:1.5px dashed var(--ink-3);
+  padding:13px 8px 13px 14px;display:flex;align-items:center}
+.dk-v{padding:11px 14px;min-width:0}
+@media(max-width:520px){.dk-row{grid-template-columns:62px 1fr}.dk-v{padding:10px 11px}}
+.blot{position:absolute;right:5px;bottom:3px;width:96px;height:74px;z-index:0;border-radius:50%;
+  background:radial-gradient(circle at 42% 40%,rgba(201,191,160,.75),rgba(201,191,160,.28) 58%,transparent 72%);
+  pointer-events:none;mix-blend-mode:multiply}
+@media(max-width:520px){.blot{width:70px;height:54px;right:3px;bottom:2px}}
+
+.find{display:flex;align-items:center;gap:10px;border-bottom:2px solid var(--ink);padding-bottom:1px}
+.find:focus-within{border-bottom-color:var(--blue)}
+.find input{flex:1;min-width:0;border:none;background:transparent;font-family:var(--mono);
+  font-size:15.5px;letter-spacing:.02em;color:var(--ink);padding:5px 2px;border-radius:0;
+  -webkit-appearance:none;appearance:none}
+.find input:focus{outline:none}
+.find input::placeholder{color:var(--ink-4);font-size:13px;letter-spacing:.1em}
+.find input::-webkit-search-cancel-button,.find input::-webkit-search-decoration{-webkit-appearance:none}
+/* 检索次数用完：单子上盖一枚朱红细边（原来是荧光） */
+.find.spent{border-bottom-color:var(--red)}
+.find.spent input::placeholder{color:var(--red)}
+
+.chips{display:flex;gap:7px;flex-wrap:wrap}
+.chip{font-family:var(--mono);font-size:11.5px;letter-spacing:.1em;padding:4px 11px;border-radius:2px;
+  border:1.5px solid var(--ink-4);background:var(--paper-4);color:var(--ink-2);cursor:pointer;transition:.14s}
+.chip:hover{border-color:var(--ink);color:var(--ink)}
+.chip.on{background:var(--paper-2);color:var(--ink);border-color:var(--ink);font-weight:700;
+  box-shadow:inset 0 -3px 0 var(--red)}
+
+.res{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;
+  font-family:var(--mono);font-size:11.5px;color:var(--ink-3);letter-spacing:.06em}
+.res b{font-size:15px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
+.res b.blue{color:var(--blue)}
+.res .none{font-size:13px;color:var(--ink-2);letter-spacing:.04em}
+.lnk{color:var(--blue);text-decoration:none;border-bottom:1px solid var(--blue);font-size:12px}
+
+/* ---- 防伪核对：样张 + 九宫格（内联，不走弹窗） ---- */
+.sample{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:2px 0 10px}
+.sample .sp{width:48px;height:48px;border:2px solid var(--ink);border-radius:2px;display:grid;
+  place-items:center;font-family:var(--emoji);font-size:26px;background:var(--paper-4);flex:none}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;max-width:228px}
+.cell{aspect-ratio:1;border:2px solid var(--ink-4);border-radius:2px;display:grid;place-items:center;
+  font-family:var(--emoji);font-size:24px;cursor:pointer;background:var(--paper-4);transition:.12s;
+  padding:0}
+.cell:hover{border-color:var(--blue)}
+.cell.on{border-color:var(--blue);background:rgba(31,78,156,.10);box-shadow:inset 0 0 0 2px var(--blue)}
+.cap-note{font-family:var(--mono);font-size:11px;color:var(--ink-2);line-height:1.7;margin-top:10px}
+.cap-note b{color:var(--blue)}
+
+/* ---- 区段工具条 ---- */
+.cat-bar{display:flex;align-items:center;gap:9px;flex-wrap:wrap;
+  border-bottom:1.5px dashed var(--ink-3);padding-bottom:14px;margin-bottom:24px}
+.cat-bar b{font-family:var(--mono);font-size:15px;font-weight:700;font-variant-numeric:tabular-nums}
+.cat-bar .sp{color:var(--ink-4)}
+
+/* 单据上本来就有的抬头 / 字段名 / 附注：都读得到，不靠 .lbl
+   （.lbl 与 .hint 已降级为最浅一档灰，只配承载可删的说明） */
+.doc-t{font-family:var(--mono);font-size:11.5px;letter-spacing:.2em;color:var(--ink-2)}
+.meta{font-family:var(--mono);font-size:11px;letter-spacing:.06em;color:var(--ink-2)}
+.fk{font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--ink-2)}
+.mla{margin-left:auto}
+
+/* ---- 官方目录：分类卡（可勾选，角上一张贴标签） ---- */
+.cat{position:relative;display:grid;grid-template-columns:1fr auto;gap:4px 12px;align-items:start;
+  padding:16px 18px 14px 48px;background:var(--paper-4);border:2px solid var(--ink);
+  border-radius:var(--rad);box-shadow:var(--sh-soft);cursor:pointer;transition:.16s}
+.cat:hover{transform:translate(-2px,-2px);box-shadow:7px 7px 0 rgba(23,23,27,.14)}
+.cat .cb{position:absolute;left:14px;top:17px;width:19px;height:19px;margin:0;opacity:0}
+.cat .box{position:absolute;left:14px;top:17px;width:19px;height:19px;border:2px solid var(--ink);
+  background:var(--paper-4);display:grid;place-items:center;pointer-events:none;transition:.14s;
+  font-family:var(--mono);font-size:12px;line-height:1;color:#fff}
+.cat .cb:checked~.box{background:var(--blue);border-color:var(--blue)}
+.cat .cb:checked~.box::after{content:"✓"}
+.cat .cb:focus-visible~.box{outline:2px solid var(--blue);outline-offset:3px}
+.cat:has(.cb:not(:checked)){background:var(--paper-2);box-shadow:none}
+.cat:has(.cb:not(:checked)) .cat-n{color:var(--ink-3)}
+.cat:has(.cb:not(:checked)) .cat-ft{color:var(--ink-3)}
+.cat:has(.cb:not(:checked)) .stars b{color:var(--ink-3)}
+.cat-lab{grid-column:2;grid-row:1;justify-self:end}
+.cat-n{grid-column:1;grid-row:1;font-size:18px;font-weight:900;letter-spacing:.16em;line-height:1.4;
+  display:flex;align-items:center;min-width:0}
+.cat-ft{grid-column:1/-1;grid-row:2;display:flex;align-items:center;gap:9px;margin-top:6px;
+  padding-top:9px;border-top:1.5px dashed var(--ink-4);font-family:var(--mono);font-size:12px;color:var(--ink-2)}
+.cat-ft b{font-size:15px;font-weight:700;font-variant-numeric:tabular-nums}
+
+/* ---- 星级 ---- */
+.stars{font-family:var(--sans);font-size:.96em;letter-spacing:.14em;white-space:nowrap}
+.stars b{font-weight:400;color:var(--ink)}
+.stars i{font-style:normal;color:var(--ink-4)}
+.cat-ft .stars{margin-left:auto}
+
+/* ---- 猜中率：一条刻度（零件一律取自 base.css 第 17 节） ----
+   刻度自己会说：甜区带 + 指针 + 一个数字。不再写「偏冷 / 落在甜区」这类整句。 */
+.rate{display:flex;align-items:center;gap:11px;flex-wrap:wrap}
+.rate .k{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--ink-3)}
+.rate .k:last-child{margin-left:auto}
+.rate .gauge,.mc-rate .gauge{flex:1 1 104px;min-width:92px}
+.rate .gauge .val,.mc-rate .gauge .val{font-size:14px}
+.mc-rate{display:flex;align-items:center;gap:11px;flex-wrap:wrap;margin-top:2px}
+.mc-rate .k{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--ink-3)}
+/* 订阅条款的阅读进度：一条刻度代替「请先把条款滚到底」 */
+.subg{margin-top:14px}
+.subg .track{height:8px}
+/* 单据上的小标（当日有效 / 本册已核）：不再刻章 */
+.pbox{border:1px solid var(--ink-4);border-radius:2px;padding:2px 8px;letter-spacing:.08em}
+/* 封面主章：一枚，只此一枚 */
+.hero-act{display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.bookseal{margin-left:auto;font-size:11.5px;padding:7px 14px;letter-spacing:.2em}
+/* 防伪核对：样张 = 目标，右上角一个问号，不用文字解释 */
+.sample .eq{font-size:15px;color:var(--ink-3);margin:0 2px}
+.sample .qm{font-family:var(--mono);font-weight:700;font-size:22px;color:var(--red)}
+.find .ibtn{width:26px;height:26px;font-size:13px}
+
+/* ---- 我的词库：索引卡 ---- */
+.mcard{display:flex;flex-direction:column;gap:10px;min-height:248px}
+.mc-hd{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.mc-hd .stamp{margin-left:auto}
+.mc-n{font-size:19px;font-weight:900;letter-spacing:.12em;line-height:1.35}
+.mc-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+  font-family:var(--mono);font-size:11.5px;color:var(--ink-3);letter-spacing:.04em}
+.mc-meta i{font-style:normal;color:var(--ink-4)}
+.mc-acts{margin-top:auto;display:flex;gap:16px;flex-wrap:wrap;
+  border-top:1.5px dashed var(--ink-4);padding-top:11px}
+.mc-acts a{font-family:var(--mono);font-size:11.5px;letter-spacing:.1em;color:var(--ink-3);
+  text-decoration:none;transition:.14s}
+.mc-acts a::before{content:"› ";opacity:.5}
+.mc-acts a:hover{color:var(--blue)}
+
+/* 空态：一张没写字的索引卡 */
+.idx.newcard{display:grid;place-content:center;justify-items:center;gap:6px;min-height:248px;
+  padding:24px;text-align:center;text-decoration:none;color:inherit;background:transparent;
+  border-style:dashed;border-color:var(--ink-3);box-shadow:none}
+.idx.newcard::before{border-style:dashed;border-color:var(--ink-3);background:transparent}
+.idx.newcard:hover{transform:translate(-3px,-3px);box-shadow:9px 9px 0 rgba(23,23,27,.12);
+  border-color:var(--ink)}
+.idx.newcard:hover::before{border-color:var(--ink);border-style:solid}
+.newcard .plus{font-family:var(--mono);font-size:42px;line-height:1;font-weight:700;color:var(--ink-4);transition:.16s}
+.newcard .nc-t{font-size:16px;font-weight:900;letter-spacing:.22em;color:var(--ink-2)}
+.idx.newcard:hover .plus{color:var(--blue)}
+
+/* 我的词库汇总 */
+.sum{margin-bottom:28px}
+.sum .stats .st{flex:1 1 140px}
+
+/* ---- 词库广场：两榜（状态一律用 .pip，不再配图例，也不刻章） ---- */
+.rank-hd{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px;
+  border-bottom:2px solid var(--ink);padding-bottom:10px}
+.rank-hd h3{font-size:18px;letter-spacing:.12em}
+.rank-hd .meta{margin-left:auto}
+.rank .row{grid-template-columns:34px minmax(0,1fr) 54px 78px 86px}
+.rank .row .nm{color:var(--ink);font-weight:700;letter-spacing:.05em;font-size:13.5px}
+.rank .row .nm .by{display:block;font-weight:400;font-size:11px;letter-spacing:.04em;color:var(--ink-3);margin-top:2px}
+.rank .row .rt{font-size:14px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
+.rank .row .pl{font-variant-numeric:tabular-nums}
+.rank .row .mk{text-align:center;padding:10px 4px}
+.rank .row .mk .pip{font-size:10px;letter-spacing:0}
+.rank .row.is-off .nm{color:var(--ink-3);font-weight:400}
+.rank .row.is-off .nm .by{color:var(--ink-4)}
+.rank .row.is-off .rt,.rank .row.is-off .pl{color:var(--ink-4)}
+.rank .row.is-off .rt{font-weight:400}
+.rank-ft{margin-top:14px;display:flex;justify-content:center}
+@media(max-width:1080px){
+  .rank .row{grid-template-columns:28px minmax(0,1fr) 46px 72px 78px}
+  .rank .row>div{padding:12px 9px}
+}
+@media(max-width:620px){
+  .rank .row{grid-template-columns:26px 52px 74px minmax(0,1fr);
+    grid-template-areas:"rk nm nm nm" "rk rt pl mk";row-gap:2px;padding:6px 0}
+  .rank .row>div{padding:8px 6px}
+  .rank .row .rk{grid-area:rk;border-right:none;padding-left:8px}
+  .rank .row .nm{grid-area:nm;border-right:none;border-bottom:1px dashed var(--ink-4);padding-bottom:7px}
+  .rank .row .rt{grid-area:rt;text-align:left}
+  .rank .row .pl{grid-area:pl;text-align:left}
+  .rank .row .mk{grid-area:mk;padding:8px;text-align:right}
+}
+
+/* 限阅行：本柜需凭介绍信查阅 */
+.rank .row.locked{cursor:pointer;background:rgba(211,58,44,.045)}
+.rank .row.locked:hover{background:rgba(211,58,44,.10)}
+.rank .row.locked .nm{color:var(--ink-2)}
+.rank .row.locked .rt{color:var(--ink-3);font-weight:400;font-size:15px}
+.rank .row.locked .pl{color:var(--ink-3)}
+.rank .row:focus-visible{outline:2px solid var(--blue);outline-offset:-2px}
+.redl{color:var(--red);font-weight:700}
+.rank .row.justunlocked{animation:unlockflash 1.3s ease-out}
+@keyframes unlockflash{0%{background:rgba(31,78,156,.26)}100%{background:transparent}}
+
+/* 介绍信（原付费墙，现在是一张纸） */
+.letter{margin-bottom:22px}
+.letter .sheet-hd .stamp{margin-left:auto}
+.ltr-t{font-size:21px;font-weight:900;letter-spacing:.08em;margin-bottom:8px}
+.fld{display:flex;align-items:baseline;gap:12px;padding:8px 0;border-bottom:1px dashed var(--ink-4)}
+.fld:last-child{border-bottom:none}
+.fld .fk{flex:none;width:56px}
+.fld .fv{font-family:var(--mono);font-size:13.5px;font-weight:700;letter-spacing:.02em}
+.ltr-body{font-family:var(--serif);font-size:15px;line-height:2;color:var(--ink-2);margin-top:12px}
+.ltr-body b{border-bottom:1.5px solid var(--ink)}
+
+/* 介绍信查阅中的凭条 */
+.ltr-strip .sheet-bd{display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+  font-family:var(--mono);font-size:12px;color:var(--ink-2);line-height:1.7}
+.ltr-strip .ls-t{flex:1;min-width:200px}
+.ltr-strip .ls-t b{color:var(--ink)}
+.tryx{background:none;border:1.5px dashed var(--ink-4);color:var(--ink-3);
+  font-family:var(--mono);font-size:11px;letter-spacing:.1em;padding:3px 9px;border-radius:2px;
+  cursor:pointer;transition:.14s;white-space:nowrap}
+.tryx:hover{color:var(--blue);border-color:var(--blue);border-style:solid}
+
+/* ---- 订阅目录更新通知：一张纸，不是弹窗 ---- */
+.subcard{margin-top:4px}
+.sub-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:24px;align-items:start}
+@media(max-width:820px){.sub-grid{grid-template-columns:1fr;gap:18px}}
+.sub-h{font-size:19px;font-weight:900;letter-spacing:.04em;line-height:1.6}
+.sub-list{list-style:none;margin:14px 0 18px;border-top:1.5px dashed var(--ink-4);
+  border-bottom:1.5px dashed var(--ink-4);padding:10px 0}
+.sub-list li{font-family:var(--mono);font-size:12px;color:var(--ink-2);line-height:2}
+.sub-list li b{color:var(--red)}
+.terms{height:236px;overflow:auto;background:var(--paper-2);border:2px solid var(--ink);
+  border-radius:2px;padding:14px 16px;font-family:var(--mono);font-size:12px;color:var(--ink-2);
+  line-height:1.95;box-shadow:inset 0 2px 0 rgba(23,23,27,.07)}
+.terms h4{font-family:var(--mono);font-size:11px;letter-spacing:.18em;color:var(--red);margin:10px 0 3px}
+.terms h4:first-child{margin-top:0}
+.sub-done{position:relative}
+
+/* ---- 详情预览 + 词条清单（装订） ---- */
+.detail{display:grid;grid-template-columns:minmax(0,336px) minmax(0,1fr);gap:22px;align-items:start}
+@media(max-width:900px){.detail{grid-template-columns:1fr}}
+.dcard-n{font-size:22px;font-weight:900;letter-spacing:.1em;margin-bottom:8px}
+.dcard .hint{display:block;line-height:1.7}
+.flds .fld:last-child{border-bottom:none}
+.fld .sv{font-family:var(--sans);font-size:13px}
+.bind::before{z-index:3}
+.bind-strip{z-index:2}
+.lcard-ft{margin-top:16px;padding-top:14px;border-top:1.5px dashed var(--ink-3);
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.lcard-ft .btn{margin-left:auto}
+.lcard .row{grid-template-columns:44px minmax(0,1fr) 96px 62px}
+.lcard .row .wd{font-size:14.5px;letter-spacing:.06em}
+.lcard .row .df{font-size:12px}
+.lcard .row .df .stars{letter-spacing:.06em}
+.lcard .row .hit{font-size:13.5px;font-weight:700;font-variant-numeric:tabular-nums}
+.lcard .row .hit.sweet{color:var(--red)}
+.lcard .row .hit.off{color:var(--ink-4);font-weight:400}
+@media(max-width:520px){
+  .lcard .row{grid-template-columns:34px minmax(0,1fr) 74px;
+    grid-template-areas:"no wd wd" "no df hit";row-gap:2px;padding:8px 0}
+  .lcard .row .no{grid-area:no;border-right:none}
+  .lcard .row .wd{grid-area:wd;border-right:none}
+  .lcard .row .df{grid-area:df}
+  .lcard .row .hit{grid-area:hit}
+}
+
+.tag-out.warn{color:var(--amber);border-color:var(--amber)}
+.cat[hidden],.mcard[hidden],.newcard[hidden],.rank .row[hidden]{display:none}
+
+/* ---------- 回执：一张纸，签收就收走（Cookie 条的替身） ---------- */
+.receipt{position:fixed;left:0;right:0;bottom:0;z-index:900;display:flex;align-items:center;
+  gap:14px;flex-wrap:wrap;padding:14px 18px;background:var(--paper-4);
+  border-top:3px solid var(--ink);box-shadow:0 -5px 0 rgba(23,23,27,.10)}
+.receipt .rc-t{flex:1;min-width:220px;font-family:var(--mono);font-size:12px;color:var(--ink-2);
+  line-height:1.85;letter-spacing:.02em}
+.receipt .rc-t a{color:var(--blue)}
+.receipt .btn[disabled]{opacity:.4}
+
+/* ---------- 柜台递出来的回执条 ---------- */
+.slip{position:fixed;left:18px;bottom:calc(18px + var(--rch,0px));z-index:890;
+  max-width:min(440px,calc(100vw - 36px));display:flex;gap:12px;align-items:flex-start;
+  background:var(--paper-4);border:2px solid var(--ink);border-left:6px solid var(--blue);
+  border-radius:2px;box-shadow:var(--sh-2);padding:12px 14px;
+  font-family:var(--mono);font-size:12.5px;line-height:1.7;color:var(--ink-2)}
+.slip .tx{flex:1;min-width:0}
+.slip .tx b{color:var(--ink)}
+.slip .x3{flex:none;background:none;border:none;color:var(--ink-3);font-family:var(--mono);
+  font-size:14px;line-height:1;cursor:pointer;padding:2px}
+.slip .x3:hover{color:var(--red)}
+
+@media(max-width:720px){
+  .receipt{padding:12px 14px}
+  .receipt .rc-t{font-size:11.5px}
+  .mc-hd .stamp{margin-left:0}
+}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="logo" href="index.html">你拼我猜<span class="no">1管51</span></a>
+    <nav>
+      <a href="plaza.html">广场</a>
+      <a href="banks.html" aria-current="page">词库</a>
+      <a href="works.html">我的作品</a>
+      <a href="me.html">我的主页</a>
+      <a href="login.html">退出</a>
+    </nav>
+    <a class="btn sm" href="#">开始拼一题</a>
+  </div>
+</header>
+
+<main>
+
+<!-- ============ 页头：标题 + 检索单 ============ -->
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <div class="eyebrow">目录册 <b>1管51-B</b> · 在架 <b>1,284</b> 本</div>
+      <h1 class="tk">词库目录册</h1>
+      <p class="lead">十类开箱即玩 · 自己写的随你写</p>
+      <div class="hero-act">
+        <div class="btn-row">
+          <a class="btn" href="#mine">新建词库</a>
+          <a class="btn ghost" href="#mine" title="支持 .txt / .csv · 也能整段粘贴">导入文本</a>
+        </div>
+        <span class="stamp blue bookseal">制 册 处</span>
+      </div>
+    </div>
+
+    <div class="sheet">
+      <div class="blot" aria-hidden="true"></div>
+      <div class="sheet-hd">
+        <span class="tag-no">NO. 1管51-B</span>
+        <span class="tag-out mla" id="freeTag">本单可查 3 次</span>
+      </div>
+      <div class="dk-row">
+        <span class="dk-k">检 索</span>
+        <div class="dk-v">
+          <div class="find" id="findBox">
+            <input id="q" type="search" autocomplete="off" placeholder="词库名 / 作者编号 / 词条…">
+            <button class="ibtn" id="clr" type="button" title="清空检索" aria-label="清空检索">✕</button>
+          </div>
+        </div>
+      </div>
+      <div class="dk-row">
+        <span class="dk-k">范 围</span>
+        <div class="dk-v">
+          <div class="chips" id="scope">
+            <button class="chip on" type="button" data-scope="all">全部</button>
+            <button class="chip" type="button" data-scope="official" title="官方目录">官方</button>
+            <button class="chip" type="button" data-scope="mine" title="我的词库">我的</button>
+            <button class="chip" type="button" data-scope="square" title="词库广场">广场</button>
+          </div>
+        </div>
+      </div>
+      <div class="dk-row">
+        <span class="dk-k">结 果</span>
+        <div class="dk-v"><div class="res" id="res">在架 <b>1,284</b> 本</div></div>
+      </div>
+      <div class="dk-row" id="capRow" hidden>
+        <span class="dk-k">防 伪</span>
+        <div class="dk-v">
+          <div class="sample">
+            <span class="sp" id="capSample">🚦</span>
+            <i class="ico-solo eq" aria-hidden="true">＝</i>
+            <span class="qm" aria-hidden="true">?</span>
+          </div>
+          <div class="grid3" id="capGrid"></div>
+          <div class="cap-note" id="capNote"></div>
+          <div class="btn-row" style="margin-top:10px">
+            <button class="ibtn" id="capNew" type="button" title="换一批" aria-label="换一批">♻</button>
+          </div>
+        </div>
+      </div>
+      <div class="sheet-hd" style="border-top:2px solid var(--ink);border-bottom:none">
+        <span class="meta">持单人 阿野 · 1管51-07</span>
+        <span class="pip warm pbox">当日有效</span>
+        <span class="meta mla">打印 1 份 · 共 47 页 · 第 1 页</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 一 · 官方目录 ============ -->
+<section id="official">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="tag">官 方 目 录</span>
+      <h2>十类</h2>
+    </div>
+
+    <div class="cat-bar reveal">
+      <span class="meta"><b id="catSel">7</b> / 10 类 · <b id="catCnt">1,276</b> 条可出题</span>
+      <div class="btn-row" style="margin-left:auto">
+        <button class="ibtn" id="selAll" type="button" title="全选十类" aria-label="全选十类">✓</button>
+        <button class="ibtn" id="selNone" type="button" title="清空勾选" aria-label="清空勾选">✕</button>
+        <a class="btn sm dark" href="#">按勾选开一局</a>
+      </div>
+    </div>
+
+    <div class="g4 reveal" id="catGrid"></div>
+  </div>
+</section>
+
+<!-- ============ 二 · 我的词库 ============ -->
+<section id="mine">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="tag">我 的 词 库</span>
+      <h2>自己写的题</h2>
+    </div>
+
+    <div class="sheet sum reveal">
+      <div class="sheet-hd">
+        <span class="tag-no">NO. 1管51-07</span>
+        <span class="doc-t">阿 野 · 我 的 词 库 汇 总</span>
+        <span class="pip on pbox">本册已核</span>
+        <span class="meta mla">更新于 今天 09:20</span>
+      </div>
+      <div class="stats">
+        <div class="st"><div class="v">5</div><div class="k">本词库</div></div>
+        <div class="st"><div class="v">157</div><div class="k">条词条</div></div>
+        <div class="st"><div class="v red">45%</div><div class="k">平均猜中率</div></div>
+        <div class="st"><div class="v">3,462</div><div class="k">被玩总次数</div></div>
+      </div>
+      <div class="sheet-hd" style="border-top:2px solid var(--ink);border-bottom:none">
+        <span class="meta">承印 1管51</span>
+      </div>
+    </div>
+
+    <div class="g3 reveal" id="mineGrid">
+      <a class="idx newcard" id="newBank" href="#">
+        <span class="plus" aria-hidden="true">+</span>
+        <span class="nc-t">新建词库</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 三 · 词库广场 ============ -->
+<section id="square">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="tag">词 库 广 场</span>
+      <h2>别人的题库</h2>
+    </div>
+
+    <div id="letterBox"></div>
+    <div id="wallMsg"></div>
+
+    <div class="g2 reveal" id="squareGrid">
+      <div class="rank">
+        <div class="rank-hd">
+          <h3 class="tk-sm">今日热门</h3>
+          <span class="meta mla">被玩次数</span>
+        </div>
+        <div class="board light" id="hotBoard"></div>
+        <div class="rank-ft"><a class="btn sm ghost" href="#">全部 128 本</a></div>
+      </div>
+      <div class="rank">
+        <div class="rank-hd">
+          <h3 class="tk-sm">最新上架</h3>
+          <span class="meta mla">上架时间</span>
+        </div>
+        <div class="board light" id="newBoard"></div>
+        <div class="rank-ft"><a class="btn sm ghost" href="#">全部 36 本</a></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 四 · 订阅目录更新通知（一张纸） ============ -->
+<section id="sub">
+  <div class="wrap">
+    <div class="sheet subcard reveal" id="subCard">
+      <div class="sheet-hd">
+        <span class="tag-no">通 知 单</span>
+        <span class="pip warm pbox">每日 07:00</span>
+        <span class="meta mla">NO. 1管51-N</span>
+      </div>
+      <div class="sheet-bd sub-grid" id="subBody">
+        <div>
+          <h3 class="sub-h">一本你猜不中的词库</h3>
+          <ul class="sub-list">
+            <li>· 每天 <b>1</b> 本 · 已连续推送 <b>1,284</b> 天，其中 <b>3</b> 天推的是同一本</li>
+          </ul>
+          <div class="btn-row">
+            <button class="btn" id="subOk" type="button" disabled>订阅（先读完条款）</button>
+            <button class="btn ghost" id="subNo" type="button">不订阅</button>
+          </div>
+          <span class="gauge subg" id="subGauge" title="条款阅读进度">
+            <span class="track"><i class="band" id="subBand" style="left:0;right:100%"></i></span>
+            <b class="val" id="subPct">0%</b>
+          </span>
+          <p class="say" id="subWarn"></p>
+        </div>
+        <div>
+          <div class="terms" id="subTerms" tabindex="0" aria-label="订阅条款，共 47 条">
+            <h4>第一条</h4>本推送不是推送，是每天早上七点的一次敲门。
+            <h4>第二条</h4>你可以在任何时候取消订阅。取消入口在第 7 页的页脚。（第 7 页不存在。）
+            <h4>第三条</h4>我们不追踪你的位置。我们只是恰好知道你昨天在鹤岗。
+            <h4>第四条</h4>词库由人工挑选。挑选过程中没有任何算法受到伤害。
+            <h4>第五条</h4>若你不喜欢本期词库，可以不喜欢。这不会改变本期词库。
+            <h4>第六条</h4>本条款共 47 条，其余 41 条与本条相同。
+            <h4>第七条</h4>你读到这一条，说明你比 99% 的人认真。我们为此感到抱歉。
+            <h4>第八条</h4>订阅免费。免费的意思是「不收费」，不是「不收你时间」。
+            <h4>第九条</h4>本店的电脑只有一台。它同时负责打印、收银、和这份推送。
+            <h4>第十条</h4>以上十条已经覆盖了全部 47 条的精神。你可以直接拉到底。
+          </div>
+          <p class="hint" id="subRead"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 五 · 词库详情预览 ============ -->
+<section id="detail">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="tag">详 情 预 览</span>
+    </div>
+
+    <div class="detail reveal">
+      <div class="sheet dcard" id="dcard"></div>
+
+      <div class="sheet lcard">
+        <div class="sheet-hd">
+          <span class="doc-t">词 条 清 单</span>
+          <span class="meta mla">前 12 / 48 条</span>
+        </div>
+        <div class="sheet-bd">
+          <div class="bind">
+            <span class="bind-strip" aria-hidden="true"></span>
+            <div class="board light" id="termBoard"></div>
+          </div>
+          <div class="lcard-ft">
+            <a class="btn sm ghost" href="#">展开全部 48 条</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <span>你拼我猜 · 用 emoji 说话</span>
+    <span>目录册 NO. 1管51-B · 制册处</span>
+  </div>
+</footer>
+
+<!-- ============ 回执（Cookie 条的替身：签收就收走） ============ -->
+<div class="receipt" id="receipt" hidden>
+  <span class="tag-no">回 执</span>
+  <span class="rc-t">抄送 <a href="#" id="rcMore">47 家合作伙伴</a> · 签收与否都记在册上</span>
+  <button class="btn sm" id="rcOk" type="button">签 收</button>
+  <button class="btn ghost sm" id="rcNo" type="button">拒 签</button>
+</div>
+
+<!-- ============ 柜台递出来的回执条 ============ -->
+<div class="slip" id="slip" hidden role="status">
+  <span class="tx" id="slipTx"></span>
+  <button class="x3" id="slipX" type="button" aria-label="收起回执">✕</button>
+</div>
+
+<script>
+/* 目录册 NO. 1管51-B · 页面脚本 */
+const $=id=>document.getElementById(id);
+const pad2=n=>String(n).padStart(2,"0");
+const num=n=>n.toLocaleString("en-US");
+const stars=n=>`<span class="stars" title="难度 ${n} / 5"><b>${"★".repeat(n)}</b><i>${"☆".repeat(5-n)}</i></span>`;
+const isSweet=r=>r!==null&&r>=40&&r<=60;
+const isOff  =r=>r!==null&&(r<25||r>80);
+/* 甜区 40~60% 是固定的一档；某本偏离多少，交给刻度上的指针说。 */
+const SWEET_L=40,SWEET_R=60;
+const gaugeHTML=r=>r===null
+  ? `<span class="gauge"><span class="track"><i class="band" style="left:${SWEET_L}%;right:${100-SWEET_R}%"></i></span><b class="val">—</b></span>`
+  : `<span class="gauge" title="猜中率 ${r}% · 甜区 ${SWEET_L}~${SWEET_R}%"><span class="track"><i class="band" style="left:${SWEET_L}%;right:${100-SWEET_R}%"></i><i class="pin" style="left:${Math.max(0,Math.min(100,r))}%"></i></span><b class="val">${r}%</b></span>`;
+
+/* ---------- 数据 ---------- */
+const CATS=[
+  {n:"成语俗语",e:"🀄",c:328,s:4,eg:"画蛇添足 · 对牛弹琴 · 火上浇油"},
+  {n:"日常短语",e:"💬",c:214,s:2,eg:"「我先睡了」「在吗」「马上到」"},
+  {n:"影视",    e:"🎬",c:186,s:3,eg:"片名 · 剧名 · 名场面"},
+  {n:"歌名歌词",e:"🎵",c:172,s:3,eg:"歌名 · 副歌一句"},
+  {n:"网络热梗",e:"🔥",c: 96,s:2,eg:"当季流行 · 每周换一批"},
+  {n:"地名城市",e:"🗺️",c:148,s:2,eg:"重庆 · 哈尔滨 · 鹤岗"},
+  {n:"品牌产品",e:"🏷️",c:132,s:3,eg:"蜜雪冰城 · 老干妈 · 六神"},
+  {n:"英文单词",e:"🔤",c:260,s:3,eg:"四级词 · 日常词",off:true},
+  {n:"二次元",  e:"🌸",c:158,s:4,eg:"番名 · 角色 · 名台词",off:true},
+  {n:"经典题库",e:"🎨",c:240,s:2,eg:"你画我猜的老题",off:true}
+];
+
+/* vis → 权限章：公开 oval blue · 好友 oval amber · 仅自己 ink */
+const MINE=[
+  {no:"B07",name:"我家的梗",   vis:"公开",  vc:"blue", n:32,s:3,up:"3 天前",   plays:1204,rate:43,note:"我妈、我舅、我表妹，一人贡献三条。"},
+  {no:"B12",name:"办公室黑话", vis:"公开",  vc:"blue", n:48,s:4,up:"昨天 22:10",plays:1842,rate:47,note:"开会时说的每一句话，都可以是一道题。"},
+  {no:"B15",name:"食堂菜单",   vis:"好友",  vc:"amber",n:26,s:2,up:"6 天前",   plays:318, rate:68,note:"西红柿炒蛋到底放不放糖，是这道题的难点。"},
+  {no:"B21",name:"年会节目单", vis:"仅自己",vc:"ink",  n:14,s:2,up:"今天 09:20",plays:6,   rate:12,note:"给部门年会准备的，还没敢发出去。"},
+  {no:"B24",name:"老板语录",   vis:"仅自己",vc:"ink",  n:37,s:4,up:"上周",     plays:92,  rate:55,note:"他说过的每一句，都值得被拼一遍。"}
+];
+
+/* lock:true = 广场里本柜限阅的那几本（写一张介绍信，当场就开） */
+const HOT=[
+  {n:"办公室黑话",     a:"阿野",ano:"1管51-07",c:48,r:47,p:1842},
+  {n:"妈妈的微信语音", a:"小舟",ano:"1管51-12",c:61,r:52,p:1506,lock:true},
+  {n:"甲方的一百种说法",a:"老陈",ano:"1管51-44",c:29,r:44,p:1187},
+  {n:"广东人煲汤图鉴", a:"Lina",ano:"1管51-31",c:35,r:21,p: 966},
+  {n:"大学宿舍生存指南",a:"小舟",ano:"1管51-12",c:44,r:83,p: 908}
+];
+const NEW=[
+  {n:"年会节目单",      a:"阿野",ano:"1管51-07",c:14,r:12,  p:   6},
+  {n:"楼下便利店的货架",a:"阿哲",ano:"1管51-58",c:22,r:null,p:   0},
+  {n:"童年零食回忆",    a:"小舟",ano:"1管51-12",c:39,r:49,  p: 143,lock:true},
+  {n:"地铁站名接龙",    a:"老陈",ano:"1管51-44",c:52,r:35,  p:  88},
+  {n:"三十岁以后才懂",  a:"Lina",ano:"1管51-31",c:27,r:57,  p:  61}
+];
+const BOARDS={hot:HOT,new:NEW};
+
+/* 详情预览用的这一本 = 我的词库里的第 2 本 */
+const TERMS=[
+  ["对齐一下",3,38],["拉个群",2,55],["闭环",4,26],["抓手",4,19],
+  ["赋能",3,31],["复盘",2,61],["下午三点前给到",4,44],["我看看排期",3,28],
+  ["这个需求不急",5,12],["你先出个初稿",3,49],["老板的意思是",4,40],["收到",1,88]
+];
+
+/* ---------- 回执条：柜台递出来的那张小纸 ---------- */
+const slipEl=$("slip");
+let slipT=null;
+function slip(html,ms){
+  $("slipTx").innerHTML=html;
+  slipEl.hidden=false;
+  slipEl.classList.remove("slot-draw");void slipEl.offsetWidth;
+  slipEl.classList.add("slot-draw");
+  clearTimeout(slipT);
+  slipT=setTimeout(()=>{slipEl.hidden=true;},ms||5600);
+}
+$("slipX").onclick=()=>{clearTimeout(slipT);slipEl.hidden=true;};
+
+/* ---------- 一 · 官方目录（分类卡：emoji 说「是什么」，短名说「叫什么」） ---------- */
+$("catGrid").innerHTML=CATS.map((c,i)=>`
+  <label class="cat" data-search="${c.n} ${c.eg}">
+    <input class="cb" type="checkbox" data-c="${c.c}"${c.off?"":" checked"}>
+    <span class="box" aria-hidden="true"></span>
+    <span class="cat-lab"><span class="label">第 ${pad2(i+1)} 类</span></span>
+    <span class="cat-n"><i class="ico-lg">${c.e}</i>${c.n}</span>
+    <span class="cat-ft"><b>${c.c}</b> 条 ${stars(c.s)}</span>
+  </label>`).join("");
+
+/* ---------- 二 · 我的词库（索引卡 + 一枚权限章换颜色） ---------- */
+/* 权限章：公开 = oval blue · 好友 = oval amber · 仅自己 = ink（方章，不出柜） */
+const permCls=b=>b.vis==="仅自己"?"stamp ink":"stamp oval "+b.vc;
+$("mineGrid").insertAdjacentHTML("afterbegin",MINE.map(b=>`
+  <article class="idx mcard" data-search="${b.name} 1管51-${b.no} ${b.vis} ${b.note}">
+    <div class="mc-hd">
+      <span class="tag-no">NO. 1管51-${b.no}</span>
+      <span class="${permCls(b)}">${b.vis}</span>
+    </div>
+    <h3 class="mc-n">《${b.name}》</h3>
+    <div class="mc-meta"><span>${b.n} 条</span><i>·</i>${stars(b.s)}<i>·</i><span>更于 ${b.up}</span></div>
+    <div class="mc-rate">
+      <span class="k">猜 中 率</span>
+      ${gaugeHTML(b.rate)}
+      <span class="k">被 玩 ${num(b.plays)} 次</span>
+    </div>
+    <div class="mc-acts">
+      <a href="#">去玩</a><a href="#">编辑</a><a href="#">分享</a><a href="#">导出</a>
+    </div>
+  </article>`).join(""));
+
+/* ---------- 三 · 词库广场（含本柜限阅） ---------- */
+function markFor(b){
+  return b.r===null?`<span class="pip off">局数不足</span>`
+    :isSweet(b.r)?`<span class="pip hot">甜区</span>`
+    :isOff(b.r)?`<span class="pip warm">偏</span>`:"";
+}
+function rankRows(list,bk){
+  return list.map((b,i)=>{
+    const off=isOff(b.r), lk=!!b.lock;
+    return `
+    <div class="row${off&&!lk?" is-off":""}${lk?" locked":""}" data-b="${bk}" data-i="${i}"
+      ${lk?'role="button" tabindex="0" aria-label="本柜需凭介绍信查阅，点击写介绍信"':""}
+      data-search="${b.n} ${b.a} ${b.ano}">
+      <div class="c1 rk">${pad2(i+1)}</div>
+      <div class="c3 nm">《${b.n}》<span class="by">${b.a} · ${b.ano} · ${b.c} 条${lk?' · <span class="redl">本柜限阅</span>':""}</span></div>
+      <div class="c4 rt">${lk?"—":b.r===null?"—":b.r+"%"}</div>
+      <div class="c4 pl">${lk?"—":num(b.p)+" 次"}</div>
+      <div class="mk">${lk?`<span class="pip lock">凭介绍信</span>`:markFor(b)}</div>
+    </div>`;
+  }).join("");
+}
+$("hotBoard").innerHTML=rankRows(HOT,"hot");
+$("newBoard").innerHTML=rankRows(NEW,"new");
+
+/* 行内容按状态重画（开具/收回介绍信都走这里，元素本身不动，检索状态不丢） */
+function paintRow(row){
+  const b=BOARDS[row.dataset.b][+row.dataset.i], lk=row.classList.contains("locked");
+  const off=isOff(b.r);
+  row.className="row"+(off&&!lk?" is-off":"")+(lk?" locked":"");
+  const tail=lk?' · <span class="redl">本柜限阅</span>':(row.dataset.letter==="1"?" · 已开介绍信":"");
+  row.querySelector(".nm").innerHTML=
+    `《${b.n}》<span class="by">${b.a} · ${b.ano} · ${b.c} 条`+tail+`</span>`;
+  row.querySelector(".rt").textContent=lk?"—":(b.r===null?"—":b.r+"%");
+  row.querySelector(".pl").textContent=lk?"—":num(b.p)+" 次";
+  row.querySelector(".mk").innerHTML=lk?`<span class="pip lock">凭介绍信</span>`:markFor(b);
+  if(lk){row.setAttribute("role","button");row.setAttribute("tabindex","0");
+    row.setAttribute("aria-label","本柜需凭介绍信查阅，点击写介绍信");}
+  else{row.removeAttribute("role");row.removeAttribute("tabindex");row.removeAttribute("aria-label");}
+}
+
+/* ---------- 四 · 详情预览（含装订好的词条清单） ---------- */
+const D=MINE[1];
+$("dcard").innerHTML=`
+  <div class="sheet-hd">
+    <span class="tag-no">NO. 1管51-${D.no}</span>
+    <span class="${permCls(D)}">${D.vis}</span>
+    <span class="meta mla">在架 47 天</span>
+  </div>
+  <div class="sheet-bd">
+    <h3 class="dcard-n">《${D.name}》</h3>
+    <hr class="dash">
+    <div class="flds">
+      <div class="fld"><span class="fk">作 者</span><span class="fv">阿野 · 1管51-07</span></div>
+      <div class="fld"><span class="fk">建 库</span><span class="fv">2025.09.14</span></div>
+      <div class="fld"><span class="fk">更新</span><span class="fv">${D.up}</span></div>
+      <div class="fld"><span class="fk">条 目</span><span class="fv">${D.n} 条</span></div>
+      <div class="fld"><span class="fk">难 度</span><span class="sv">${stars(D.s)}</span></div>
+      <div class="fld"><span class="fk">备 注</span><span class="sv">${D.note}</span></div>
+    </div>
+    <hr class="dash">
+    <div class="rate">
+      <span class="k">猜 中 率</span>
+      ${gaugeHTML(D.rate)}
+      <span class="k">被 玩 ${num(D.plays)} 次</span>
+    </div>
+    <div class="btn-row" style="margin-top:18px">
+      <a class="btn sm" href="#">去玩这一库</a>
+      <a class="btn sm ghost" href="#">编辑</a>
+      <a class="btn sm ghost" href="#">导出 .txt</a>
+    </div>
+  </div>`;
+
+$("termBoard").innerHTML=TERMS.map((t,i)=>`
+  <div class="row">
+    <div class="c1 no">${pad2(i+1)}</div>
+    <div class="c2 wd">${t[0]}</div>
+    <div class="c3 df">${stars(t[1])}</div>
+    <div class="c4 hit${isSweet(t[2])?" sweet":""}${isOff(t[2])?" off":""}">${t[2]}%</div>
+  </div>`).join("");
+
+/* ---------- 勾选计数 ---------- */
+function countCats(){
+  const cbs=[...document.querySelectorAll("#catGrid .cb")];
+  const sel=cbs.filter(x=>x.checked);
+  $("catSel").textContent=sel.length;
+  $("catCnt").textContent=num(sel.reduce((s,x)=>s+ +x.dataset.c,0));
+}
+$("catGrid").addEventListener("change",e=>{
+  if(e.target.classList.contains("cb"))countCats();
+});
+$("selAll").onclick=()=>{
+  document.querySelectorAll("#catGrid .cb").forEach(x=>x.checked=true);countCats();
+};
+$("selNone").onclick=()=>{
+  document.querySelectorAll("#catGrid .cb").forEach(x=>x.checked=false);countCats();
+};
+
+/* ---------- 检索 + 范围 ---------- */
+const qEl=$("q"), resEl=$("res"), scopeEl=$("scope"), newEl=$("newBank"),
+      secOfficial=$("official"), secMine=$("mine"), secSquare=$("square"), secDetail=$("detail"),
+      catEls=[...document.querySelectorAll("#catGrid .cat")],
+      mineEls=[...document.querySelectorAll("#mineGrid .mcard")],
+      sqEls=[...document.querySelectorAll("#squareGrid .row")];
+let scope="all";
+
+function update(){
+  const k=qEl.value.trim().toLowerCase();
+  const on=s=>scope==="all"||scope===s;
+  const hit=el=>!k||el.dataset.search.toLowerCase().includes(k);
+  let a=0,b=0,c=0;
+
+  catEls.forEach(el=>{const v=on("official")&&hit(el);el.hidden=!v;if(v)a++;});
+  mineEls.forEach(el=>{const v=on("mine")&&hit(el);el.hidden=!v;if(v)b++;});
+  sqEls.forEach(el=>{const v=on("square")&&hit(el);el.hidden=!v;if(v)c++;});
+
+  secOfficial.hidden=!on("official");
+  secMine.hidden=!on("mine");
+  secSquare.hidden=!on("square");
+  secDetail.hidden=!(scope==="all"||scope==="mine");
+  newEl.hidden=!on("mine");
+
+  const tot=a+b+c;
+  if(!k){
+    resEl.innerHTML=`在架 <b>1,284</b> 本 · 官方 <b>${a}</b> 类 · 我的 <b>${b}</b> 本 · 广场 <b>${c}</b> 本`;
+  }else if(tot){
+    resEl.innerHTML=`命中 <b class="blue">${tot}</b> 项
+      <span class="meta">官方 ${a} · 我的 ${b} · 广场 ${c}</span>`;
+  }else{
+    resEl.innerHTML=`<span class="none">没有匹配的词库</span>
+      <a class="lnk" href="#mine">换个词，或者新建一本</a>`;
+  }
+}
+qEl.addEventListener("input",update);
+$("clr").onclick=()=>{qEl.value="";update();qEl.focus();};
+scopeEl.addEventListener("click",e=>{
+  const btn=e.target.closest(".chip");
+  if(!btn)return;
+  scope=btn.dataset.scope;
+  [...scopeEl.querySelectorAll(".chip")].forEach(x=>x.classList.toggle("on",x===btn));
+  update();
+});
+
+/* ============================================================
+   本柜需凭介绍信查阅（原付费墙：拦得住手，拦不住「申请介绍信」）
+   ============================================================ */
+const letterBox=$("letterBox");
+const pad3=n=>String(n).padStart(2,"0");
+let ltrTimer=null,ltrLeft=7*86400,ltrRounds=1;
+
+function fmtLtr(s){
+  const d=Math.floor(s/86400),h=Math.floor(s%86400/3600),
+        m=Math.floor(s%3600/60),x=s%60;
+  return `${d} 天 ${pad3(h)}:${pad3(m)}:${pad3(x)}`;
+}
+function startLtr(){
+  clearInterval(ltrTimer);ltrLeft=7*86400;
+  ltrTimer=setInterval(()=>{
+    const el=$("ltrCd");
+    if(!el){clearInterval(ltrTimer);return;}
+    ltrLeft--;
+    if(ltrLeft<=0){           /* 到期？自动续期，反正介绍信一直有 */
+      ltrRounds++;ltrLeft=7*86400;
+      const n=$("ltrNote");
+      if(n)n.innerHTML=`有效期已自动续 <b>${ltrRounds}</b> 次`;
+    }
+    el.textContent=fmtLtr(ltrLeft);
+  },1000);
+}
+function openLetter(row){  const b=BOARDS[row.dataset.b][+row.dataset.i];
+  letterBox.innerHTML=`
+    <div class="sheet letter">
+      <div class="sheet-hd">
+        <span class="tag-no">介 绍 信 NO. 1管51-X</span>
+        <span class="stamp bar red mla">限 阅</span>
+      </div>
+      <div class="sheet-bd">
+        <h3 class="ltr-t">《${b.n}》</h3>
+        <div class="flds">
+          <div class="fld"><span class="fk">持 有</span><span class="fv">${b.a} · ${b.ano}</span></div>
+          <div class="fld"><span class="fk">条 目</span><span class="fv">${b.c} 条</span></div>
+          <div class="fld"><span class="fk">被 玩</span><span class="fv">${num(b.p)} 次</span></div>
+          <div class="fld"><span class="fk">猜中率</span><span class="fv">${b.r===null?"暂无":b.r+"%"}</span></div>
+        </div>
+        <p class="ltr-body">兹介绍 <b>阿野</b>（1管51-07）前往查阅《${b.n}》，请予接洽为荷。</p>
+        <div class="btn-row" style="margin-top:14px">
+          <button class="btn" id="letterGo" type="button">申 请 介 绍 信</button>
+          <button class="btn ghost" id="letterNo" type="button">不 办 了</button>
+        </div>
+      </div>
+    </div>`;
+  letterBox.dataset.row=row.dataset.b+":"+row.dataset.i;
+  $("letterGo").onclick=grantLetter;
+  $("letterNo").onclick=()=>{letterBox.innerHTML="";};
+  letterBox.scrollIntoView({block:"nearest",behavior:"smooth"});
+}
+/* 申请介绍信 = 真的能看 */
+function grantLetter(){
+  const [bk,i]=letterBox.dataset.row.split(":");
+  const row=document.querySelector(`.row[data-b="${bk}"][data-i="${i}"]`);
+  letterBox.innerHTML="";
+  if(!row)return;
+  row.classList.remove("locked");
+  row.dataset.letter="1";
+  paintRow(row);
+  row.classList.add("justunlocked");
+  setTimeout(()=>row.classList.remove("justunlocked"),1400);
+  const b=BOARDS[bk][+i];
+  wallMsg(row,b);
+  slip(`介绍信已开具 · 有效期 7 天 · 《${b.n}》开放查阅`);
+}
+$("squareGrid").addEventListener("click",e=>{
+  const row=e.target.closest(".row.locked");
+  if(row)openLetter(row);
+});
+$("squareGrid").addEventListener("keydown",e=>{
+  const row=e.target.closest(".row.locked");
+  if(row&&(e.key==="Enter"||e.key===" ")){e.preventDefault();openLetter(row);}
+});
+
+/* 凭条：就摆在广场上面，随时可以收回 */
+function wallMsg(row,b){
+  const box=$("wallMsg");
+  box.innerHTML=`
+    <div class="sheet ltr-strip">
+      <div class="sheet-bd">
+        <span class="tag-no blue">凭介绍信查阅中</span>
+        <span class="ls-t"><b>《${b.n}》</b>已开放 · 有效期 <b id="ltrCd">7 天 00:00:00</b> ·
+          猜中率 ${b.r===null?"暂无":b.r+"%"} · 到期自动续期
+          <span class="hint" id="ltrNote"></span></span>
+        <button class="tryx" id="undoTrial" type="button">收回介绍信</button>
+        <button class="tryx" id="closeMsg" type="button" aria-label="收起凭条">✕</button>
+      </div>
+    </div>`;
+  startLtr();
+  $("undoTrial").onclick=()=>{
+    row.classList.add("locked");
+    delete row.dataset.letter;
+    paintRow(row);
+    box.innerHTML="";
+    clearInterval(ltrTimer);
+    slip("介绍信已收回 · 可以再申请一张");
+  };
+  $("closeMsg").onclick=()=>{box.innerHTML="";clearInterval(ltrTimer);};
+}
+
+/* ============================================================
+   防伪核对：比对样张，点出相同的一枚（原检索验证码）
+   点对点错都放行，重点是单上留的那一句记录
+   ============================================================ */
+const CAP_POOL=["🚗","🚕","🚌","🚑","🚒","🚓","🚚","🚜","🛵","🚲","🚂","✈️","🚀","⛽","🅿️","🚧","🛑","⚠️","🛴","🚁"];
+let freeLeft=3, capCount=0, capWhitelist=false, capAt=-1, capPicked=false;
+
+function renderFree(){
+  const t=$("freeTag");
+  if(capWhitelist){
+    t.textContent="本机已加入临时白名单";
+    t.className="tag-out mla";
+    $("findBox").classList.remove("spent");
+    return;
+  }
+  t.textContent=`本单可查 ${freeLeft} 次`;
+  t.className="tag-out mla"+(freeLeft<=0?" warn":"");
+  $("findBox").classList.toggle("spent",freeLeft<=0);
+}
+function buildCap(){
+  const sample=CAP_POOL[Math.floor(Math.random()*CAP_POOL.length)];
+  capAt=Math.floor(Math.random()*9);
+  capPicked=false;
+  $("capSample").textContent=sample;
+  const others=CAP_POOL.filter(e=>e!==sample);
+  $("capGrid").innerHTML=[...Array(9)].map((_,i)=>{
+    const e=i===capAt?sample:others[Math.floor(Math.random()*others.length)];
+    return `<button class="cell" type="button" data-i="${i}" data-hit="${i===capAt?1:0}"
+      aria-label="样张 ${i+1}">${e}</button>`;
+  }).join("");
+  $("capNote").innerHTML="";
+}
+$("capGrid").addEventListener("click",e=>{
+  const c=e.target.closest(".cell");if(!c||capPicked)return;
+  capPicked=true;
+  document.querySelectorAll("#capGrid .cell").forEach(x=>x.classList.remove("on"));
+  c.classList.add("on");
+  const hit=c.dataset.hit==="1";
+  $("capNote").innerHTML=hit
+    ?'<b>✓ 与样张相符 · 已记入本单</b>'
+    :'与样张不符 · 已记录在案';
+  setTimeout(()=>passCap(hit),520);
+});
+$("capNew").onclick=()=>buildCap();
+
+function showCap(){
+  capCount++;
+  buildCap();
+  const r=$("capRow");
+  r.hidden=false;
+  r.scrollIntoView({block:"center",behavior:"smooth"});
+}
+function passCap(hit){ /* 点对、点错、不点 —— 三条路都放行 */
+  $("capRow").hidden=true;
+  if(capCount>=2){capWhitelist=true;renderFree();}
+  else{freeLeft=3;renderFree();}
+  slip(hit
+    ?`防伪核对通过 · 与样张相符`
+    :`防伪核对已记录 · 与样张不符`);
+}
+
+/* 检索计数：停下来算一次 */
+let tickT=null,lastCounted="";
+qEl.addEventListener("input",()=>{
+  clearTimeout(tickT);
+  tickT=setTimeout(()=>{
+    const v=qEl.value.trim();
+    if(v.length<2||v===lastCounted||capWhitelist)return;
+    lastCounted=v;
+    freeLeft--;
+    if(freeLeft>0){renderFree();}
+    else{renderFree();setTimeout(showCap,240);}
+  },900);
+});
+renderFree();
+
+/* ============================================================
+   订阅目录更新通知：一张纸，条款读到底才给订阅
+   进度不写字，只用一条刻度（律二：需要解释的交互，改成图形）
+   ============================================================ */
+const subTerms=$("subTerms"), subOk=$("subOk"), subWarn=$("subWarn");
+function paintSub(){
+  const max=Math.max(1,subTerms.scrollHeight-subTerms.clientHeight);
+  const done=subTerms.scrollTop+subTerms.clientHeight>=subTerms.scrollHeight-8;
+  const p=done?100:Math.min(100,Math.max(0,Math.round(subTerms.scrollTop/max*100)));
+  $("subBand").style.right=(100-p)+"%";
+  $("subPct").textContent=p+"%";
+  return done;
+}
+function checkTerms(){
+  const bottom=paintSub();
+  if(bottom&&subOk.disabled){
+    subOk.disabled=false;
+    subOk.textContent="订阅（¥ 0 / 月）";
+    subWarn.textContent="✓ 已读完 · 第 4 个读完的人";
+    subWarn.style.color="var(--blue)";
+    $("subRead").textContent="读完了。全网做到这件事的人，从 3 个变成了 4 个。";
+  }
+}
+subTerms.addEventListener("scroll",checkTerms);
+subTerms.addEventListener("keydown",e=>{
+  if(e.key==="ArrowDown"||e.key==="PageDown")setTimeout(checkTerms,40);
+});
+paintSub();
+subOk.onclick=()=>{
+  $("subBody").innerHTML=`
+    <div class="sub-done">
+      <span class="pip on pbox" id="subSeal">已订</span>
+      <h3 class="sub-h">✓ 订阅成功</h3>
+      <p class="say" style="margin-top:10px">每天早上 7:00，这台机器会自己响一声。</p>
+      <div class="btn-row" style="margin-top:16px">
+        <button class="btn sm ghost" id="subUndo" type="button">退 订</button>
+      </div>
+    </div>`;
+  slip("订阅成功 · 推送地址：<b>这台电脑的扬声器</b> · 每天早上 7:00 响一声");
+  $("subUndo").onclick=()=>slip("退订入口在第 7 页页脚（第 7 页不存在）");
+};
+$("subNo").onclick=()=>{
+  $("subBody").innerHTML=`
+    <div>
+      <h3 class="sub-h">已注销 · 不订阅</h3>
+      <p class="say" style="margin-top:10px">本单留存柜台，不作为。</p>
+      <div class="btn-row" style="margin-top:16px">
+        <button class="btn ghost" id="subReload" type="button">重新填写这张通知单</button>
+      </div>
+    </div>`;
+  slip("通知单已注销 · 目录更新不再通知你");
+  $("subReload").onclick=()=>location.reload();
+};
+
+/* ============================================================
+   回执：一张纸，签收就收走（原 Cookie 同意条）
+   ============================================================ */
+const rc=$("receipt");
+function setRch(){document.documentElement.style.setProperty("--rch",(rc.hidden?0:rc.offsetHeight+8)+"px");}
+(function(){
+  let ok=false;
+  try{ok=sessionStorage.getItem("ypwc_receipt")==="1"}catch(e){}
+  if(!ok)rc.hidden=false;
+  setRch();
+})();
+function signRc(kind){
+  const s=document.createElement("span");
+  s.className="pip "+(kind==="ok"?"on pbox":"lock pbox");
+  s.textContent=kind==="ok"?"已签收":"拒签";
+  rc.appendChild(s);
+  requestAnimationFrame(()=>s.classList.add("stamping"));
+  rc.querySelectorAll("button").forEach(b=>b.disabled=true);
+  setTimeout(()=>{
+    rc.hidden=true;setRch();
+    slip(kind==="ok"
+      ?"回执已签收 · 共 214 项 · 记入本册"
+      :"回执已拒签 · 我们仍然记得你拒签");
+  },780);
+}
+$("rcOk").onclick=()=>signRc("ok");
+$("rcNo").onclick=()=>signRc("no");
+$("rcMore").onclick=e=>{
+  e.preventDefault();
+  slip("47 家合作伙伴：老板、老板娘、隔壁复印店的老王。剩下 44 家是凑数的。");
+};
+setRch();
+window.addEventListener("resize",setRch);
+
+/* ============================================================
+   控制台留言：给翻到这里的网民
+   ============================================================ */
+console.log("%c你拼我猜 · 词库目录册 NO. 1管51-B（v3）","background:#F2EFE4;color:#1F4E9C;border:2px solid #17171B;font-family:monospace;padding:4px 10px;letter-spacing:.2em");
+console.log("%c"+[
+  "· 这本目录册在架 1,284 本，其中 3 本是空的，编号 1管51-000。",
+  "· 「1管51」是「一管五十一」的意思，不是「1 管 51 个」。老板解释过很多次，没人信。",
+  "· B21《年会节目单》没发出去，不是因为它不好，是因为年会取消了。",
+  "· 本柜限阅那两本拦不住你：点「申请介绍信」，当场就开。真的。",
+  "· 在下面输入 unlockAll() 可以把限阅词库全部开出介绍信 —— 我们拦不住你，也不想拦。"
+].join("\n"),"color:#4A4841;line-height:1.75;font-family:monospace");
+window.unlockAll=()=>{
+  const rows=[...document.querySelectorAll(".row.locked")];
+  rows.forEach(r=>{r.classList.remove("locked");r.dataset.letter="1";paintRow(r);});
+  slip(`已开出 <b>${rows.length}</b> 张介绍信 · 通过控制台`);
+  console.log("%c开出了 "+rows.length+" 张。","color:#1F4E9C");
+  return `开出 ${rows.length} 张介绍信（本来也没锁住）`;
+};
+
+/* ---------- 进场 ---------- */
+const io=new IntersectionObserver(es=>es.forEach(e=>{
+  if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target);}
+}),{threshold:.08});
+document.querySelectorAll(".reveal").forEach(el=>io.observe(el));
+
+countCats();
+update();
+</script>
+</body>
+</html>

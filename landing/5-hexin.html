@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>你拼我猜 · 和心 · 独热</title>
+<style>
+/* ============================================================
+   S5 「和心 · 独热」
+   种子: 和首给涧独热7具至主4立随面持心
+   机关: 数字 7 恰好落在第 7 位（位置=数值，全五条唯一一次自指）
+        「独热」= one-hot：只有一个位置是热的，其余全是冷的
+        首尾「和 … 心」；正中位=具；持心 / 主(房主) / 独(单人)
+   基调: 哑光深炭 · 朱赤(热) ↔ 涧青(冷) · 严格网格坐标 · 心跳脉冲
+   ============================================================ */
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#121211; --bg2:#181817; --bg3:#1F1F1D;
+  --line:#2C2C29; --line2:#3A3A36;
+  --paper:#EDE8DE; --dim:#8B877C; --faint:#5A574F;
+  --hot:#E8452A; --hot2:#FF6B45; --cold:#4A93AB; --warm:#E8A33D;
+  --sans:"Noto Sans CJK SC","Source Han Sans SC",system-ui,sans-serif;
+  --mono:"Noto Sans Mono CJK SC",ui-monospace,"DejaVu Sans Mono",monospace;
+  --emoji:"Noto Color Emoji","Apple Color Emoji",sans-serif;
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--bg);color:var(--paper);line-height:1.75;overflow-x:hidden}
+.wrap{max-width:1180px;margin:0 auto;padding:0 26px;position:relative;z-index:2}
+
+/* ---------- 导航 ---------- */
+.nav{position:sticky;top:0;z-index:100;background:rgba(18,18,17,.9);backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--line)}
+.nav .wrap{display:flex;align-items:center;gap:26px;height:68px}
+.logo{font-weight:700;font-size:17px;letter-spacing:.24em;white-space:nowrap;display:flex;align-items:center;gap:12px}
+.logo .tag{font-family:var(--mono);font-size:10px;letter-spacing:.18em;color:var(--hot);
+  border:1px solid var(--hot);padding:2px 7px;border-radius:2px}
+.nav nav{display:flex;gap:28px;margin-left:auto;font-family:var(--mono);font-size:13px;letter-spacing:.06em}
+.nav nav a{color:var(--dim);text-decoration:none;transition:.2s;display:flex;align-items:center;gap:7px}
+.nav nav a i{width:5px;height:5px;background:var(--cold);border-radius:50%;font-style:normal;transition:.2s}
+.nav nav a:hover{color:var(--paper)}
+.nav nav a:hover i{background:var(--hot);box-shadow:0 0 10px var(--hot)}
+.btn{
+  display:inline-block;text-decoration:none;font-size:14px;font-weight:700;letter-spacing:.1em;
+  padding:12px 28px;border-radius:2px;background:var(--hot);color:#fff;transition:.22s;white-space:nowrap;
+  box-shadow:0 0 0 rgba(232,69,42,0)
+}
+.btn:hover{background:var(--hot2);box-shadow:0 0 26px -4px rgba(232,69,42,.85)}
+.btn.ghost{background:transparent;color:var(--cold);border:1px solid var(--cold)}
+.btn.ghost:hover{background:rgba(74,147,171,.12);color:#8FD3E8;box-shadow:0 0 22px -6px var(--cold)}
+@media(max-width:840px){.nav nav{display:none}.nav .wrap{height:62px;gap:12px}}
+
+/* ---------- 首屏 ---------- */
+.hero{padding:70px 0 34px}
+.hero .wrap{display:grid;grid-template-columns:1fr 1.06fr;gap:60px;align-items:center}
+.eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.32em;color:var(--hot);
+  display:flex;align-items:center;gap:12px;margin-bottom:28px}
+.eyebrow::before{content:"";width:34px;height:1px;background:var(--hot)}
+.hero h1{font-size:clamp(28px,4.6vw,50px);font-weight:800;line-height:1.3;letter-spacing:.02em;margin-bottom:24px}
+.hero h1 .h{color:var(--hot);text-shadow:0 0 30px rgba(232,69,42,.5)}
+.hero h1 .c{color:var(--cold)}
+.hero .sub{color:var(--dim);font-size:16px;max-width:30em;margin-bottom:34px}
+.hero .sub b{color:var(--paper);font-weight:600}
+.cta-row{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.hero .meta{font-family:var(--mono);font-size:11.5px;letter-spacing:.2em;color:var(--faint);margin-top:26px}
+@media(max-width:940px){.hero .wrap{grid-template-columns:1fr;gap:48px}}
+
+/* ---------- 独热矩阵 ---------- */
+.stage{position:relative;padding-left:44px}
+/* 温度轴 */
+.axis{position:absolute;left:0;top:0;bottom:66px;width:30px;border-right:1px solid var(--line2)}
+.axis .lab{position:absolute;left:0;font-family:var(--mono);font-size:10px;letter-spacing:.14em;writing-mode:vertical-rl}
+.axis .lab.t{top:0;color:var(--hot)}
+.axis .lab.c{bottom:0;color:var(--cold)}
+.axis .grad{position:absolute;right:-1px;top:0;bottom:0;width:3px;
+  background:linear-gradient(180deg,var(--hot),var(--warm) 42%,var(--cold));opacity:.85}
+.axis .tk{position:absolute;right:0;width:9px;height:1px;background:var(--line2)}
+/* 自由画布：带坐标网格，emoji 可拖入 · 缩放 · 旋转 */
+.canvas{
+  position:relative;width:min(100%,430px);aspect-ratio:1;margin-left:26px;
+  border:1px solid var(--line2);border-radius:2px;overflow:hidden;
+  background:
+    repeating-linear-gradient(0deg,rgba(255,255,255,.055) 0 1px,transparent 1px 20%),
+    repeating-linear-gradient(90deg,rgba(255,255,255,.055) 0 1px,transparent 1px 20%),
+    linear-gradient(160deg,#17171b,#101013);
+  box-shadow:inset 0 0 40px rgba(0,0,0,.6)
+}
+.canvas .hint{
+  position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);text-align:center;
+  font-family:var(--mono);font-size:11px;letter-spacing:.24em;color:var(--faint);
+  transition:opacity .4s;line-height:2.1
+}
+.canvas .hint.off{opacity:0}
+.piece{
+  position:absolute;font-family:var(--emoji);font-size:32px;line-height:1;
+  transform:translate(-50%,-50%) scale(var(--s)) rotate(var(--r));
+  filter:drop-shadow(0 0 16px rgba(232,69,42,.4));
+  opacity:0;transition:opacity .5s
+}
+.piece.on{opacity:1;animation:land .5s cubic-bezier(.2,1.4,.4,1)}
+@keyframes land{
+  from{opacity:0;transform:translate(-50%,-50%) scale(calc(var(--s) * .3)) rotate(var(--r))}
+  to{opacity:1;transform:translate(-50%,-50%) scale(var(--s)) rotate(var(--r))}
+}
+/* 独热向量：发到的十张牌各占一位，用掉的位是热的 */
+.vec{display:grid;grid-template-columns:repeat(10,1fr);gap:5px;margin-top:30px;padding-left:26px}
+.vcell{
+  position:relative;aspect-ratio:1;border:1px solid var(--line2);border-radius:2px;background:var(--bg2);
+  display:grid;place-items:center;font-family:var(--emoji);font-size:clamp(12px,2.4vw,18px);
+  transition:background .45s,border-color .45s,box-shadow .45s
+}
+.vcell .ix{position:absolute;top:-16px;left:0;right:0;text-align:center;
+  font-family:var(--mono);font-size:8.5px;color:var(--faint);letter-spacing:.06em}
+.vcell.hot{
+  background:linear-gradient(150deg,rgba(232,69,42,.30),rgba(232,69,42,.10));
+  border-color:var(--hot);box-shadow:0 0 22px -4px rgba(232,69,42,.85)
+}
+.vcell.hot::after{content:"";position:absolute;inset:0;border:1px solid var(--hot);border-radius:2px;
+  animation:pulse 1.5s ease-out infinite}
+@keyframes pulse{0%{transform:scale(1);opacity:.9}100%{transform:scale(1.6);opacity:0}}
+/* 读数 */
+.readout{display:flex;align-items:center;gap:18px;margin-top:20px;padding-left:26px;flex-wrap:wrap}
+.readout .kv{font-family:var(--mono);font-size:11.5px;letter-spacing:.1em;color:var(--dim)}
+.readout .kv b{color:var(--paper);font-weight:700}
+.readout .kv.hotv b{color:var(--hot)}
+.ecg{width:100%;height:40px;margin-top:8px;padding-left:26px;display:block}
+.ecg polyline{fill:none;stroke:var(--hot);stroke-width:1.6;stroke-linejoin:round;
+  stroke-dasharray:1200;stroke-dashoffset:1200;animation:trace 3.4s linear infinite;
+  filter:drop-shadow(0 0 5px rgba(232,69,42,.85))}
+@keyframes trace{to{stroke-dashoffset:0}}
+.answer{font-family:var(--mono);font-size:clamp(16px,2.6vw,23px);font-weight:700;letter-spacing:.3em;
+  color:var(--faint);transition:.5s;margin-top:16px;padding-left:26px;min-height:1.6em}
+.answer.lit{color:var(--hot);text-shadow:0 0 28px rgba(232,69,42,.6)}
+
+/* ---------- 索引 ---------- */
+section{padding:96px 0}
+.sec-head{margin-bottom:52px;display:flex;align-items:baseline;gap:22px;flex-wrap:wrap;
+  border-bottom:1px solid var(--line);padding-bottom:18px}
+.sec-head .tag{font-family:var(--mono);font-size:11px;letter-spacing:.3em;color:var(--cold)}
+.sec-head h2{font-size:clamp(22px,3.4vw,33px);font-weight:800;letter-spacing:.04em;margin-left:auto}
+.index{display:grid;grid-template-columns:repeat(auto-fit,minmax(238px,1fr));gap:1px;background:var(--line)}
+.ix{background:var(--bg);padding:32px 26px;transition:.3s;position:relative}
+.ix:hover{background:var(--bg3)}
+.ix .no{font-family:var(--mono);font-size:11px;letter-spacing:.24em;color:var(--faint);margin-bottom:20px;
+  display:flex;align-items:center;gap:10px}
+.ix .no::after{content:"";flex:1;height:1px;background:var(--line)}
+.ix h3{font-size:24px;font-weight:800;letter-spacing:.2em;margin-bottom:12px}
+.ix p{color:var(--dim);font-size:14.5px}
+.ix .dot{position:absolute;top:32px;right:26px;width:7px;height:7px;border-radius:50%;background:var(--line2);transition:.3s}
+.ix:hover .dot{background:var(--hot);box-shadow:0 0 14px var(--hot)}
+
+/* ---------- 模式：主 / 独 ---------- */
+.modes{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line)}
+.mode{background:var(--bg);padding:44px 38px;transition:.35s}
+.mode:hover{background:var(--bg3)}
+.mode .k{font-family:var(--mono);font-size:11px;letter-spacing:.26em;margin-bottom:18px}
+.mode.h .k{color:var(--hot)}.mode.c .k{color:var(--cold)}
+.mode h3{font-size:26px;font-weight:800;letter-spacing:.16em;margin-bottom:14px}
+.mode p{color:var(--dim);font-size:15px;margin-bottom:22px}
+.mode .bar{height:2px;background:var(--line2);position:relative;overflow:hidden}
+.mode .bar i{position:absolute;inset:0;transform:translateX(-100%);animation:slide 2.6s ease-in-out infinite}
+.mode.h .bar i{background:linear-gradient(90deg,transparent,var(--hot),transparent)}
+.mode.c .bar i{background:linear-gradient(90deg,transparent,var(--cold),transparent)}
+@keyframes slide{to{transform:translateX(100%)}}
+@media(max-width:700px){.modes{grid-template-columns:1fr}}
+
+/* ---------- 样例 ---------- */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.card{background:var(--bg2);border:1px solid var(--line);border-radius:3px;padding:24px 22px;
+  transition:.3s;position:relative;overflow:hidden}
+.card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--cold);transition:.3s}
+.card:hover{border-color:var(--line2);transform:translateY(-4px);box-shadow:0 20px 40px -22px #000}
+.card:hover::before{background:var(--hot);box-shadow:0 0 16px var(--hot)}
+.card .hd{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;
+  letter-spacing:.2em;color:var(--faint);margin-bottom:20px}
+.card .g{font-family:var(--emoji);font-size:28px;display:flex;gap:9px;flex-wrap:wrap;margin-bottom:18px}
+.card .hide{font-family:var(--mono);font-size:15px;font-weight:700;letter-spacing:.26em;color:var(--faint);transition:.3s}
+.card:hover .hide{color:var(--hot);letter-spacing:.2em}
+
+/* ---------- 数字 ---------- */
+.nums{border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--bg2)}
+.nums .wrap{display:grid;grid-template-columns:repeat(4,1fr)}
+.n{padding:48px 18px;text-align:center;border-right:1px solid var(--line)}
+.n:last-child{border-right:none}
+.n .v{font-family:var(--mono);font-weight:700;font-size:clamp(30px,5vw,50px);line-height:1}
+.n .k{font-family:var(--mono);font-size:11.5px;letter-spacing:.2em;color:var(--dim);margin-top:12px}
+.n:nth-child(1) .v{color:var(--cold)}.n:nth-child(2) .v{color:var(--warm)}
+.n:nth-child(3) .v{color:var(--hot)}.n:nth-child(4) .v{color:var(--paper)}
+@media(max-width:640px){.nums .wrap{grid-template-columns:repeat(2,1fr)}
+  .n:nth-child(2){border-right:none}.n:nth-child(1),.n:nth-child(2){border-bottom:1px solid var(--line)}}
+
+/* ---------- 自指条 ---------- */
+.selfref{font-family:var(--mono);font-size:11.5px;color:var(--faint);letter-spacing:.14em;
+  display:flex;gap:5px;align-items:center;justify-content:center;flex-wrap:wrap;padding:22px 0 0}
+.selfref .cell{width:26px;height:26px;border:1px solid var(--line2);border-radius:2px;
+  display:grid;place-items:center;font-size:10.5px;color:var(--faint)}
+.selfref .cell.h{background:rgba(232,69,42,.24);border-color:var(--hot);color:#fff;
+  box-shadow:0 0 14px -2px var(--hot)}
+.selfref .note{margin-left:14px;color:var(--dim)}
+
+/* ---------- 尾屏 ---------- */
+.final{text-align:center;padding:120px 0}
+.final h2{font-size:clamp(23px,4vw,42px);font-weight:800;line-height:1.4;letter-spacing:.03em;margin-bottom:22px}
+.final p{color:var(--dim);margin-bottom:38px;font-size:16px}
+footer{border-top:1px solid var(--line);padding:32px 0;font-family:var(--mono);font-size:11.5px;
+  color:var(--faint);letter-spacing:.1em}
+footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+footer .seed{opacity:.7;word-break:break-all;letter-spacing:0}
+.reveal{opacity:0;transform:translateY(22px);transition:opacity .7s,transform .7s}
+.reveal.in{opacity:1;transform:none}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap">
+    <div class="logo">你拼我猜 <span class="tag">ONE-HOT</span></div>
+    <nav>
+      <a href="#how"><i></i>索引</a>
+      <a href="#modes"><i></i>模式</a>
+      <a href="#samples"><i></i>题库</a>
+    </nav>
+    <a class="btn" href="#">开始拼一题</a>
+  </div>
+</header>
+
+<main>
+
+<section class="hero">
+  <div class="wrap">
+    <div>
+      <div class="eyebrow reveal">十 张 牌 · 一 个 位 置 是 热 的</div>
+      <h1 class="reveal">系统发你十个 <span class="c">0</span><br>只有一个拼法是 <span class="h">对 的</span></h1>
+      <p class="sub reveal">每局随机发十张 emoji，<b>用几张随你</b>。拖进画布，放大、缩小、随手一转 ——
+        朋友会给出<b>一堆答案，而只有一个是热的</b>。</p>
+      <div class="cta-row reveal">
+        <a class="btn" href="#">开始拼一题</a>
+        <a class="btn ghost" href="#samples">先测一测</a>
+      </div>
+      <div class="meta reveal">免费 · 免注册 · 手机直开</div>
+    </div>
+
+    <!-- 自由画布 + 独热向量 -->
+    <div class="stage reveal">
+      <div class="axis">
+        <span class="lab t">热</span><span class="lab c">冷</span>
+        <div class="grad"></div>
+      </div>
+      <div class="canvas" id="canvas">
+        <div class="hint" id="hint">把 牌<br>拖 进 画 布</div>
+      </div>
+      <div class="vec" id="vec"></div>
+      <svg class="ecg" viewBox="0 0 620 40" preserveAspectRatio="none" aria-hidden="true">
+        <polyline points="0,20 78,20 88,20 96,4 104,36 112,20 190,20 200,20 208,6 216,34 224,20 302,20 312,20 320,4 328,36 336,20 414,20 424,20 432,6 440,34 448,20 526,20 536,20 544,4 552,36 560,20 620,20"/>
+      </svg>
+      <div class="readout">
+        <span class="kv hotv">HOT 位 <b id="hoted">01 · 05 · 07 · 09</b></span>
+        <span class="kv">已用 <b id="used">4</b> / 10</span>
+        <span class="kv">其余 <b id="zero">6</b> 位 = 0</span>
+      </div>
+      <div class="answer" id="ans">— — — —</div>
+    </div>
+  </div>
+</section>
+
+<section id="how">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="tag">I N D E X  0 1 — 0 4</span>
+      <h2>四个索引，指向一个答案</h2>
+    </div>
+    <div class="index reveal">
+      <div class="ix"><div class="no">01</div><div class="dot"></div><h3>拼</h3><p>十张随机牌，拖 · 缩 · 转，把想说的编码进画布。</p></div>
+      <div class="ix"><div class="no">02</div><div class="dot"></div><h3>发</h3><p>生成一条链接，丢进群里，等别人来解。</p></div>
+      <div class="ix"><div class="no">03</div><div class="dot"></div><h3>猜</h3><p>对方给出很多个答案。绝大多数，都是冷的。</p></div>
+      <div class="ix"><div class="no">04</div><div class="dot"></div><h3>揭</h3><p>只有一个位置亮起朱赤色 —— 那就是答案。</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="modes" style="padding-top:16px">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="tag">和 · 独</span>
+      <h2>两个人玩，或者一个人玩</h2>
+    </div>
+    <div class="modes reveal">
+      <div class="mode h"><div class="k">MODE / 和</div><h3>开一间房</h3>
+        <p>你当房主出题，朋友进来猜。人多的时候，冷答案会多到刷屏。</p><div class="bar"><i></i></div></div>
+      <div class="mode c"><div class="k">MODE / 独</div><h3>单人挑战</h3>
+        <p>没有朋友在线也能玩。系统出题，你一个人慢慢解。</p><div class="bar"><i></i></div></div>
+    </div>
+  </div>
+</section>
+
+<section id="samples" style="padding-top:16px">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="tag">T E S T  S E T</span>
+      <h2>四道题，先测一测你的解码器</h2>
+    </div>
+    <div class="cards reveal" id="cards"></div>
+  </div>
+</section>
+
+<section class="nums" style="padding:0">
+  <div class="wrap">
+    <div class="n"><div class="v">10</div><div class="k">张随机牌</div></div>
+    <div class="n"><div class="v">3</div><div class="k">拖 · 缩 · 转</div></div>
+    <div class="n"><div class="v">60</div><div class="k">秒一局</div></div>
+    <div class="n"><div class="v">∞</div><div class="k">种歪解</div></div>
+  </div>
+</section>
+
+<section class="final">
+  <div class="wrap">
+    <div class="selfref reveal" id="selfref"></div>
+    <h2 class="reveal" style="margin-top:44px">从「和」出发，<br>走到「心」为止</h2>
+    <p class="reveal">你脑子里那句话，正等着被编码。</p>
+    <a class="btn reveal" href="#">开始拼一题</a>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>你拼我猜 · 用 emoji 说话</span>
+    <span class="seed">种子 S5：和首给涧独热7具至主4立随面持心</span>
+  </div>
+</footer>
+
+<script>
+/* ---- 每局随机发十张；u = 这一局用掉几张（用几张随你，所以每题不同）---- */
+const PUZZLES=[
+  {d:["🔥","⛽","💧","🪵","🌫️","🧯","🕯️","☀️","🥵","🚒"],u:3,a:"火上浇油",c:"成语"},
+  {d:["🌊","⬇️","🥄","🌙","🐟","🪣","⛵","🕳️","✨","🎣"],u:4,a:"海底捞月",c:"成语"},
+  {d:["🐍","🖌️","➕","🦶","👣","🖍️","🎨","➖","🦎","🐛"],u:5,a:"画蛇添足",c:"成语"},
+  {d:["🐑","💨","🕳️","🧱","🔨","🏠","🚧","🪚","🐺","🌾"],u:6,a:"亡羊补牢",c:"成语"}
+];
+/* 最多六笔的落点；每题取前 u 个 —— 用几张随你 */
+const LAYOUT=[
+  {x:50,y:70,s:2.5,r:-5},
+  {x:52,y:44,s:1.5,r:4},
+  {x:75,y:58,s:1.35,r:24},
+  {x:25,y:30,s:1.15,r:-15},
+  {x:78,y:22,s:1.05,r:18},
+  {x:24,y:76,s:1.25,r:-24}
+];
+const DEAL=10;
+
+/* --- 样例卡：这一局用掉的那几笔，大小角度各异 --- */
+document.getElementById("cards").innerHTML=PUZZLES.map((p,i)=>`
+  <div class="card">
+    <div class="hd"><span>IDX ${String(i+1).padStart(2,"0")}</span><span>${p.c} · 用了 ${p.u} 张</span></div>
+    <div class="g">${p.d.slice(0,p.u).map((x,k)=>
+      `<span style="font-size:${(22*LAYOUT[k].s/2.5*1.8).toFixed(0)}px;transform:rotate(${LAYOUT[k].r}deg)">${x}</span>`).join("")}</div>
+    <div class="hide">${p.a}</div>
+  </div>`).join("");
+
+/* 种子给的自指：数字 7 落在第 7 位 */
+document.getElementById("selfref").innerHTML=
+  Array.from({length:10},(_,i)=>{
+    const pos=i+1, isHit=pos===7;
+    return `<span class="cell${isHit?" h":""}">${isHit?7:"·"}</span>`;
+  }).join("")+`<span class="note">位置 7 = 数值 7 ｜ 全五条种子中唯一一次自指</span>`;
+
+const ansEl=document.getElementById("ans"),canvas=document.getElementById("canvas"),
+      hint=document.getElementById("hint"),vec=document.getElementById("vec"),
+      hotedEl=document.getElementById("hoted"),usedEl=document.getElementById("used"),
+      zeroEl=document.getElementById("zero");
+let turn=0;
+
+function play(){
+  const p=PUZZLES[turn%PUZZLES.length];
+  canvas.querySelectorAll(".piece").forEach(n=>n.remove());
+  hint.classList.remove("off");
+  ansEl.className="answer";ansEl.textContent="— — — —";
+
+  /* 独热向量：十位全部置 0，emoji 摆上画布时对应位变热 */
+  vec.innerHTML=p.d.map((e,i)=>
+    `<div class="vcell" data-i="${i}"><span class="ix">${String(i+1).padStart(2,"0")}</span>${e}</div>`).join("");
+  hotedEl.textContent="—";usedEl.textContent="0";zeroEl.textContent=DEAL;
+
+  /* 四个笔触依次落进画布 —— 编码过程 */
+  p.d.slice(0,p.u).forEach((e,k)=>{
+    setTimeout(()=>{
+      hint.classList.add("off");
+      const L=LAYOUT[k],el=document.createElement("span");
+      el.className="piece";el.textContent=e;
+      el.style.cssText=`left:${L.x}%;top:${L.y}%;--s:${L.s};--r:${L.r}deg`;
+      canvas.appendChild(el);
+      requestAnimationFrame(()=>el.classList.add("on"));
+
+      const v=vec.querySelector(`.vcell[data-i="${k}"]`);
+      if(v)v.classList.add("hot");
+      const hot=[...vec.querySelectorAll(".vcell.hot")].map(n=>String(+n.dataset.i+1).padStart(2,"0"));
+      hotedEl.textContent=hot.join(" · ");
+      usedEl.textContent=hot.length;
+      zeroEl.textContent=DEAL-hot.length;
+    },560*k+340);
+  });
+
+  /* 揭晓：等最后一笔落下 */
+  setTimeout(()=>{
+    ansEl.textContent=p.a.split("").join(" ");
+    ansEl.classList.add("lit");
+  },560*p.u+1200);
+
+  turn++;
+  setTimeout(play,560*p.u+3200);
+}
+
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target)}}),{threshold:.12});
+document.querySelectorAll(".reveal").forEach(el=>io.observe(el));
+new IntersectionObserver((es,o)=>{if(es[0].isIntersecting){play();o.disconnect()}},{threshold:.25})
+  .observe(canvas);
+</script>
+</body>
+</html>

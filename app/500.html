@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>设备故障 · 正在抢修 · 1管51 站 — 你拼我猜</title>
+<link rel="stylesheet" href="base.css">
+<style>
+/* ============================================================
+   500 = 设备故障通告 —— 信号设备故障，正在抢修
+   机构形态：抢修通告（横版、宽纸、贴在设备柜门上）
+   主章：.stamp.bar.amber「抢修中」（本页唯一一枚）
+   进度：细实线 + 等宽文字（20 格），不用发光进度条
+   物理动作：左上角 .hole 归档孔 · 纸张 .creased 对折过 · .label 已张贴
+   简化律：字段小字注解全删（值就是值）；长解释删除；
+           清单开关从文字按钮改成一枚 .ibtn。
+   ============================================================ */
+.mla{margin-left:auto}
+
+.mast{padding:34px 0 8px}
+
+/* 通告纸：横版，比 404 宽，向右压一点 */
+.paper500{position:relative;max-width:960px;margin:0 auto 0 2%;transform:rotate(.5deg);
+  padding:24px 30px 28px;border-left:7px solid var(--amber)}
+.paper500 .hole{left:20px;top:20px}
+@media(max-width:900px){.paper500{margin:0 auto}}
+@media(max-width:560px){.paper500{padding:20px 16px 22px;transform:none;border-left-width:5px}}
+
+.tag-tl{position:absolute;left:-10px;top:-13px;transform:rotate(-6deg)}
+.tag-br{position:absolute;right:-10px;bottom:-13px;transform:rotate(4deg)}
+@media(max-width:560px){.tag-tl{left:4px}.tag-br{right:4px}}
+
+/* 抬头 */
+.pf-hd{display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+  border-bottom:2.5px solid var(--ink);padding:16px 0 10px 30px}
+@media(max-width:560px){.pf-hd{padding-left:0}}
+
+/* 故障通告的字段表：只有键与值 */
+.fr{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
+  border-bottom:2px solid var(--ink)}
+.fr .c{padding:14px 18px 15px;border-right:1.5px dashed var(--ink-3)}
+.fr .c:last-child{border-right:none}
+.fr .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.2em;color:var(--ink-3)}
+.fr .v{font-family:var(--mono);font-weight:700;font-size:19px;letter-spacing:.04em;margin-top:7px;
+  font-variant-numeric:tabular-nums;line-height:1.35}
+.fr .v.amber{color:var(--amber)}
+.fr .v.red{color:var(--red)}
+@media(max-width:640px){.fr .c{border-right:none;border-bottom:1.5px dashed var(--ink-3)}
+  .fr .c:last-child{border-bottom:none}}
+
+/* 抢修进度：细实线 + 等宽文字 */
+.rp{padding:20px 18px 4px}
+.rp-hd{display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap}
+.rp-hd .pct{font-family:var(--mono);font-weight:900;font-size:clamp(30px,5.4vw,46px);line-height:1;
+  letter-spacing:.02em;color:var(--amber);font-variant-numeric:tabular-nums}
+.rp-hd .k{font-family:var(--mono);font-size:11.5px;letter-spacing:.1em;color:var(--ink-2)}
+.rp-hd .st{margin-left:auto}
+.barline{margin-top:14px;display:flex;align-items:center;gap:12px}
+.barline .track{flex:1;height:5px;border:1.5px solid var(--ink);background:var(--paper-4);
+  position:relative;overflow:hidden}
+.barline .track i{display:block;height:100%;width:0;background:var(--amber)}
+.barline .track .cap-mark{position:absolute;left:92%;top:-4px;bottom:-4px;width:2px;background:var(--red)}
+.barline .num{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);white-space:nowrap}
+.segline{margin-top:8px;font-family:var(--mono);font-size:13px;letter-spacing:.06em;
+  color:var(--amber);white-space:nowrap;overflow:hidden}
+
+/* 抢修流水：单据流水，是最多四条的内容 */
+.log{margin:18px 0 0;border-top:1.5px dashed var(--ink-3);padding-top:12px;
+  font-family:var(--mono);font-size:11.5px;line-height:2;color:var(--ink-2)}
+.log div{padding-left:1.2em;position:relative}
+.log div::before{content:"·";position:absolute;left:.25em;color:var(--ink-3)}
+.log .t{color:var(--ink-3)}
+.log .w{color:var(--amber)}
+.log .d{color:var(--red)}
+.log .ok{color:var(--blue)}
+
+/* 卡住的几条 */
+.jam{margin-top:20px;border:1.5px solid var(--ink);background:var(--paper-2);
+  border-radius:var(--rad);overflow:hidden}
+.jam .hd{display:flex;align-items:center;gap:12px;padding:10px 16px;flex-wrap:wrap}
+.jam .hd .ibtn{margin-left:auto}
+.jam .board{border-left:none;border-right:none;border-bottom:none;border-radius:0}
+.jam .row{grid-template-columns:34px minmax(0,1fr) 108px}
+.jam .row .wd{white-space:normal;font-size:12.5px}
+@media(max-width:640px){.jam .row{grid-template-columns:26px minmax(0,1fr) 84px}
+  .jam .row .wd{font-size:11px}}
+
+/* 出口 */
+.exits{max-width:960px;margin:0 auto;padding-top:22px}
+.note-out{margin-top:14px;font-family:var(--mono);font-size:11px;color:var(--ink-4);letter-spacing:.06em}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="logo" href="index.html">你拼我猜<span class="no">1管51</span></a>
+    <nav>
+      <a href="plaza.html">广场</a>
+      <a href="banks.html">词库</a>
+      <a href="works.html">我的作品</a>
+      <a href="me.html">我的主页</a>
+    </nav>
+    <a class="btn sm" href="login.html">办证 / 进站</a>
+  </div>
+</header>
+
+<main class="mast">
+  <div class="wrap">
+
+    <!-- ==================== 抢修通告 ==================== -->
+    <article class="sheet paper500 creased">
+      <span class="hole" aria-hidden="true"></span>
+      <span class="label tag-tl">已张贴</span>
+      <span class="label tag-br">设备柜 A-3 留存</span>
+
+      <div class="pf-hd">
+        <span class="tag-no red">HTTP 500</span>
+        <span class="lbl">抢 修 通 告</span>
+        <span class="lbl mla" id="foundAt">--:-- 报修</span>
+      </div>
+
+      <!-- 字段表 -->
+      <div class="fr">
+        <div class="c">
+          <div class="k">故 障 编 号</div>
+          <div class="v red" id="fno">1管51-F-0000</div>
+        </div>
+        <div class="c">
+          <div class="k">故 障 部 位</div>
+          <div class="v">服务器 · 信号柜</div>
+        </div>
+        <div class="c">
+          <div class="k">预 计 恢 复</div>
+          <div class="v amber" id="eta">--:--</div>
+        </div>
+        <div class="c">
+          <div class="k">已 抢 修</div>
+          <div class="v" id="worked">00:00</div>
+        </div>
+      </div>
+
+      <!-- 抢修进度：细线 + 等宽 -->
+      <div class="rp">
+        <div class="rp-hd">
+          <span class="pct" id="pct">0%</span>
+          <span class="k" id="pctK">抢修班已进场</span>
+          <span class="stamp bar amber st" id="fixStamp">抢 修 中</span>
+        </div>
+
+        <div class="barline">
+          <span class="num">0</span>
+          <span class="track"><i id="bar"></i><span class="cap-mark" aria-hidden="true"></span></span>
+          <span class="num">92 上限</span>
+        </div>
+        <div class="segline" id="segs" aria-hidden="true">□□□□□□□□□□□□□□□□□□□□</div>
+
+        <div class="log" id="log"></div>
+      </div>
+
+      <!-- 卡住的几条 -->
+      <div class="jam">
+        <div class="hd">
+          <span class="lbl"><i class="ico" aria-hidden="true">🧰</i>信 号 柜 里 卡 着 的 东 西</span>
+          <button class="ibtn" type="button" id="what" aria-expanded="false" aria-label="展开清单" title="展开清单">📋</button>
+        </div>
+        <div class="board light" id="jamList" hidden>
+          <div class="row">
+            <div class="c1">01</div>
+            <div class="c3 wd">《办公室黑话》第 47 条 ·「对齐一下」</div>
+            <div class="c4">卡了 <b id="jamTimer">00:00</b></div>
+          </div>
+          <div class="row">
+            <div class="c1">02</div>
+            <div class="c3 wd">《年会节目单》第 3 条 ·「抽奖环节」</div>
+            <div class="c4">卡了 2 天</div>
+          </div>
+          <div class="row">
+            <div class="c1">03</div>
+            <div class="c3 wd">本站的发票存根（空白的一沓）</div>
+            <div class="c4">卡了 11 年</div>
+          </div>
+          <div class="row">
+            <div class="c1">04</div>
+            <div class="c3 wd">上一位乘客的证件复印件</div>
+            <div class="c4">我们也在找</div>
+          </div>
+        </div>
+      </div>
+
+    </article>
+
+    <!-- ==================== 出口 ==================== -->
+    <div class="exits">
+      <div class="btn-row">
+        <button class="btn" type="button" id="retry">重 试（不刷新）</button>
+        <a class="btn ghost" href="plaza.html">回站前广场</a>
+        <a class="btn ghost" href="index.html">回站台首页</a>
+      </div>
+      <p class="note-out" id="exitNote">抢修期间本站照常收票，只是这一班晚点。</p>
+    </div>
+
+  </div>
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <span>你拼我猜 · 1管51 站 · 设备故障通告</span>
+    <span>抢修班在岗 · 通车即时报。</span>
+  </div>
+</footer>
+
+<script>
+/* ============================================================
+   500 —— 真实行为全部保留：
+   「重试」不刷新，只让进度从 0 走到卡住值 92%；
+   记次数；第 3 / 第 5 次换台词。
+   表达方式换掉了：等宽文字 + 细实线，没有发光进度条。
+   ============================================================ */
+const $ = id => document.getElementById(id);
+const bar = $("bar"), pct = $("pct"), pctK = $("pctK"), segs = $("segs"), logBox = $("log"),
+      jamList = $("jamList"), jamTimer = $("jamTimer"), worked = $("worked"),
+      fno = $("fno"), eta = $("eta"), exitNote = $("exitNote"),
+      what = $("what");
+
+const CAP = 92;                        /* 本机上限，永远到不了 100 */
+const SEGS = 20;                       /* 20 格等宽刻度 */
+let retries = 0, running = false, started = Date.now(), stuckT = null, jitter = null;
+
+/* ---------- 编号与预计恢复 ---------- */
+const d0 = new Date(), p2 = x => String(x).padStart(2, "0");
+const hm = t => p2(t.getHours()) + ":" + p2(t.getMinutes());
+fno.textContent = "1管51-F-" + String(Math.floor(Math.random() * 9000) + 1000);
+$("foundAt").textContent = hm(d0) + " 报修";
+const etaT = new Date(d0.getTime() + (25 + Math.floor(Math.random() * 26)) * 60000);
+eta.textContent = hm(etaT);
+
+/* ---------- 刻度条：等宽字符，替代发光进度 ---------- */
+function drawSegs(v){
+  const on = Math.round(v / 100 * SEGS);
+  segs.textContent = "█".repeat(on) + "□".repeat(SEGS - on);
+}
+function setVal(v){
+  const x = Math.max(0, Math.min(v, CAP));
+  bar.style.width = x + "%";
+  pct.textContent = (x % 1 === 0 ? x : x.toFixed(1)) + "%";
+  drawSegs(x);
+}
+
+/* ---------- 流水：最多四条，超了就砍 ---------- */
+function nowT(){ const d = new Date(); return p2(d.getHours()) + ":" + p2(d.getMinutes()) + ":" + p2(d.getSeconds()); }
+function log(msg, cls){
+  const el = document.createElement("div");
+  el.innerHTML = '<span class="t">' + nowT() + "</span> " + (cls ? '<span class="' + cls + '">' + msg + "</span>" : msg);
+  logBox.prepend(el);
+  while(logBox.children.length > 4) logBox.lastChild.remove();
+}
+
+/* ---------- 挣扎：在 91.x 抖动，但过不去 92 ---------- */
+function stopJitter(){ clearInterval(jitter); jitter = null; }
+function startJitter(){
+  stopJitter();
+  jitter = setInterval(() => {
+    if(running) return;
+    setVal(91.2 + Math.random() * 0.8);
+  }, 820);
+}
+
+/* ---------- 走一遍 0 → 92，然后卡住 ---------- */
+function run(){
+  if(running) return;
+  running = true; retries++; stopJitter();
+  clearTimeout(stuckT);
+  log(retries === 1 ? "抢修班进场 · 第 1 次尝试送电" : "重试 · 第 " + retries + " 次 · 还是那个信号柜");
+  pctK.textContent = "正在把信号抽出来…";
+  bar.style.transition = "none";
+  setVal(0);
+  void bar.offsetWidth;                                   /* 让浏览器认账，再走一遍 */
+  bar.style.transition = "width 2.6s cubic-bezier(.15,.75,.2,1)";
+  setVal(CAP);
+  document.title = "500 · 抢修中（第 " + retries + " 次）· 你拼我猜";
+  stuckT = setTimeout(stuck, 2680);
+}
+function stuck(){
+  running = false;
+  setVal(CAP);
+  document.title = "设备故障 · 抢修中 92% · 你拼我猜";
+  pctK.textContent = retries === 1
+    ? "卡住了。它就停在 92%，很安稳。"
+    : "第 " + retries + " 次，还是 92%。";
+
+  if(retries >= 5){
+    log("又停在 92% · 抢修班长说：再送一次电就好了（他每次都这么说）", "d");
+    pctK.textContent = "第 " + retries + " 次。92% 是这台的极限，不是我们的。";
+  }else if(retries >= 3){
+    log("又停在 92% · 你已经陪着抢修 " + retries + " 次了", "w");
+    pctK.textContent = "第 " + retries + " 次，仍是 92%。你不用一直陪着。";
+  }else{
+    log("停在 92% · 卡住的还是那一段信号", "w");
+  }
+  if(retries === 3) log("调度室建议：不要再试了。调度室也知道你不会听。", "ok");
+  if(retries === 5) log("已为你转人工：人工也在等厂家。", "ok");
+
+  exitNote.textContent = "第 " + retries + " 次重试 · 进度仍会走到 92" +
+    (retries >= 5 ? "。别试了，去广场转转吧。" : "，然后卡住。");
+  startJitter();
+}
+$("retry").addEventListener("click", run);
+
+/* ---------- 已抢修多久（真的在走） ---------- */
+function tick(){
+  const s = Math.floor((Date.now() - started) / 1000);
+  worked.textContent = p2(Math.floor(s / 60)) + ":" + p2(s % 60);
+  jamTimer.textContent = p2(Math.floor(s / 60)) + ":" + p2(s % 60);
+}
+tick(); setInterval(tick, 1000);
+
+/* ---------- 展开清单：一枚图标按钮，点开 / 收起 ---------- */
+what.addEventListener("click", () => {
+  const open = jamList.hidden;
+  jamList.hidden = !open;
+  what.setAttribute("aria-expanded", String(open));
+  what.textContent = open ? "🔼" : "📋";
+  what.title = open ? "收起清单" : "展开清单";
+  what.setAttribute("aria-label", what.title);
+});
+
+/* ---------- 开机就报修 ---------- */
+log("设备已通电 · 自检通过（自检从来不检查信号柜）");
+log("抢修班已派工 · 工单 " + fno.textContent);
+drawSegs(0);
+run();
+setTimeout(() => { const h = document.querySelector(".paper500 .hole"); if(h) h.classList.add("punching"); }, 460);
+
+/* ---------- 控制台留痕 ---------- */
+console.log("%c500 · 设备故障 · 抢修中","color:#C98A0E;font-size:14px;font-weight:700;letter-spacing:.08em");
+console.log("%c进度停在 92% 是因为信号柜咬住了那一段，不是代码写错了 —— 代码写错的是另外三处。\n" +
+  "· 「重试」不会刷新页面：刷新是抢修班的活，不是你的。\n" +
+  "· 你可以一直点重试。它不会成功，但它会认真地走一遍 0 到 92。\n" +
+  "· 想知道卡住的是什么，点那枚 📋。第 04 条我们真的在找。",
+  "color:#4A4841;line-height:1.75;font-family:monospace");
+</script>
+</body>
+</html>

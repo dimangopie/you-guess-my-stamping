@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>你拼我猜 · 雾间轻帆</title>
+<style>
+/* ============================================================
+   S4 「雾间轻帆」
+   种子: 谈女满无诉真梅4轻帆雾间3亲5音活此今
+   机关: 正中位（第10字）= 帆；无诉 / 轻帆 / 帆雾 / 雾间 / 此今
+        全五条中最长（19 字），语感最像散文
+   基调: 宣纸 · 竖排 · 极大留白 · 一点梅脂 · 慢
+   ============================================================ */
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --paper:#F6F3EC; --paper2:#EFEBE0; --paper3:#E6E1D3;
+  --ink:#1B1A18; --ink2:#514E47; --ink3:#918C81; --ink4:#C3BEB1;
+  --plum:#B0344E; --mist:#AEB9BC;
+  --serif:"Noto Serif CJK SC","Source Han Serif SC",serif;
+  --sans:"Noto Sans CJK SC",sans-serif;
+  --emoji:"Noto Color Emoji","Apple Color Emoji",sans-serif;
+}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--serif);background:var(--paper);color:var(--ink);
+  line-height:2.1;overflow-x:hidden;-webkit-font-smoothing:antialiased;
+  background-image:
+    radial-gradient(90% 60% at 78% 6%,rgba(174,185,188,.16),transparent 62%),
+    radial-gradient(70% 50% at 12% 84%,rgba(176,52,78,.05),transparent 60%),
+    repeating-linear-gradient(0deg,rgba(27,26,24,.012) 0 1px,transparent 1px 4px);
+}
+/* 缓慢飘移的雾 */
+.fog{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.fog i{position:absolute;border-radius:50%;filter:blur(46px);opacity:.5}
+.fog i:nth-child(1){width:44vw;height:26vw;left:-8vw;top:14vh;background:rgba(174,185,188,.5);animation:drift 42s ease-in-out infinite}
+.fog i:nth-child(2){width:36vw;height:22vw;right:-6vw;top:46vh;background:rgba(200,205,205,.42);animation:drift 56s ease-in-out infinite reverse}
+.fog i:nth-child(3){width:30vw;height:18vw;left:34vw;top:74vh;background:rgba(190,196,196,.34);animation:drift 68s ease-in-out infinite}
+@keyframes drift{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(7vw,-4vh) scale(1.14)}}
+.wrap{max-width:1080px;margin:0 auto;padding:0 30px;position:relative;z-index:2}
+
+/* ---------- 导航 ---------- */
+.nav{position:sticky;top:0;z-index:100;background:rgba(246,243,236,.86);backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--ink4)}
+.nav .wrap{display:flex;align-items:center;gap:30px;height:74px}
+.logo{font-weight:700;font-size:19px;letter-spacing:.42em;white-space:nowrap}
+.nav nav{display:flex;gap:34px;margin-left:auto;font-family:var(--sans);font-size:13.5px;letter-spacing:.2em}
+.nav nav a{color:var(--ink3);text-decoration:none;transition:.3s}
+.nav nav a:hover{color:var(--plum)}
+.btn{
+  display:inline-block;text-decoration:none;font-family:var(--sans);font-size:14px;letter-spacing:.24em;
+  padding:12px 32px;color:var(--paper);background:var(--ink);border-radius:1px;
+  transition:.35s;white-space:nowrap
+}
+.btn:hover{background:var(--plum);letter-spacing:.3em}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--ink3)}
+.btn.ghost:hover{background:transparent;color:var(--plum);border-color:var(--plum);letter-spacing:.3em}
+@media(max-width:800px){.nav nav{display:none}.nav .wrap{gap:14px;height:64px}.logo{letter-spacing:.24em}}
+
+/* ---------- 首屏 ---------- */
+.hero{padding:68px 0 28px}
+.hero .wrap{display:grid;grid-template-columns:1fr auto;gap:56px;align-items:start}
+.hero .col{max-width:31em}
+.eyebrow{font-family:var(--sans);font-size:12px;letter-spacing:.5em;color:var(--plum);margin-bottom:24px}
+.hero h1{
+  font-weight:400;font-size:clamp(27px,4.4vw,44px);line-height:1.95;letter-spacing:.14em;
+  margin-bottom:26px;color:var(--ink)
+}
+.hero h1 b{font-weight:700}
+.hero h1 .dot{color:var(--plum)}
+.hero .sub{color:var(--ink2);font-size:16px;line-height:2.3;margin-bottom:34px;max-width:26em}
+.hero .sub em{font-style:normal;border-bottom:1px solid var(--plum);padding-bottom:1px}
+.cta-row{display:flex;gap:20px;flex-wrap:wrap;align-items:center}
+.hero .meta{font-family:var(--sans);font-size:12px;letter-spacing:.26em;color:var(--ink4);margin-top:30px}
+/* 竖排题名 */
+.vertical{
+  writing-mode:vertical-rl;text-orientation:upright;
+  font-size:clamp(34px,6vw,68px);font-weight:700;letter-spacing:.32em;
+  line-height:1;height:clamp(300px,44vh,460px);color:var(--ink);
+  border-right:1px solid var(--ink4);padding-right:26px;position:relative
+}
+.vertical::after{content:"";position:absolute;right:26px;top:0;bottom:0;width:1px;background:var(--paper)}
+.seal{
+  writing-mode:vertical-rl;text-orientation:upright;font-family:var(--serif);font-weight:700;
+  font-size:15px;letter-spacing:.2em;color:#fff;background:var(--plum);
+  padding:14px 7px;line-height:1;margin-top:26px;opacity:.9
+}
+@media(max-width:880px){
+  .hero .wrap{grid-template-columns:1fr;gap:44px}
+  .vertical{writing-mode:horizontal-tb;height:auto;border-right:none;border-bottom:1px solid var(--ink4);
+    padding:0 0 22px;font-size:clamp(30px,8vw,46px);letter-spacing:.24em}
+  .seal{writing-mode:horizontal-tb;display:inline-block;padding:8px 14px;margin-top:22px}
+}
+
+/* ---------- 长卷 · 画布 ---------- */
+.scroll-sec{padding:26px 0 32px}
+.scroll{
+  position:relative;border-top:1px solid var(--ink4);border-bottom:1px solid var(--ink4);
+  padding:58px 0;overflow:hidden;background:linear-gradient(180deg,rgba(255,255,255,.42),rgba(255,255,255,0))
+}
+.scroll .fogline{
+  position:absolute;left:-10%;right:-10%;height:120px;top:50%;transform:translateY(-50%);
+  background:linear-gradient(180deg,transparent,rgba(174,185,188,.34),transparent);
+  filter:blur(18px);animation:slide 30s ease-in-out infinite
+}
+@keyframes slide{0%,100%{transform:translate(-4%,-50%)}50%{transform:translate(4%,-50%)}}
+/* 方形宣纸画布：emoji 拖进来，自由摆放，不是格子 */
+.canvas{
+  position:relative;width:min(520px,100%);aspect-ratio:1/1;margin:0 auto;overflow:hidden;
+  border:1px solid rgba(27,26,24,.09);border-radius:1px;
+  background:linear-gradient(180deg,rgba(255,255,255,.5),rgba(255,255,255,.1))
+}
+.canvas .hint{
+  position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);text-align:center;
+  font-family:var(--sans);font-size:11.5px;letter-spacing:.44em;color:var(--ink4);
+  transition:opacity 1.1s ease
+}
+.canvas .hint.off{opacity:0}
+/* 笔触：像墨点落在宣纸上，慢，不弹 */
+.piece{
+  position:absolute;z-index:2;font-family:var(--emoji);line-height:1;
+  font-size:clamp(26px,5.6vw,46px);pointer-events:none;
+  transform:translate(-50%,-42%) scale(calc(var(--s) * .78)) rotate(var(--r));
+  opacity:0;will-change:transform,opacity;
+  transition:opacity 1.1s ease,transform 1.1s cubic-bezier(.22,.61,.36,1);
+  filter:drop-shadow(0 4px 14px rgba(27,26,24,.16))
+}
+.piece.on{opacity:1;transform:translate(-50%,-50%) scale(var(--s)) rotate(var(--r))}
+/* 帆：画布里的淡色底纹，压在笔触下面 */
+.canvas .boat{position:absolute;left:7%;bottom:5%;width:120px;height:104px;opacity:.35;z-index:1;pointer-events:none}
+.canvas .boat .mast{position:absolute;left:22px;top:0;bottom:16px;width:1px;background:var(--ink2)}
+.canvas .boat .sail{
+  position:absolute;left:23px;top:4px;width:56px;height:66px;
+  background:linear-gradient(180deg,#fff,#E9E4D8);
+  clip-path:polygon(0 0,100% 100%,0 100%);border-right:1px solid rgba(27,26,24,.22)
+}
+.canvas .boat .hull{
+  position:absolute;left:6px;bottom:12px;width:96px;height:11px;
+  border-bottom:1.5px solid var(--ink2);border-radius:0 0 60% 40%;
+  background:linear-gradient(180deg,transparent,rgba(27,26,24,.10))
+}
+
+/* ---------- 十张画笺 ---------- */
+.hand{margin-top:44px}
+.hand-lbl{font-family:var(--sans);font-size:11px;letter-spacing:.42em;color:var(--ink4);text-align:center;margin-bottom:16px}
+.hand-lbl .free{display:block;margin-top:5px;color:var(--plum);opacity:.72}
+.hand-row{display:flex;gap:clamp(6px,1.1vw,11px);justify-content:center;flex-wrap:wrap}
+.tile{
+  position:relative;width:clamp(44px,8.4vw,56px);padding:7px 0 9px;
+  display:flex;flex-direction:column;align-items:center;gap:5px;
+  background:rgba(255,255,255,.58);border:1px solid var(--ink4);border-radius:1px;
+  transition:border-color .9s ease,transform .9s ease,background .9s ease,box-shadow .9s ease
+}
+.tile .no{font-family:var(--serif);font-size:9.5px;line-height:1;letter-spacing:.06em;color:var(--ink4);transition:color .9s ease}
+.tile .gl{font-family:var(--emoji);font-size:clamp(19px,3.3vw,25px);line-height:1}
+.tile.used{border-color:var(--plum);background:#fff;transform:translateY(-5px);box-shadow:0 8px 18px -10px rgba(176,52,78,.5)}
+.tile.used .no{color:var(--plum)}
+.tile.used::after{content:"";position:absolute;right:3px;bottom:3px;width:4px;height:4px;border-radius:50%;background:var(--plum)}
+
+.answer{
+  text-align:center;margin-top:46px;font-size:clamp(17px,2.8vw,25px);font-weight:400;
+  letter-spacing:.62em;color:var(--ink4);transition:.9s;min-height:2em
+}
+.answer.lit{color:var(--plum);letter-spacing:.44em}
+
+/* ---------- 四事 ---------- */
+section{padding:96px 0}
+.sec-head{text-align:center;margin-bottom:70px}
+.sec-head .tag{font-family:var(--sans);font-size:12px;letter-spacing:.46em;color:var(--ink3);display:block;margin-bottom:20px}
+.sec-head h2{font-weight:400;font-size:clamp(21px,3.2vw,31px);letter-spacing:.2em}
+.four{max-width:620px;margin:0 auto}
+.four .row{display:grid;grid-template-columns:56px 1fr;gap:28px;padding:30px 0;border-bottom:1px solid var(--ink4);align-items:baseline}
+.four .row:last-child{border-bottom:none}
+.four .cn{font-size:19px;color:var(--plum);letter-spacing:.1em}
+.four .bd h3{font-size:20px;font-weight:700;letter-spacing:.3em;margin-bottom:9px}
+.four .bd p{font-family:var(--sans);font-size:14.5px;color:var(--ink2);line-height:2;letter-spacing:.04em}
+
+/* ---------- 画笺 ---------- */
+.notes{display:grid;grid-template-columns:repeat(auto-fit,minmax(226px,1fr));gap:26px}
+.note{
+  background:rgba(255,255,255,.56);border:1px solid var(--ink4);border-radius:1px;
+  padding:30px 24px;text-align:center;transition:.5s;position:relative
+}
+.note:hover{border-color:var(--plum);transform:translateY(-4px);background:#fff}
+.note .cat{font-family:var(--sans);font-size:10.5px;letter-spacing:.3em;color:var(--ink4);margin-bottom:16px}
+/* 一幅小画：用掉的那几笔，大小角度各异 */
+.note .mini{
+  position:relative;height:118px;margin-bottom:20px;
+  background:radial-gradient(62% 56% at 48% 50%,rgba(174,185,188,.12),transparent 74%)
+}
+.note .mini span{
+  position:absolute;left:var(--x);top:var(--y);font-family:var(--emoji);font-size:26px;line-height:1;
+  transform:translate(-50%,-50%) scale(var(--s)) rotate(var(--r));
+  filter:drop-shadow(0 3px 9px rgba(27,26,24,.14))
+}
+.note .hide{font-size:16px;letter-spacing:.44em;color:var(--ink4);transition:.5s}
+.note:hover .hide{color:var(--plum);letter-spacing:.3em}
+
+/* ---------- 数 ---------- */
+.figures{border-top:1px solid var(--ink4);border-bottom:1px solid var(--ink4)}
+.figures .wrap{display:grid;grid-template-columns:repeat(4,1fr)}
+.fig{padding:52px 16px;text-align:center;border-right:1px solid var(--ink4)}
+.fig:last-child{border-right:none}
+.fig .v{font-size:clamp(28px,4.6vw,46px);font-weight:400;line-height:1;color:var(--ink);letter-spacing:.04em}
+.fig .k{font-family:var(--sans);font-size:12px;letter-spacing:.24em;color:var(--ink3);margin-top:14px}
+@media(max-width:640px){.figures .wrap{grid-template-columns:repeat(2,1fr)}
+  .fig:nth-child(2){border-right:none}.fig:nth-child(1),.fig:nth-child(2){border-bottom:1px solid var(--ink4)}}
+
+/* ---------- 尾 ---------- */
+.final{text-align:center;padding:130px 0}
+.final h2{font-weight:400;font-size:clamp(22px,3.6vw,36px);letter-spacing:.2em;line-height:2.1;margin-bottom:32px}
+.final h2 em{font-style:normal;color:var(--plum);font-weight:700}
+.final p{font-family:var(--sans);font-size:15px;color:var(--ink2);margin-bottom:52px;letter-spacing:.06em}
+footer{border-top:1px solid var(--ink4);padding:40px 0;font-family:var(--sans);font-size:12px;
+  color:var(--ink3);letter-spacing:.24em;text-align:center}
+footer .seed{font-size:10.5px;opacity:.62;margin-top:12px;letter-spacing:.02em;word-break:break-all;font-family:var(--serif)}
+.reveal{opacity:0;transform:translateY(18px);transition:opacity 1.1s ease,transform 1.1s ease}
+.reveal.in{opacity:1;transform:none}
+</style>
+</head>
+<body>
+
+<div class="fog"><i></i><i></i><i></i></div>
+
+<header class="nav">
+  <div class="wrap">
+    <div class="logo">你拼我猜</div>
+    <nav>
+      <a href="#how">四事</a>
+      <a href="#samples">画笺</a>
+      <a href="#figures">数</a>
+    </nav>
+    <a class="btn ghost" href="#">开始拼一题</a>
+  </div>
+</header>
+
+<main>
+
+<section class="hero">
+  <div class="wrap">
+    <div class="col">
+      <div class="eyebrow reveal">雾 间 · 轻 帆</div>
+      <h1 class="reveal">满腹的话<br>拼成一幅小画<span class="dot">，</span><br><b>渡给对岸的人</b></h1>
+      <p class="sub reveal">不用会画画。系统随手发你十张 emoji，用几张随你，拖进画布，
+        放大、缩小、随手一转，把此刻你脑子里那句话摆出来，
+        丢进水里，看它<em>漂到谁那儿</em>。</p>
+      <div class="cta-row reveal">
+        <a class="btn" href="#">开始拼一题</a>
+        <a class="btn ghost" href="#samples">看几张画笺</a>
+      </div>
+      <div class="meta reveal">免费 · 不用注册 · 手机就能玩</div>
+    </div>
+    <div class="reveal">
+      <div class="vertical">你拼我猜</div>
+      <div class="seal">一言</div>
+    </div>
+  </div>
+</section>
+
+<section class="scroll-sec">
+  <div class="wrap">
+    <div class="scroll reveal">
+      <div class="fogline"></div>
+      <div class="canvas" id="canvas">
+        <div class="hint" id="hint">十 张 画 笺 · 拖 进 来</div>
+        <div class="boat">
+          <div class="mast"></div>
+          <div class="sail"></div>
+          <div class="hull"></div>
+        </div>
+      </div>
+    </div>
+    <div class="hand">
+      <div class="hand-lbl">随 手 发 的 十 张 画 笺<span class="free">用 几 张 随 你</span></div>
+      <div class="hand-row" id="hand"></div>
+    </div>
+    <div class="answer" id="ans">— — — —</div>
+  </div>
+</section>
+
+<section id="how" style="padding-top:40px">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="tag">四 件 事</span>
+      <h2>拼 · 发 · 猜 · 揭</h2>
+    </div>
+    <div class="four reveal">
+      <div class="row"><div class="cn">一</div><div class="bd"><h3>拼</h3><p>系统随手发十张，用几张随你，拖进画布，缩一缩、转一转，把想说的摆出来。</p></div></div>
+      <div class="row"><div class="cn">二</div><div class="bd"><h3>发</h3><p>生成一条链接，随手丢给谁。</p></div></div>
+      <div class="row"><div class="cn">三</div><div class="bd"><h3>猜</h3><p>对方盯着那幅小画，开始怀疑自己的理解力。</p></div></div>
+      <div class="row"><div class="cn">四</div><div class="bd"><h3>揭</h3><p>倒计时归零，谜底浮出雾面。</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section id="samples" style="padding-top:16px">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="tag">画 笺</span>
+      <h2>别人渡过来的几张</h2>
+    </div>
+    <div class="notes reveal" id="notes"></div>
+  </div>
+</section>
+
+<section class="figures" id="figures" style="padding:0">
+  <div class="wrap">
+    <div class="fig"><div class="v">三</div><div class="k">拖 · 缩 · 转</div></div>
+    <div class="fig"><div class="v">十</div><div class="k">张随机画笺</div></div>
+    <div class="fig"><div class="v">六十</div><div class="k">秒一局</div></div>
+    <div class="fig"><div class="v">∞</div><div class="k">种歪解</div></div>
+  </div>
+</section>
+
+<section class="final">
+  <div class="wrap">
+    <h2 class="reveal">满腹无诉<em>，</em><br>不如拼一题给人猜</h2>
+    <p class="reveal">三十秒出一题。剩下的，交给雾和对方。</p>
+    <a class="btn reveal" href="#">开始拼一题</a>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    你拼我猜 · 用 emoji 说话
+    <div class="seed">种子 S4：谈女满无诉真梅4轻帆雾间3亲5音活此今</div>
+  </div>
+</footer>
+
+<script>
+/* 每局随机发十张；u = 这一局用掉几张（用几张随你，所以每题不同） */
+const PUZZLES=[
+  {d:["🔥","⛽","💧","🪵","🌫️","🧯","🕯️","☀️","🥵","🚒"],u:3,a:"火上浇油",c:"成语"},
+  {d:["🌊","⬇️","🥄","🌙","🐟","🪣","⛵","🕳️","✨","🎣"],u:4,a:"海底捞月",c:"成语"},
+  {d:["🐍","🖌️","➕","🦶","👣","🖍️","🎨","➖","🦎","🐛"],u:5,a:"画蛇添足",c:"成语"},
+  {d:["🐑","💨","🕳️","🧱","🔨","🏠","🚧","🪚","🐺","🌾"],u:6,a:"亡羊补牢",c:"成语"}
+];
+/* 最多六笔的落点；每题取前 u 个 —— 用几张随你 */
+const LAYOUT=[
+  {x:50,y:70,s:2.5,r:-5},
+  {x:52,y:44,s:1.5,r:4},
+  {x:75,y:58,s:1.35,r:24},
+  {x:25,y:30,s:1.15,r:-15},
+  {x:78,y:22,s:1.05,r:18},
+  {x:24,y:76,s:1.25,r:-24}
+];
+const CN=["壹","贰","叁","肆","伍","陆","柒","捌","玖","拾"];
+
+/* ---- 样例画笺：拼好的那几笔，大小角度各异 ---- */
+document.getElementById("notes").innerHTML=PUZZLES.map(p=>`
+  <div class="note"><div class="cat">${p.c}</div>
+    <div class="mini">${p.d.slice(0,p.u).map((x,k)=>{
+      const L=LAYOUT[k];
+      return `<span style="--x:${L.x}%;--y:${L.y}%;--s:${(L.s*.5).toFixed(3)};--r:${L.r}deg">${x}</span>`
+    }).join("")}</div>
+    <div class="hide">${p.a}</div></div>`).join("");
+
+/* ---- 长卷：发十张笺 → 笔触慢慢落下 → 揭晓，循环 ---- */
+const canvas=document.getElementById("canvas"),hand=document.getElementById("hand"),
+      ansEl=document.getElementById("ans"),hint=document.getElementById("hint");
+let idx=0;
+
+function play(){
+  const p=PUZZLES[idx%PUZZLES.length];
+  canvas.querySelectorAll(".piece").forEach(n=>n.remove());
+  hand.innerHTML=p.d.map((e,i)=>`<div class="tile" data-i="${i}"><span class="no">${CN[i]}</span><span class="gl">${e}</span></div>`).join("");
+  hint.classList.remove("off");
+  ansEl.className="answer";ansEl.textContent="— — — —";
+
+  /* 用掉的那 u 张依次落进画布，对应的画笺同时转成梅脂红；落笔间隔保持 900ms 的慢 */
+  p.d.slice(0,p.u).forEach((e,k)=>{
+    setTimeout(()=>{
+      hint.classList.add("off");
+      const L=LAYOUT[k],el=document.createElement("span");
+      el.className="piece";el.textContent=e;
+      el.style.cssText=`left:${L.x}%;top:${L.y}%;--s:${L.s};--r:${L.r}deg`;
+      canvas.appendChild(el);
+      requestAnimationFrame(()=>el.classList.add("on"));
+      const t=hand.querySelector(`.tile[data-i="${k}"]`);
+      if(t)t.classList.add("used");
+    },900*k+400);
+  });
+
+  /* 揭晓：落在最后一笔之后 —— 用几张就等几张，慢节奏不变 */
+  setTimeout(()=>{
+    ansEl.textContent=p.a.split("").join(" ");
+    ansEl.classList.add("lit");
+  },900*p.u+1100);
+
+  idx++;
+  setTimeout(play,8600);
+}
+
+/* ---- 滚动进场 ---- */
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target)}}),{threshold:.1});
+document.querySelectorAll(".reveal").forEach(el=>io.observe(el));
+
+/* ---- 长卷进入视口再开演 ---- */
+new IntersectionObserver((es,o)=>{if(es[0].isIntersecting){play();o.disconnect()}},{threshold:.25})
+  .observe(canvas);
+</script>
+</body>
+</html>

@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>你拼我猜 · 五个落地页方向</title>
+<style>
+/* ============================================================
+   索引页 —— 中性编辑部风格，不与五个方案抢戏
+   一条种子字符串 → 一套风格 → 一个落地页
+   ============================================================ */
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0E0F11; --bg2:#16181B; --line:#282B2F;
+  --fg:#E9E7E2; --dim:#8D9096; --faint:#5D6167;
+  --acc:#C8A96B;
+  --sans:"Noto Sans CJK SC",system-ui,sans-serif;
+  --mono:"Noto Sans Mono CJK SC",ui-monospace,monospace;
+  --serif:"Noto Serif CJK SC",serif;
+}
+body{font-family:var(--sans);background:var(--bg);color:var(--fg);line-height:1.7;
+  background-image:radial-gradient(80% 50% at 50% 0%,rgba(200,169,107,.07),transparent 60%)}
+.wrap{max-width:1360px;margin:0 auto;padding:0 28px}
+
+header{padding:64px 0 40px;border-bottom:1px solid var(--line)}
+.kicker{font-family:var(--mono);font-size:11.5px;letter-spacing:.34em;color:var(--acc);margin-bottom:22px}
+h1{font-family:var(--serif);font-size:clamp(26px,4.2vw,44px);font-weight:900;letter-spacing:.04em;line-height:1.35;margin-bottom:20px}
+.lede{color:var(--dim);max-width:44em;font-size:15.5px}
+.lede b{color:var(--fg);font-weight:600}
+.meta-row{display:flex;gap:28px;flex-wrap:wrap;margin-top:30px;font-family:var(--mono);font-size:12px;color:var(--faint)}
+.meta-row span b{color:var(--acc);font-weight:700}
+
+.sheet{padding:48px 0 8px}
+.sheet img{width:100%;display:block;border:1px solid var(--line);border-radius:6px;
+  box-shadow:0 30px 60px -34px #000}
+.sheet .cap{font-family:var(--mono);font-size:11.5px;color:var(--faint);letter-spacing:.06em;
+  margin-top:16px;text-align:center}
+.grid{display:flex;flex-wrap:wrap;gap:34px;padding:56px 0}
+.item{width:452px}
+@media(max-width:1000px){.item{width:100%;max-width:452px}}
+.head{display:flex;align-items:baseline;gap:12px;margin-bottom:6px}
+.no{font-family:var(--mono);font-size:12px;color:var(--acc);letter-spacing:.16em}
+.name{font-family:var(--serif);font-size:22px;font-weight:900;letter-spacing:.08em}
+.kind{margin-left:auto;font-family:var(--mono);font-size:10.5px;color:var(--faint);letter-spacing:.14em}
+.seed{font-family:var(--mono);font-size:11.5px;color:var(--faint);margin-bottom:14px;
+  word-break:break-all;letter-spacing:.02em;line-height:1.9}
+.seed i{color:var(--acc);font-style:normal;font-weight:700}
+.hook{font-size:13.5px;color:var(--dim);margin-bottom:16px;min-height:3.2em}
+.hook b{color:var(--fg);font-weight:600}
+
+.pv{position:relative;width:452px;aspect-ratio:1440/1000;overflow:hidden;border:1px solid var(--line);
+  border-radius:6px;background:#000;box-shadow:0 24px 48px -28px #000}
+.pv img{width:100%;height:100%;object-fit:cover;object-position:top center;display:block}
+.pv .open{position:absolute;inset:auto 0 0 0;padding:34px 16px 14px;text-align:right;
+  background:linear-gradient(transparent,rgba(0,0,0,.82));pointer-events:none}
+.pv .open a{pointer-events:auto;font-family:var(--mono);font-size:12px;letter-spacing:.14em;
+  color:#fff;text-decoration:none;border:1px solid rgba(255,255,255,.45);
+  padding:7px 16px;border-radius:3px;background:rgba(0,0,0,.35);backdrop-filter:blur(4px);transition:.2s}
+.pv .open a:hover{background:#fff;color:#000;border-color:#fff}
+.pv .still{position:absolute;bottom:20px;left:16px;font-family:var(--mono);font-size:10px;
+  letter-spacing:.16em;color:rgba(255,255,255,.62);background:rgba(0,0,0,.5);
+  padding:3px 8px;border-radius:2px;backdrop-filter:blur(4px);pointer-events:none}
+@media(max-width:1000px){.pv{width:100%;max-width:452px}}
+.pal{display:flex;gap:0;margin-top:14px;border:1px solid var(--line);border-radius:4px;overflow:hidden}
+.pal i{flex:1;height:26px;display:block}
+.pal i span{display:none}
+.traits{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.traits span{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--dim);
+  border:1px solid var(--line);padding:3px 9px;border-radius:2px}
+
+.table-sec{padding:56px 0 80px;border-top:1px solid var(--line)}
+h2{font-family:var(--serif);font-size:24px;font-weight:900;letter-spacing:.08em;margin-bottom:26px}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th,td{text-align:left;padding:13px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-size:11px;letter-spacing:.16em;color:var(--acc);font-weight:500;
+  border-bottom:1px solid var(--faint);white-space:nowrap}
+td:first-child{font-family:var(--mono);font-size:11.5px;color:var(--faint);white-space:nowrap}
+td b{font-weight:700;color:#fff}
+tbody tr:hover{background:rgba(200,169,107,.045)}
+.sw{display:inline-flex;gap:4px;vertical-align:middle}
+.sw i{width:13px;height:13px;border-radius:2px;display:block;border:1px solid rgba(255,255,255,.16)}
+
+.notes{padding:0 0 80px}
+.note{background:var(--bg2);border:1px solid var(--line);border-left:2px solid var(--acc);
+  border-radius:4px;padding:22px 26px;margin-bottom:14px;font-size:14px;color:var(--dim)}
+.note b{color:var(--fg)}
+footer{border-top:1px solid var(--line);padding:34px 0;font-family:var(--mono);font-size:11.5px;color:var(--faint);
+  display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="kicker">双钻石 · 发现期 ／ 五 案 并 置</div>
+  <h1>一条种子字符串，一套落地页</h1>
+  <p class="lede">五条随机中文字＋数字串，各自被当作一枚<b>强制发散器</b>：先从字面、谐音、相邻成词、数字位置里找出它独有的「机关」，
+    再把那个机关翻译成色彩、字体、布局与动效。五套方案共用同一份信息结构，<b>以便只比较风格，不比较内容</b>。</p>
+  <div class="meta-row">
+    <span>方案 <b>05</b></span>
+    <span>明度轴 <b>暗 3 / 亮 2</b></span>
+    <span>字体主角 <b>宋 · 黑 · 等宽</b></span>
+    <span>密度 <b>高 → 极低</b></span>
+  </div>
+</header>
+
+<div class="sheet">
+  <img src="../preview/all.jpg" alt="五个落地页首屏对照">
+  <div class="cap">五页首屏并置 · 首屏都在演同一件事：十张牌、拖 · 缩 · 转、用几张随你</div>
+</div>
+
+<div class="grid" id="grid"></div>
+
+<section class="table-sec">
+  <h2>并排对照</h2>
+  <table>
+    <thead><tr>
+      <th>#</th><th>命名</th><th>种子里的机关</th><th>色板</th><th>字体</th><th>核心手法</th><th>气质</th>
+    </tr></thead>
+    <tbody id="tbody"></tbody>
+  </table>
+</section>
+
+<section class="notes">
+  <div class="note"><b>为什么这五个不会撞车？</b>它们在四个轴上都拉开了距离 ——
+    明度（暗／亮）、色彩温度（暖木／冷霓虹／中性票据／无彩墨／冷暖对撞）、字体类别（粗宋／发光黑体／等宽／宋体竖排／无衬线＋坐标）、
+    信息密度（高／中高／高／<b>极低</b>／中）。任取两个并排，第一眼就能分辨。</div>
+  <div class="note"><b>五套都遵守的产品约束（来自用户画像）：</b>
+    首屏必须能玩（每页都有一块活着的画布）· 一局只发十张牌 · 结果可截图分享。</div>
+  <div class="note" style="border-left-color:#E8452A"><b>v2 规则修正（已应用到全部五页）：</b>
+    emoji 是<b>拖进画布</b>的，可以<b>放大、缩小、旋转</b>，系统每局<b>随机发十张</b> —— 不是「挑四个放进格子」。
+    这个改动让产品更好：玩家不能挑牌，<b>约束才是创意的来源</b>，笑点从「选得妙」变成「被逼出来的妙」。
+    五页据此把 4×4 网格换成了自由画布，并各自用自己的语言加了「十张牌」托盘
+    （木牌 / 霓虹卡槽 / 旋转木马转盘 / 宣纸画笺 / 独热向量）。</div>
+  <div class="note" style="border-left-color:#E8452A"><b>v2.1 用几张随你：</b>
+    十张牌<b>不必须用完</b>，也不固定张数。这条不靠文案说，靠页面自己演 ——
+    demo 循环里四道题分别用 <b>3 / 4 / 5 / 6</b> 张（火上浇油 / 海底捞月 / 画蛇添足 / 亡羊补牢），看两轮就懂。
+    它顺带给了产品一条天然的<b>难度轴</b>：用 2 张拼出来 = 难，用 8 张 = 送分。
+    <b>出题人自己就是难度调节器</b>，不需要额外做难度选项。</div>
+  <div class="note"><b>注意 S4 是唯一的「慢」页面。</b>它故意把信息密度压到最低 —— 如果最终选它，
+    需要额外验证一件事：通勤场景下用户会不会觉得「加载太慢／找不到按钮」。</div>
+</section>
+
+<footer>
+  <span>你拼我猜 · 落地页方向对照</span>
+  <span>docs/01-discovery.md ← 完整推导</span>
+</footer>
+
+</div>
+
+<script>
+const ITEMS=[
+  {no:"01",file:"landing/1-jiuqi.html",name:"明牌酒馆",kind:"DARK · WARM",
+   seed:"具酒价究明讲桥<i>4</i>是了式上<i>1</i>河从出长",
+   hook:"<b>酒</b>＋<b>价</b>＝酒馆价目表；<b>究明</b>→<b>明讲</b>→<b>讲桥</b> 连成「把话说明白、架一座桥」。",
+   pal:["#0D0906","#241A11","#D9A04A","#B23A2E","#EFE2C6"],
+   traits:["粗宋招牌","木纹铜钉","价目表","灯笼微晃","朱印"]},
+
+  {no:"02",file:"landing/2-neon.html",name:"4-1-0 夜市",kind:"DARK · NEON",
+   seed:"凤另皮<i>4</i>朋惊不<i>1</i>鱼比音观什<i>0</i>也极",
+   hook:"数字 <b>4→1→0</b> 严格递减，是一条倒计时；而 <b>1</b> 正好压在正中位。",
+   pal:["#06040B","#FF2D95","#00E5FF","#FFE600","#A855F7"],
+   traits:["霓虹辉光","CRT 扫描线","4→1→0 倒数","跑马灯泡","电玩机台"]},
+
+  {no:"03",file:"landing/3-ticket.html",name:"1管51",kind:"LIGHT · MONO",
+   seed:"<i>1</i>管<i>51</i>取门少利队音<i>6</i>马高转具老燕",
+   hook:"开头 <b>1管51</b> 天然是个编号；<b>马高转</b>＝旋转木马；首字 1 ＋ 尾字 <b>燕</b>(≈言)＝<b>一言</b>。",
+   pal:["#F2EFE4","#17171B","#1F4E9C","#D33A2C","#C98A0E"],
+   traits:["等宽主导","虚线撕口","条形码","翻牌时刻表","旋转木马轮盘"]},
+
+  {no:"04",file:"landing/4-ink.html",name:"雾间轻帆",kind:"LIGHT · MINIMAL",
+   seed:"谈女满无诉真梅<i>4</i>轻帆雾间<i>3</i>亲<i>5</i>音活此今",
+   hook:"<b>正中位（第 10 字）＝ 帆</b>；<b>无诉</b>（满腹话没处说）、<b>轻帆雾间</b> 成词。全五条中最长。",
+   pal:["#F6F3EC","#1B1A18","#B0344E","#AEB9BC","#C3BEB1"],
+   traits:["竖排题名","极大留白","雾缓慢飘移","一叶帆","密度最低"]},
+
+  {no:"05",file:"landing/5-hexin.html",name:"和心 · 独热",kind:"DARK · GRID",
+   seed:"和首给涧独热<i>7</i>具至主<i>4</i>立随面持心",
+   hook:"<b>7 落在第 7 位</b>（位置＝数值，唯一一次自指）；<b>独热</b>＝one-hot，一个位置热、其余全冷。",
+   pal:["#121211","#E8452A","#4A93AB","#E8A33D","#EDE8DE"],
+   traits:["坐标网格","one-hot 向量","心电脉冲","冷↔热温度轴","和 → 心"]}
+];
+
+document.getElementById("grid").innerHTML=ITEMS.map(it=>`
+  <div class="item">
+    <div class="head"><span class="no">${it.no}</span><span class="name">${it.name}</span><span class="kind">${it.kind}</span></div>
+    <div class="seed">${it.seed}</div>
+    <div class="hook">${it.hook}</div>
+    <div class="pv">
+      <img src="${it.file.replace('landing/','preview/').replace('.html','.png')}" alt="${it.name} 首屏">
+      <span class="still">静态截图 · 点开看动效</span>
+      <div class="open"><a href="${it.file}" target="_blank">打开完整页面 ↗</a></div>
+    </div>
+    <div class="pal">${it.pal.map(c=>`<i style="background:${c}"></i>`).join("")}</div>
+    <div class="traits">${it.traits.map(t=>`<span>${t}</span>`).join("")}</div>
+  </div>`).join("");
+
+document.getElementById("tbody").innerHTML=ITEMS.map(it=>`
+  <tr>
+    <td>${it.no}</td>
+    <td><b>${it.name}</b></td>
+    <td>${it.hook.replace(/<\/?b>/g,"")}</td>
+    <td><span class="sw">${it.pal.map(c=>`<i style="background:${c}"></i>`).join("")}</span></td>
+    <td>${it.traits[0]}</td>
+    <td>${it.traits.slice(1).join(" · ")}</td>
+    <td>${it.kind}</td>
+  </tr>`).join("");
+</script>
+</body>
+</html>

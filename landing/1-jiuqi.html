@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>你拼我猜 · 明牌酒馆</title>
+<style>
+/* ============================================================
+   S1 「明牌酒馆」
+   种子: 具酒价究明讲桥4是了式上1河从出长
+   机关: 酒+价=价目表 / 究明→明讲→讲桥=把话说明白
+   基调: 深木 · 酒琥珀 · 朱印 · 粗宋
+   ============================================================ */
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --wood-900:#0D0906; --wood-800:#16100A; --wood-700:#241A11; --wood-600:#2E2114;
+  --line:#6B4E2A; --line-soft:#4A3520;
+  --amber:#D9A04A; --amber-hi:#F0C377; --amber-dim:#8A6A38;
+  --seal:#B23A2E; --seal-hi:#D2543F;
+  --rice:#EFE2C6; --rice-dim:#B7A483; --rice-faint:#7A6B52;
+  --serif:"Noto Serif CJK SC","Source Han Serif SC",serif;
+  --sans:"Noto Sans CJK SC","Source Han Sans SC",sans-serif;
+  --emoji:"Noto Color Emoji","Apple Color Emoji",sans-serif;
+}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--sans); color:var(--rice); background:var(--wood-900);
+  background-image:
+    repeating-linear-gradient(90deg,rgba(0,0,0,.20) 0 1px,transparent 1px 3px),
+    repeating-linear-gradient(90deg,rgba(255,200,120,.022) 0 1px,transparent 1px 11px),
+    repeating-linear-gradient(0deg,rgba(0,0,0,.10) 0 2px,transparent 2px 9px),
+    radial-gradient(130% 90% at 50% -15%,#33240f 0%,#1a120a 45%,#0b0704 100%);
+  background-attachment:fixed; overflow-x:hidden; line-height:1.75;
+}
+body::after{ /* 暖光晕 */
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(60% 40% at 50% 0%,rgba(217,160,74,.10),transparent 70%);
+}
+.wrap{max-width:1140px;margin:0 auto;padding:0 24px;position:relative;z-index:1}
+
+/* ---------- 灯笼 ---------- */
+.lanterns{position:fixed;top:0;left:0;right:0;height:0;z-index:0;pointer-events:none}
+.lantern{position:absolute;top:0;width:52px;transform-origin:50% 0;animation:sway 6s ease-in-out infinite}
+.lantern:nth-child(1){left:6%;animation-delay:-1s}
+.lantern:nth-child(2){right:7%;animation-delay:-3.4s;transform:scale(.82)}
+.lantern .cord{width:1px;height:64px;margin:0 auto;background:linear-gradient(#4A3520,transparent)}
+.lantern .body{
+  height:66px;border-radius:50%/38%;
+  background:radial-gradient(circle at 34% 32%,#e2604a,#a8281d 60%,#6d150f);
+  box-shadow:0 0 46px rgba(210,84,63,.35),inset -6px 0 12px rgba(0,0,0,.35);
+  position:relative;
+}
+.lantern .body::before,.lantern .body::after{
+  content:"";position:absolute;left:16%;right:16%;height:7px;background:#3a2a16;border-radius:2px
+}
+.lantern .body::before{top:-3px}.lantern .body::after{bottom:-3px}
+.lantern .tassel{width:3px;height:30px;margin:6px auto 0;background:linear-gradient(#c8a05a,#5a4520);border-radius:0 0 3px 3px}
+@keyframes sway{0%,100%{transform:rotate(-2.5deg)}50%{transform:rotate(2.5deg)}}
+
+/* ---------- 导航 ---------- */
+.nav{
+  position:sticky;top:0;z-index:50;backdrop-filter:blur(10px);
+  background:linear-gradient(#16100ae8,#16100ab8);
+  border-bottom:1px solid var(--line-soft);
+}
+.nav .wrap{display:flex;align-items:center;gap:32px;height:68px}
+.logo{
+  font-family:var(--serif);font-weight:900;font-size:21px;letter-spacing:.14em;
+  color:var(--amber-hi);text-shadow:0 0 22px rgba(217,160,74,.32);
+  display:flex;align-items:center;gap:10px;white-space:nowrap;
+}
+.logo .seal-mini{
+  width:24px;height:24px;background:var(--seal);border-radius:3px;flex:none;
+  display:grid;place-items:center;font-size:12px;font-weight:700;color:#F5D9C8;
+  font-family:var(--serif);letter-spacing:0;transform:rotate(-6deg);
+  box-shadow:0 3px 10px rgba(178,58,46,.5)
+}
+.nav nav{display:flex;gap:26px;margin-left:auto;font-size:14.5px}
+.nav nav a{color:var(--rice-dim);text-decoration:none;transition:color .2s;position:relative}
+.nav nav a:hover{color:var(--amber-hi)}
+.nav nav a::after{content:"";position:absolute;left:0;right:100%;bottom:-5px;height:1px;background:var(--amber);transition:right .25s}
+.nav nav a:hover::after{right:0}
+.btn{
+  display:inline-block;text-decoration:none;cursor:pointer;border:none;
+  font-family:var(--serif);font-weight:700;letter-spacing:.1em;
+  padding:11px 26px;font-size:15px;border-radius:3px;
+  background:linear-gradient(#D2543F,#9E2F24);color:#FFE9DC;
+  box-shadow:0 4px 0 #6D1D15,0 10px 26px -8px rgba(178,58,46,.8);
+  transition:transform .15s,box-shadow .15s;
+}
+.btn:hover{transform:translateY(-2px);box-shadow:0 6px 0 #6D1D15,0 16px 32px -8px rgba(178,58,46,.9)}
+.btn:active{transform:translateY(2px);box-shadow:0 2px 0 #6D1D15}
+.btn.ghost{
+  background:transparent;color:var(--amber-hi);border:1px solid var(--line);
+  box-shadow:none;font-weight:500
+}
+.btn.ghost:hover{border-color:var(--amber);background:rgba(217,160,74,.08);transform:translateY(-2px)}
+@media(max-width:780px){.nav nav{display:none}.nav .wrap{gap:16px;height:60px}}
+
+/* ---------- 牌匾 ---------- */
+.hero{padding:70px 0 40px;text-align:center}
+.plaque{
+  display:inline-block;position:relative;padding:22px 52px;border-radius:4px;
+  background:linear-gradient(180deg,#37270f,#221708 55%,#2c1e0c);
+  border:3px solid var(--line);
+  box-shadow:inset 0 2px 0 rgba(240,195,119,.22),inset 0 -3px 10px rgba(0,0,0,.6),
+             0 22px 50px -14px #000,0 0 60px -10px rgba(217,160,74,.22);
+  margin-bottom:30px;
+}
+.plaque::before,.plaque::after{
+  content:"";position:absolute;top:8px;bottom:8px;width:8px;
+  background:radial-gradient(circle,var(--amber) 0 2px,transparent 2.4px) center/8px 26px repeat-y;
+  opacity:.75
+}
+.plaque::before{left:14px}.plaque::after{right:14px}
+.plaque .big{
+  font-family:var(--serif);font-weight:900;font-size:clamp(30px,5.2vw,52px);
+  letter-spacing:.22em;text-indent:.22em;
+  background:linear-gradient(180deg,#FBE3B4,#D9A04A 55%,#9C6C26);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 2px 0 #1a1105)
+}
+.hero h1{
+  font-family:var(--serif);font-weight:900;font-size:clamp(26px,4.4vw,44px);
+  line-height:1.35;letter-spacing:.04em;margin-bottom:18px;color:var(--rice)
+}
+.hero h1 em{font-style:normal;color:var(--amber-hi);position:relative;white-space:nowrap}
+.hero h1 em::after{
+  content:"";position:absolute;left:-2%;right:-2%;bottom:6px;height:9px;
+  background:rgba(178,58,46,.42);z-index:-1;border-radius:2px
+}
+.hero .sub{max-width:34em;margin:0 auto 30px;color:var(--rice-dim);font-size:16.5px}
+.hero .sub b{color:var(--amber);font-weight:500}
+.hero .cta-row{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-bottom:12px}
+.hero .meta{font-size:13px;color:var(--rice-faint);letter-spacing:.16em}
+
+/* ---------- 木牌画布 ---------- */
+.board-sec{margin-top:56px;display:grid;place-items:center}
+.board{
+  position:relative;width:min(430px,86vw);aspect-ratio:1;padding:26px;border-radius:6px;
+  background:linear-gradient(160deg,#31220f,#1d1409);
+  border:2px solid var(--line-soft);
+  box-shadow:inset 0 1px 0 rgba(240,195,119,.14),0 30px 60px -20px #000;
+}
+/* 自由画布：emoji 拖进来，可缩放、可旋转 */
+.board .canvas{
+  position:relative;height:100%;border-radius:4px;overflow:hidden;
+  background:
+    repeating-linear-gradient(0deg,rgba(0,0,0,.20) 0 1px,transparent 1px 33.4%),
+    repeating-linear-gradient(90deg,rgba(0,0,0,.20) 0 1px,transparent 1px 33.4%),
+    radial-gradient(circle at 50% 46%,rgba(217,160,74,.10),transparent 72%);
+  box-shadow:inset 0 0 34px rgba(0,0,0,.66)
+}
+.canvas .hint{
+  position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);text-align:center;
+  font-family:var(--serif);font-size:13px;letter-spacing:.34em;color:rgba(183,164,131,.5);
+  transition:opacity .4s
+}
+.canvas .hint.off{opacity:0}
+.piece{
+  position:absolute;font-family:var(--emoji);font-size:38px;line-height:1;
+  transform:translate(-50%,-50%) scale(var(--s)) rotate(var(--r));
+  filter:drop-shadow(0 6px 16px rgba(0,0,0,.62));
+  opacity:0;transition:opacity .5s
+}
+.piece.on{opacity:1;animation:settle .55s cubic-bezier(.2,1.5,.45,1)}
+@keyframes settle{
+  from{opacity:0;transform:translate(-50%,-50%) scale(calc(var(--s) * .25)) rotate(var(--r))}
+  to{opacity:1;transform:translate(-50%,-50%) scale(var(--s)) rotate(var(--r))}
+}
+/* 手牌 */
+.hand{margin-top:58px}
+.hand-lbl{font-size:11.5px;letter-spacing:.34em;color:var(--rice-faint);margin-bottom:16px}
+.hand-row{display:flex;gap:9px;justify-content:center;flex-wrap:wrap}
+.tile{
+  position:relative;width:52px;height:66px;border-radius:4px;display:grid;place-items:center;
+  font-family:var(--emoji);font-size:25px;
+  background:linear-gradient(168deg,#2E2114,#1B1208);
+  border:1px solid var(--line-soft);
+  box-shadow:0 7px 16px -7px #000,inset 0 1px 0 rgba(240,195,119,.10);
+  transition:transform .45s,border-color .45s,box-shadow .45s
+}
+.tile.used{
+  border-color:rgba(240,195,119,.62);
+  background:linear-gradient(168deg,#3B2A13,#241809);
+  box-shadow:0 0 24px -5px rgba(217,160,74,.6),inset 0 0 14px rgba(217,160,74,.16);
+  transform:translateY(-5px)
+}
+.tile.used::after{
+  content:"";position:absolute;top:5px;right:5px;width:5px;height:5px;border-radius:50%;
+  background:var(--seal-hi);box-shadow:0 0 8px var(--seal-hi)
+}
+@media(max-width:520px){
+  .tile{width:43px;height:55px;font-size:20px}
+  .piece{font-size:26px}
+  .hand-lbl{letter-spacing:.26em}   /* 标签变长后，窄屏收一点字距，保证一行放得下 */
+}
+.board .plate{
+  position:absolute;left:50%;bottom:-19px;transform:translateX(-50%);
+  background:linear-gradient(#3a2a14,#241809);border:1px solid var(--line);
+  padding:5px 20px;border-radius:3px;font-family:var(--serif);font-size:13px;
+  letter-spacing:.24em;color:var(--amber);white-space:nowrap;
+  box-shadow:0 8px 20px -6px #000
+}
+.board .plate b{color:var(--rice);font-weight:500}
+.answer{
+  margin-top:38px;font-family:var(--serif);font-size:clamp(17px,2.6vw,23px);
+  letter-spacing:.3em;color:var(--rice-faint);transition:color .5s,text-shadow .5s;min-height:1.6em
+}
+.answer.lit{color:var(--amber-hi);text-shadow:0 0 26px rgba(217,160,74,.6)}
+
+/* ---------- 价目表 ---------- */
+section{padding:88px 0}
+.sec-head{text-align:center;margin-bottom:52px}
+.sec-head .tag{
+  font-family:var(--serif);font-size:13px;letter-spacing:.4em;color:var(--seal-hi);
+  display:block;margin-bottom:12px
+}
+.sec-head h2{
+  font-family:var(--serif);font-weight:900;font-size:clamp(22px,3.4vw,34px);
+  letter-spacing:.1em;color:var(--rice)
+}
+.menu{max-width:660px;margin:0 auto}
+.menu-row{
+  display:flex;align-items:baseline;gap:14px;padding:19px 4px;
+  border-bottom:1px dashed rgba(107,78,42,.55);transition:background .25s
+}
+.menu-row:hover{background:rgba(217,160,74,.045)}
+.menu-row .no{
+  font-family:var(--serif);font-size:15px;color:var(--amber-dim);
+  width:2.4em;flex:none;letter-spacing:.06em
+}
+.menu-row .name{
+  font-family:var(--serif);font-weight:700;font-size:19px;color:var(--amber-hi);
+  letter-spacing:.16em;flex:none
+}
+.menu-row .dots{flex:1;border-bottom:1px dotted rgba(107,78,42,.7);transform:translateY(-4px)}
+.menu-row .desc{color:var(--rice-dim);font-size:14.5px;text-align:right;flex:none;max-width:60%}
+.menu-row .price{
+  font-family:var(--serif);color:var(--seal-hi);font-size:14px;flex:none;
+  letter-spacing:.1em;min-width:3.6em;text-align:right
+}
+@media(max-width:640px){
+  .menu-row{flex-wrap:wrap}
+  .menu-row .desc{text-align:left;max-width:100%;flex-basis:100%;padding-left:2.4em}
+  .menu-row .dots{display:none}
+}
+
+/* ---------- 酒牌样例 ---------- */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(252px,1fr));gap:20px}
+.card{
+  background:linear-gradient(165deg,#2a1d10,#1a1208);
+  border:1px solid var(--line-soft);border-radius:5px;padding:24px 22px;
+  position:relative;overflow:hidden;transition:transform .28s,border-color .28s,box-shadow .28s
+}
+.card::before{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(120deg,transparent 40%,rgba(240,195,119,.07) 50%,transparent 60%);
+  transform:translateX(-100%);transition:transform .7s
+}
+.card:hover{transform:translateY(-5px);border-color:var(--line);box-shadow:0 22px 44px -18px #000}
+.card:hover::before{transform:translateX(100%)}
+.card .glyphs{
+  font-family:var(--emoji);font-size:31px;letter-spacing:normal;
+  display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap
+}
+.card .hide{
+  font-family:var(--serif);font-size:16px;letter-spacing:.34em;color:var(--rice-faint);
+  transition:color .3s,letter-spacing .3s;cursor:pointer;user-select:none
+}
+.card:hover .hide{color:var(--amber-hi);letter-spacing:.28em;text-shadow:0 0 18px rgba(217,160,74,.45)}
+.card .cat{
+  position:absolute;top:14px;right:14px;font-size:11px;letter-spacing:.2em;
+  color:var(--rice-faint);border:1px solid var(--line-soft);padding:2px 8px;border-radius:2px
+}
+
+/* ---------- 数字 ---------- */
+.numbers{border-top:1px solid var(--line-soft);border-bottom:1px solid var(--line-soft);
+  background:linear-gradient(#1d140933,#0d090600)}
+.numbers .wrap{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;text-align:center;padding-top:52px;padding-bottom:52px}
+.num .v{
+  font-family:var(--serif);font-weight:900;font-size:clamp(30px,4.6vw,48px);
+  color:var(--amber-hi);letter-spacing:.02em;text-shadow:0 0 30px rgba(217,160,74,.3)
+}
+.num .k{font-size:13.5px;color:var(--rice-dim);letter-spacing:.2em;margin-top:6px}
+@media(max-width:640px){.numbers .wrap{grid-template-columns:repeat(2,1fr);gap:34px}}
+
+/* ---------- 尾屏 ---------- */
+.final{text-align:center;padding:110px 0}
+.stamp{
+  width:104px;height:104px;margin:0 auto 34px;border:3px solid var(--seal);
+  border-radius:5px;display:grid;place-items:center;transform:rotate(-7deg);
+  font-family:var(--serif);font-weight:900;font-size:17px;color:var(--seal-hi);
+  letter-spacing:.06em;line-height:1.15;padding:8px;
+  box-shadow:0 0 40px -8px rgba(178,58,46,.6),inset 0 0 20px rgba(178,58,46,.15);
+  opacity:.92
+}
+.final h2{
+  font-family:var(--serif);font-weight:900;font-size:clamp(22px,3.6vw,36px);
+  letter-spacing:.09em;margin-bottom:16px;line-height:1.5
+}
+.final p{color:var(--rice-dim);margin-bottom:36px;font-size:16px}
+footer{border-top:1px solid var(--line-soft);padding:34px 0;text-align:center;color:var(--rice-faint);font-size:13px;letter-spacing:.14em}
+footer .seed{font-size:11px;opacity:.5;margin-top:8px;letter-spacing:.05em;word-break:break-all}
+.reveal{opacity:0;transform:translateY(22px);transition:opacity .7s ease,transform .7s ease}
+.reveal.in{opacity:1;transform:none}
+</style>
+</head>
+<body>
+
+<div class="lanterns">
+  <div class="lantern"><div class="cord"></div><div class="body"></div><div class="tassel"></div></div>
+  <div class="lantern"><div class="cord"></div><div class="body"></div><div class="tassel"></div></div>
+</div>
+
+<header class="nav">
+  <div class="wrap">
+    <div class="logo"><span class="seal-mini">猜</span>你拼我猜</div>
+    <nav>
+      <a href="#how">怎么玩</a>
+      <a href="#menu">价目</a>
+      <a href="#samples">今日酒牌</a>
+    </nav>
+    <a class="btn" href="#">开始拼一题</a>
+  </div>
+</header>
+
+<main>
+
+<section class="hero">
+  <div class="wrap">
+    <div class="plaque reveal"><div class="big">你拼我猜</div></div>
+    <h1 class="reveal">把话<em>明讲</em>，<br>让朋友来猜</h1>
+    <p class="sub reveal">系统随手发你十张牌，用几张随你。拖进画布，放大、缩小、随手一转，把脑子里那句话摆出来。<br>
+      猜中的人很得意，<b>猜歪的人更有意思</b>。</p>
+    <div class="cta-row reveal">
+      <a class="btn" href="#">开始拼一题</a>
+      <a class="btn ghost" href="#samples">先看看今日酒牌</a>
+    </div>
+    <div class="meta reveal">免费 · 不用注册 · 手机就能玩</div>
+
+    <div class="board-sec reveal">
+      <div class="board">
+        <div class="canvas" id="canvas">
+          <div class="hint" id="hint">把 牌 拖 进 来</div>
+        </div>
+        <div class="plate">今日酒牌 · <b id="plateno">01</b></div>
+      </div>
+      <div class="hand">
+        <div class="hand-lbl">掌 柜 发 的 十 张 牌 · 用 几 张 随 你</div>
+        <div class="hand-row" id="hand"></div>
+      </div>
+    </div>
+    <div class="answer" id="ans">— — — —</div>
+  </div>
+</section>
+
+<section id="how">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="tag">价 目 表</span>
+      <h2>四步，一壶酒的工夫</h2>
+    </div>
+    <div class="menu reveal">
+      <div class="menu-row"><span class="no">壹</span><span class="name">拼</span><span class="dots"></span><span class="desc">十张牌，用几张随你，拖 · 缩 · 转</span><span class="price">免费</span></div>
+      <div class="menu-row"><span class="no">贰</span><span class="name">发</span><span class="dots"></span><span class="desc">拿到一条链接，丢进群里</span><span class="price">免费</span></div>
+      <div class="menu-row"><span class="no">叁</span><span class="name">猜</span><span class="dots"></span><span class="desc">朋友开始怀疑人生</span><span class="price">免费</span></div>
+      <div class="menu-row"><span class="no">肆</span><span class="name">揭</span><span class="dots"></span><span class="desc">倒计时归零，一起笑一场</span><span class="price">免费</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="samples" style="padding-top:20px">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="tag">今 日 酒 牌</span>
+      <h2>这些，都是别人拼的</h2>
+    </div>
+    <div class="cards reveal" id="cards"></div>
+  </div>
+</section>
+
+<section class="numbers">
+  <div class="wrap">
+    <div class="num"><div class="v">10</div><div class="k">张随机手牌</div></div>
+    <div class="num"><div class="v">3</div><div class="k">拖 · 缩 · 转</div></div>
+    <div class="num"><div class="v">60</div><div class="k">秒一局</div></div>
+    <div class="num"><div class="v">∞</div><div class="k">种歪解</div></div>
+  </div>
+</section>
+
+<section class="final">
+  <div class="wrap">
+    <div class="stamp reveal">你拼<br>我猜</div>
+    <h2 class="reveal">你脑子里那句话，<br>值不值得一个谜题？</h2>
+    <p class="reveal">三十秒就能出题。剩下的交给朋友的脑洞。</p>
+    <a class="btn reveal" href="#">开始拼一题</a>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    你拼我猜 · 用 emoji 说话
+    <div class="seed">种子 S1：具酒价究明讲桥4是了式上1河从出长</div>
+  </div>
+</footer>
+
+<script>
+/* 每局随机发十张；u = 这一局用掉几张（用几张随你，所以每题不同） */
+const PUZZLES=[
+  {d:["🔥","⛽","💧","🪵","🌫️","🧯","🕯️","☀️","🥵","🚒"],u:3,a:"火上浇油",c:"成语"},
+  {d:["🌊","⬇️","🥄","🌙","🐟","🪣","⛵","🕳️","✨","🎣"],u:4,a:"海底捞月",c:"成语"},
+  {d:["🐍","🖌️","➕","🦶","👣","🖍️","🎨","➖","🦎","🐛"],u:5,a:"画蛇添足",c:"成语"},
+  {d:["🐑","💨","🕳️","🧱","🔨","🏠","🚧","🪚","🐺","🌾"],u:6,a:"亡羊补牢",c:"成语"}
+];
+
+/* 最多六笔的落点；每题取前 u 个 —— 用几张随你 */
+const LAYOUT=[
+  {x:50,y:70,s:2.5,r:-5},
+  {x:52,y:44,s:1.5,r:4},
+  {x:75,y:58,s:1.35,r:24},
+  {x:25,y:30,s:1.15,r:-15},
+  {x:78,y:22,s:1.05,r:18},
+  {x:24,y:76,s:1.25,r:-24}
+];
+
+/* ---- 样例卡：这局用掉的 p.u 个笔触（大小角度从 LAYOUT 推导）---- */
+document.getElementById("cards").innerHTML=PUZZLES.map(p=>`
+  <div class="card">
+    <span class="cat">${p.c}</span>
+    <div class="glyphs">${p.d.slice(0,p.u).map((x,k)=>
+      `<span style="font-size:${(22*LAYOUT[k].s/2.5*1.8).toFixed(0)}px;transform:rotate(${LAYOUT[k].r}deg)">${x}</span>`).join("")}</div>
+    <div class="hide">${p.a}</div>
+  </div>`).join("");
+
+/* ---- 首屏：发牌 → 拖进画布 → 揭晓，循环 ---- */
+const canvas=document.getElementById("canvas"),hand=document.getElementById("hand"),
+      ansEl=document.getElementById("ans"),plate=document.getElementById("plateno"),
+      hint=document.getElementById("hint");
+let idx=0;
+
+function play(){
+  const p=PUZZLES[idx%PUZZLES.length];
+  plate.textContent=String(idx%PUZZLES.length+1).padStart(2,"0");
+  canvas.querySelectorAll(".piece").forEach(n=>n.remove());
+  hand.innerHTML=p.d.map((e,i)=>`<div class="tile" data-i="${i}">${e}</div>`).join("");
+  hint.classList.remove("off");
+  ansEl.className="answer";ansEl.textContent="— — — —";
+
+  /* 这局用掉的 p.u 个笔触依次落进画布，对应的牌同时亮起 */
+  p.d.slice(0,p.u).forEach((e,k)=>{
+    setTimeout(()=>{
+      hint.classList.add("off");
+      const L=LAYOUT[k],el=document.createElement("span");
+      el.className="piece";el.textContent=e;
+      el.style.cssText=`left:${L.x}%;top:${L.y}%;--s:${L.s};--r:${L.r}deg`;
+      canvas.appendChild(el);
+      requestAnimationFrame(()=>el.classList.add("on"));
+      const t=hand.querySelector(`.tile[data-i="${k}"]`);
+      if(t)t.classList.add("used");
+    },620*k+420);
+  });
+
+  /* 揭晓 */
+  setTimeout(()=>{
+    ansEl.textContent=p.a.split("").join(" ");
+    ansEl.classList.add("lit");
+  },620*p.u+1100);
+
+  idx++;
+  /* 用牌多的那局多留一点读答案的时间，再进下一轮 */
+  setTimeout(play,Math.max(6000,620*p.u+1100+2200));
+}
+
+/* ---- 滚动进场 ---- */
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target)}}),{threshold:.12});
+document.querySelectorAll(".reveal").forEach(el=>io.observe(el));
+
+/* ---- 首屏进入视口再开演 ---- */
+new IntersectionObserver((es,o)=>{
+  if(es[0].isIntersecting){play();o.disconnect()}
+},{threshold:.3}).observe(canvas);
+</script>
+</body>
+</html>

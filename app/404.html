@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>查无此站 · 1管51 站台通告 — 你拼我猜</title>
+<link rel="stylesheet" href="base.css">
+<style>
+/* ============================================================
+   404 = 查无此站 —— 一张划掉站名的告示
+   机构形态：站台上的纸质通告（一张纸，不是深色整页）
+   主章：.stamp.round.red「查无此站」（本页唯一一枚）
+   物理动作：站名 .struck 划掉 · 右上角 .hole 归档孔 · .label 已张贴
+   简化律：长解释 → 一句标题；改乘列表 → 三个出口按钮；
+           明细流水（时间/字符/经办/存期）是内容，留。
+   ============================================================ */
+.mla{margin-left:auto}
+
+/* 站台 */
+.plat{padding:34px 0 8px}
+
+/* 通告纸：竖版，微微歪，顶边压一条红线 */
+.paper404{position:relative;max-width:760px;margin:0 auto;transform:rotate(-.8deg);
+  padding:26px 30px 30px;border-top:6px solid var(--red)}
+.paper404 .hole{right:22px;top:22px}
+/* base 的 .stamp 是 nowrap；圆形章里的四个字必须允许折成两行且不顶格 */
+.paper404 .stamp.round{white-space:normal;line-height:1.2}
+@media(max-width:560px){.paper404{padding:20px 16px 22px;transform:none;border-top-width:5px}}
+
+/* 张贴标签：两角，各自歪一点 */
+.tag-tl{position:absolute;left:-12px;top:14px;transform:rotate(-8deg)}
+.tag-br{position:absolute;right:-8px;bottom:46px;transform:rotate(5deg)}
+@media(max-width:560px){.tag-tl{left:4px}.tag-br{right:6px}}
+
+/* 抬头 */
+.pf-hd{display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+  border-bottom:2.5px solid var(--ink);padding-bottom:10px}
+
+/* 标题 + 主章：一句标题说清发生了什么，章只说状态 */
+.pf-act{display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin:20px 0 4px}
+.pf-act h1{font-size:clamp(20px,3.6vw,30px);font-weight:900;letter-spacing:.1em;line-height:1.5}
+.pf-act .stamp{margin-left:auto}
+
+/* 站名：被红笔划掉的那一站 */
+.station{margin:14px 0 18px}
+.station .nm{font-family:var(--mono);font-weight:900;letter-spacing:.06em;line-height:1.25;
+  font-size:clamp(27px,5.2vw,42px);word-break:break-all}
+.station .py{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.26em;
+  color:var(--ink-3);margin-top:9px;font-weight:400}
+.station .say{margin-top:11px;text-wrap:pretty}
+.station .say::before{content:"▍";color:var(--red);margin-right:7px}
+
+/* 存档栏：单据流水，全留 */
+.rec{margin-top:20px;border-top:1.5px dashed var(--ink-3);padding-top:13px;
+  font-family:var(--mono);font-size:10.5px;line-height:2.1;color:var(--ink-3);letter-spacing:.05em;
+  display:flex;gap:6px 20px;flex-wrap:wrap}
+.rec b{color:var(--ink-2)}
+.barcode{margin-top:16px;opacity:.85}
+
+/* 出口区：与通告纸同宽、同轴 */
+.exits{max-width:760px;margin:0 auto;padding-top:22px}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="logo" href="index.html">你拼我猜<span class="no">1管51</span></a>
+    <nav>
+      <a href="plaza.html">广场</a>
+      <a href="banks.html">词库</a>
+      <a href="works.html">我的作品</a>
+      <a href="me.html">我的主页</a>
+    </nav>
+    <a class="btn sm" href="login.html">办证 / 进站</a>
+  </div>
+</header>
+
+<main class="plat">
+  <div class="wrap">
+
+    <!-- ==================== 通告纸 ==================== -->
+    <article class="sheet paper404">
+      <span class="hole" aria-hidden="true"></span>
+      <span class="label tag-tl">已张贴</span>
+      <span class="label tag-br">站台留存</span>
+
+      <div class="pf-hd">
+        <span class="tag-no red">HTTP 404</span>
+        <span class="lbl">站 台 通 告 · 第 1管51-404 号</span>
+        <span class="lbl mla" id="stampTime">--:-- 张贴</span>
+      </div>
+
+      <div class="pf-act">
+        <h1>你要去的那一站<br>不在运行图上</h1>
+        <span class="stamp round red double" id="voidStamp">查无<br>此站</span>
+      </div>
+
+      <!-- 站名：红笔划掉 -->
+      <div class="station">
+        <div class="nm struck" id="badUrl">/</div>
+        <span class="py" id="pathMeta">— 字符 · 未登记</span>
+        <p class="say" id="say">—</p>
+      </div>
+
+      <div class="rec">
+        <span>录入 <b id="stampClock">--:--:--</b></span>
+        <span>字符 <b id="bits">—</b></span>
+        <span>经办 站台值班员</span>
+        <span>存期 三年</span>
+      </div>
+      <div class="barcode" aria-hidden="true"></div>
+    </article>
+
+    <!-- ==================== 出口 ==================== -->
+    <div class="exits">
+      <div class="btn-row">
+        <a class="btn blue" href="plaza.html">回站前广场</a>
+        <a class="btn ghost" href="index.html">回站台首页</a>
+        <button class="btn ghost" type="button" id="back">按原路退回</button>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <span>你拼我猜 · 1管51 站 · 通告第 404 号</span>
+    <span>走错站台也是乘客。</span>
+  </div>
+</footer>
+
+<script>
+/* ---------- 一 · 你实际访问的那一站 ---------- */
+const $ = id => document.getElementById(id);
+const params = new URLSearchParams(location.search);
+/* 支持 ?p=/admin 这类手工演示；没有就取真实路径 */
+const raw = (params.get("p") || (location.pathname + location.search) || "/").trim() || "/";
+const n = [...raw].length;
+
+$("badUrl").textContent = raw;
+$("bits").textContent = n + " 个";
+$("pathMeta").textContent = n + " 个字符 · 未在本站登记";
+
+const d = new Date(), p = x => String(x).padStart(2, "0");
+const hm = p(d.getHours()) + ":" + p(d.getMinutes());
+$("stampTime").textContent = hm + " 张贴";
+$("stampClock").textContent = hm + ":" + p(d.getSeconds());
+
+/* ---------- 二 · 按你输错的姿势给台词 ---------- */
+function say(path){
+  const rules = [
+    [/admin|wp-admin|phpmyadmin|dashboard|manage|后台/i,
+     "找后台的旅客每天都有几位。本站没有后台，只有站台 —— 后台在铁轨的另一侧，得先办证。"],
+    [/\.php|\.asp|\.jsp|\.cgi|\.aspx/i,
+     "本站不认这门语言。运行图上只有站名，没有扩展名。"],
+    [/404/,
+     "你已经在 404 上了，还要找一站叫 404 的。这种执着适合去玩盲拼。"],
+    [/\.(png|jpe?g|gif|svg|webp|bmp|ico)$/i,
+     "这是一张图，不是一站。图没丢，是这张运行图上没有它。"],
+    [/[?&]/,
+     "还带了参数。看得出来你是认真的 —— 我们也很认真地查过，确实没有这一站。"],
+    [/^\/(index\.html)?$/,
+     "站名一个字都没错。错的是它不在运行图上。"],
+    [/\.\.|\/\.\.\//,
+     "还想往上翻一级？上一级是调度室，闲人免进。"],
+    [/[<>{}"'\\]/,
+     "这行站名里有几个字符，连广播员都不敢念出口。"]
+  ];
+  for(const [re, msg] of rules) if(re.test(path)) return msg;
+  if(n > 44) return "这一站的名字有 " + n + " 个字符，广播员念到一半就下班了 —— 所以本站查不到。";
+  if(n > 14) return "站名挺长，像一份写得很详细的乘车申请。可惜这张运行图上没有它。";
+  return "这一行已经抄进本站的错站登记簿，存三年。三年后也不会有人来查它。";
+}
+$("say").textContent = say(raw);
+
+/* ---------- 三 · 三个出口：原路退回真的退 ---------- */
+$("back").addEventListener("click", () => {
+  if(history.length > 1) history.back();
+  else location.href = "plaza.html";
+});
+
+/* ---------- 四 · 盖章（本页的主章，落纸一次）+ 归档打孔 ---------- */
+const vs = $("voidStamp");
+vs.style.opacity = "0";
+requestAnimationFrame(() => { vs.style.opacity = ""; vs.classList.add("stamping"); });
+
+const hole = document.querySelector(".paper404 .hole");
+if(hole) setTimeout(() => hole.classList.add("punching"), 420);
+
+/* ---------- 五 · 控制台留痕 ---------- */
+console.log("%c404 · 查无此站","color:#D33A2C;font-size:14px;font-weight:700;letter-spacing:.08em");
+console.log("%c这张通告上被划掉的，就是你刚才输的那一行。\n" +
+  "· 「查无此站」是盖上去的，盖重影了 —— 重影的章不算数，所以这一页其实还有效。\n" +
+  "· 想在后面接别的站名看台词：在地址后面加 ?p=/admin 再回车。",
+  "color:#4A4841;line-height:1.75;font-family:monospace");
+</script>
+</body>
+</html>

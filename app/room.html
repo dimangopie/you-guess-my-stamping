@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>你拼我猜 · 游戏房间 NO. 1管51</title>
+<link rel="stylesheet" href="base.css">
+<style>
+/* ============================================================
+   游戏房间 /room/:id —— 工具页，任务是「用起来快」
+   机构语言 v3：一张调度单（谁什么时候拼、谁什么时候猜）
+
+   v3 不再有「网页层」——
+     · 荧光色 / 系统条 / 下载弹窗 / 标题角标：已全部撤掉
+     · 印章 = 状态系统（轴 3）；柜台的物理动作 = 交互（轴 8）
+     · 材质照旧：席位表是纸（.board.light），得分板与倒计时是屏（.board）
+   本页只写独有版面，base.css 的零件一律不重定义。
+   ============================================================ */
+
+/* ---- 页容器：工具页比营销页紧 ---- */
+.room{padding:26px 0 64px}
+.room .wrap+.wrap{margin-top:20px}
+@media(max-width:700px){.room{padding:16px 0 44px}.room .wrap+.wrap{margin-top:14px}}
+
+/* ---- 房间头 ---- */
+.rh-hd{gap:14px}
+.rh-title{font-weight:900;letter-spacing:.22em;font-size:16px}
+.rh-set{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+.rh-bar{padding:9px 18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.rh-note{margin-left:auto;transition:color .2s}
+.rh-note.on{color:var(--blue)}
+/* 本站广播（页头的一枚小条，不做弹窗、不动标题栏） */
+.cast{display:inline-flex;align-items:center;gap:10px;background:var(--ink);
+  color:var(--paper);font-family:var(--mono);font-size:11.5px;letter-spacing:.1em;
+  padding:5px 12px;border-radius:2px;border-bottom:3px solid var(--amber);transition:.2s}
+.cast b{color:var(--amber)}
+.cast.quiet{background:var(--paper-3);color:var(--ink-3);border-bottom-color:var(--ink-4)}
+.cast.quiet b{color:var(--ink-2)}
+
+/* 可点的设置摘要（不弹窗：点一下换一个取值，并广播） */
+.setchip{display:inline-flex;align-items:center;gap:7px;cursor:pointer;
+  font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;color:var(--ink-3);
+  background:var(--paper-4);border:1.5px solid var(--ink-4);border-radius:2px;
+  padding:6px 10px;transition:.14s}
+.setchip b{color:var(--ink);font-weight:700}
+.setchip i{font-style:normal;opacity:.55}
+.setchip:hover{border-color:var(--ink);transform:translate(-1px,-1px);box-shadow:var(--sh-1)}
+.setchip:focus-visible{outline:2.5px solid var(--blue);outline-offset:2px}
+.setchip.flash{background:var(--paper-2);border-color:var(--amber)}
+
+/* ---- 三栏主体 ---- */
+.grid3{display:grid;grid-template-columns:294px minmax(0,1fr) 326px;gap:18px;align-items:start}
+@media(max-width:1060px){.grid3{grid-template-columns:266px minmax(0,1fr) 292px;gap:14px}}
+@media(max-width:900px){.grid3{grid-template-columns:1fr;gap:18px}}
+.col{min-width:0}
+
+/* 栏头：与 .sheet-hd 同高同面，但下沿让给下方表格自己的边线 */
+.col-hd{display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+  background:var(--paper-2);border:2px solid var(--ink);border-bottom:none;
+  border-radius:3px 3px 0 0;padding:10px 14px}
+.col-hd .r{margin-left:auto}
+
+/* ---- 左：玩家席位表 = 纸，装订孔留在纸边 ---- */
+.seats{position:relative}
+.seat{grid-template-columns:38px minmax(0,1fr) 96px;min-height:92px}
+.board .row.seat>div{padding:12px 10px}
+.seat .c1{display:flex;align-items:center;justify-content:center;font-size:11px;letter-spacing:.04em}
+.seat .c2{display:flex;align-items:flex-start;gap:9px;padding-right:4px!important}
+.av{width:26px;height:26px;flex:none;display:grid;place-items:center;background:var(--paper-2);
+  border:1.5px solid var(--ink);border-radius:2px;font-family:var(--mono);font-size:12px;
+  color:var(--ink-2);letter-spacing:0}
+.pn{display:flex;flex-direction:column;min-width:0;line-height:1.35}
+.pn b{font-size:13.5px;letter-spacing:.14em;color:var(--ink);white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis}
+/* 四态：一枚章 = 一个状态（轴 3）。文字状态描述已删（律一），分数是内容 */
+.pn .sc{font-family:var(--mono);font-size:11px;letter-spacing:.02em;color:var(--ink-3);
+  font-variant-numeric:tabular-nums}
+.seat .c3{display:grid;place-items:center;gap:5px}
+.sealcell{position:relative;display:grid;place-items:center;width:100%;height:66px}
+.stamp.no{padding:0}
+.seat .stamp.round{width:62px;height:62px;font-size:10px;letter-spacing:.06em;line-height:1.3;gap:1px}
+.seat .stamp.steel{font-size:9.5px;line-height:1.45;letter-spacing:.12em;width:100%;text-align:center}
+.seat .p-sc{font-family:var(--mono);font-weight:700;font-size:15px;font-variant-numeric:tabular-nums}
+/* 空席：用「凹槽」面 */
+.seat-empty{grid-template-columns:1fr;min-height:0}
+.seat-empty>div{background:var(--paper-3);color:var(--ink-2);display:flex;align-items:center;gap:12px}
+.seat-empty .btn{margin-left:auto}
+
+/* 本房规程 */
+.rules{margin-top:14px;border:1.5px dashed var(--ink-4);background:var(--paper-4);padding:12px 14px}
+.rules .lbl{display:block;border-bottom:1.5px dashed var(--ink-4);padding-bottom:8px;margin-bottom:6px}
+.rule{display:flex;justify-content:space-between;gap:12px;font-family:var(--mono);font-size:11.5px;
+  padding:5px 0;border-bottom:1px dashed rgba(198,192,174,.7)}
+.rule:last-child{border-bottom:none}
+.rule span{color:var(--ink-3)}
+.rule b{color:var(--ink-2);font-weight:700}
+
+/* ---- 中：当前谜面（画布 = base 的 .snap 零件） ---- */
+.canvas{max-width:400px;margin:0 auto}
+.canvas .pc{font-size:38px}
+.canvas .pc.drop{animation:drop .5s cubic-bezier(.2,1.4,.4,1)}
+@keyframes drop{
+  from{opacity:0;transform:translate(-50%,-50%) scale(calc(var(--s) * .35)) rotate(var(--r))}
+  to{opacity:1;transform:translate(-50%,-50%) scale(var(--s)) rotate(var(--r))}}
+.canvas-fine{position:absolute;inset:0;pointer-events:none;
+  background-image:
+    repeating-linear-gradient(0deg,rgba(23,23,27,.03) 0 1px,transparent 1px 8px),
+    repeating-linear-gradient(90deg,rgba(23,23,27,.03) 0 1px,transparent 1px 8px)}
+/* 画布上的常驻柜台入口：一个 emoji 图标代替「在谜面上点右键」那句话（律二） */
+.cv-ctx{position:absolute;left:12px;bottom:12px;z-index:4}
+.cv-stamp{position:absolute;top:12px;right:12px;z-index:3}
+@media(max-width:520px){.canvas .pc{font-size:26px}}
+/* 抽签筒档口：这一题的牌还剩几张，从筒里一张张抽到画布上（轴 8） */
+.slotbar{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:16px;
+  border-bottom:1.5px dashed var(--ink-4);padding-bottom:14px}
+.slotbar .slot{padding:8px 16px 14px;box-shadow:none}
+.slotbar .slot .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.2em;color:var(--ink-3)}
+.slotbar .slot .v{font-family:var(--mono);font-weight:700;font-size:22px;line-height:1.1;
+  font-variant-numeric:tabular-nums}
+.slotbar .slot .v i{font-style:normal;color:var(--ink-3);font-size:13px}
+/* 倒计时读数 = 屏 */
+.cd-strip{display:flex;align-items:flex-end;justify-content:space-between;gap:16px}
+.cd-box{background:var(--ink);border-radius:2px;padding:8px 18px;text-align:right}
+.cd-box .k{font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:#A9A597}
+.cd-v{font-family:var(--mono);font-weight:700;font-size:clamp(32px,4.4vw,50px);line-height:.95;
+  color:var(--amber);font-variant-numeric:tabular-nums;transition:color .25s}
+.cd-v.urgent{color:var(--red)}
+.cd-u{font-family:var(--mono);font-size:11.5px;color:var(--ink-3);margin-left:7px;letter-spacing:.1em}
+.tick{height:10px;border:1.5px solid var(--ink);background:var(--paper-3);border-radius:2px;
+  margin-top:10px;overflow:hidden}
+.tick i{display:block;height:100%;background:var(--amber);transition:width .95s linear,background .3s}
+.tick.urgent i{background:var(--red)}
+.stats.st3{margin-top:6px}
+.stats.st3 .st{flex:1 1 0;min-width:0;padding:12px 14px}
+.stats.st3 .k{color:var(--ink-4)}
+
+/* 柜台窗口牌 + 叫号（谁该到哪个窗口去猜） */
+.winbar{margin-top:16px;background:var(--ink);border-radius:2px;padding:14px 18px;
+  display:flex;align-items:center;gap:22px;flex-wrap:wrap;border-bottom:4px solid var(--amber)}
+.winbar .q{display:grid;gap:2px;text-align:center}
+.winbar .q .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.22em;color:#A9A597}
+.winbar .queue-no{font-size:44px}
+.winbar .signs{display:flex;gap:8px;flex-wrap:wrap;flex:1;min-width:190px}
+.winbar .window-sign{background:rgba(242,239,228,.08);border-bottom-color:var(--ink-3)}
+.winbar .window-sign.on{background:var(--red);border-bottom-color:#7A1F16}
+.winbar .window-sign.on b{color:#FFE2DA}
+
+/* ---- 右：猜测流（房间的心脏） ---- */
+.flow-wrap{border:2px solid var(--ink);border-top:none;border-radius:0 0 3px 3px;
+  background:var(--paper-4);padding:0 0 12px}
+.flow{list-style:none;max-height:520px;overflow-y:auto;overscroll-behavior:contain}
+.flow::-webkit-scrollbar{width:9px}
+.flow::-webkit-scrollbar-thumb{background:var(--paper-3);border-left:2px solid var(--ink)}
+.flow-wrap .dash{margin:0 14px 10px}
+.g{display:grid;grid-template-columns:62px 54px minmax(0,1fr);gap:8px;align-items:baseline;
+  padding:10px 14px;border-bottom:1.5px dashed var(--ink-4);font-size:13.5px}
+.g:last-child{border-bottom:none}
+.g-t{font-family:var(--mono);font-size:11px;color:var(--ink-3);font-variant-numeric:tabular-nums}
+.g-who{font-family:var(--mono);font-size:11.5px;font-weight:700;color:var(--ink);letter-spacing:.06em;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.g-main{color:var(--ink);overflow-wrap:anywhere}
+.g-mark{display:inline-block;margin-left:7px;font-family:var(--mono);font-weight:700;font-size:10.5px;
+  letter-spacing:.06em;border:1.5px solid currentColor;border-radius:2px;padding:1px 6px;
+  color:var(--ink-3);white-space:nowrap}
+.g.hit{background:rgba(31,78,156,.06);border-left:3px solid var(--blue)}
+.g.hit .g-main{color:var(--blue);font-weight:700}
+.g.hit .g-mark{color:var(--blue)}
+.g.star{background:rgba(211,58,44,.055);border-left:3px solid var(--red)}
+.g.star .g-mark{color:var(--red)}
+.g.sys{grid-template-columns:1fr;padding:7px 14px;background:var(--paper-2);text-align:center;
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;color:var(--ink-3)}
+.g.in{animation:gin .42s cubic-bezier(.2,1,.3,1)}
+@keyframes gin{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+/* 待办角标：一枚小圆印（不是红点） */
+.flow-mark{border-radius:50%!important;width:38px;height:38px;min-width:38px;padding:0;
+  display:inline-grid;place-items:center;font-size:10px;cursor:pointer;background:var(--paper-4);
+  font-family:var(--mono);letter-spacing:.02em;line-height:1.1;transition:.16s}
+.flow-mark:hover{transform:rotate(-3deg) scale(1.04)}
+.flow-mark.faded{cursor:default;box-shadow:none;transform:rotate(-7deg)}
+
+/* ---- 底部得分板 =「屏」（深底）：席位表是纸，记分牌是屏 ---- */
+.srow,.throw{grid-template-columns:64px minmax(0,1fr) 96px 116px}
+.throw{background:rgba(255,255,255,.07)}
+.throw:hover{background:rgba(255,255,255,.07)}
+.srow .c2{display:flex;align-items:center;gap:9px}
+.srow .sc{font-family:var(--mono);font-weight:700;font-size:15px;color:var(--paper);
+  font-variant-numeric:tabular-nums}
+#score .throw .lbl{color:#A9A597}
+#score .srow .c4{color:#A9A597;font-size:13px}
+/* 猜测流的合计：emoji 承担名词，一行两三个数字（律五） */
+.flow-sum{display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:0 14px;
+  font-family:var(--mono);font-size:11px;letter-spacing:.06em;color:var(--ink-3);
+  font-variant-numeric:tabular-nums}
+.flow-sum span{display:inline-flex;align-items:baseline;gap:5px}
+.flow-sum b{color:var(--ink);font-weight:700}
+@media(max-width:640px){
+  .srow,.throw{grid-template-columns:40px minmax(0,1fr) 58px 78px}
+  .seat{grid-template-columns:30px minmax(0,1fr) 74px}
+  .g{grid-template-columns:64px minmax(0,1fr);row-gap:2px}
+  .g-t{grid-row:1;grid-column:1}
+  .g-who{grid-row:1;grid-column:2}
+  .g-main{grid-row:2;grid-column:1/-1}
+  .rh-set{margin-left:0;width:100%}
+  .cast{margin-left:0}
+}
+
+/* 页脚当前页高亮：base.css 未定义 footer 的 aria-current 状态，这里补一条 */
+footer.site a[aria-current]{color:var(--amber)}
+
+/* ============================================================
+   柜台：右键操作台（轴 8 的入口）
+   票据 = 纸，操作台 = 屏；菜单头压一条琥珀，不用第四色
+   ============================================================ */
+.ctx{position:fixed;z-index:950;min-width:230px;background:var(--ink);color:var(--paper);
+  border:2px solid var(--ink);border-radius:3px;overflow:hidden;
+  box-shadow:var(--sh-2),0 22px 44px -18px rgba(23,23,27,.6)}
+.ctx .ctx-h{background:var(--paper-2);color:var(--ink);font-family:var(--mono);font-size:11px;
+  letter-spacing:.16em;padding:6px 12px;display:flex;align-items:center;gap:8px;
+  border-bottom:2px solid var(--ink)}
+.ctx .ctx-h .x{margin-left:auto;cursor:pointer;opacity:.7;line-height:1}
+.ctx .ctx-h .x:hover{opacity:1}
+.ctx button{display:flex;width:100%;align-items:center;gap:11px;background:none;border:none;
+  color:inherit;text-align:left;cursor:pointer;padding:10px 13px;font-family:var(--mono);
+  font-size:13px;letter-spacing:.06em;border-bottom:1px solid rgba(242,239,228,.14)}
+.ctx button:hover{background:rgba(201,138,14,.16);color:var(--amber)}
+.ctx button .ci{width:17px;text-align:center;opacity:.7}
+.ctx button .cl{display:flex;flex-direction:column;line-height:1.5}
+.ctx button .cl i{font-style:normal;font-size:10.5px;color:#8E8A7E;letter-spacing:.04em}
+.ctx .ctx-f{padding:7px 12px;font-family:var(--mono);font-size:10px;letter-spacing:.08em;color:#8E8A7E}
+
+/* ---- 画布上的柜台动作结果 ---- */
+/* 撕口：一条锯齿纸边压在画布下沿（用元素不用伪元素，避免和别的伪元素打架） */
+.cv-tear{position:absolute;left:-2%;right:-2%;bottom:0;height:13px;z-index:4;pointer-events:none;
+  background:var(--paper);
+  clip-path:polygon(0 100%,0 42%,4% 0,8% 56%,12% 8%,16% 62%,20% 4%,24% 52%,28% 14%,32% 66%,
+    36% 6%,40% 54%,44% 18%,48% 62%,52% 5%,56% 50%,60% 14%,64% 62%,68% 4%,72% 56%,76% 12%,
+    80% 58%,84% 6%,88% 52%,92% 16%,96% 60%,100% 28%,100% 100%)}
+.canvas-stamp{position:absolute;transform-origin:center}
+.stub-out{display:grid;gap:12px;margin-top:14px}
+/* 作用域限定：只给票根卡加裁切，不动 base.css 的 .stubcard 本体 */
+.stub-out .stubcard{position:relative;overflow:hidden}
+.stubcard .top{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.stubcard .barcode{height:24px;margin:10px 0 8px}
+.stubcard.in{animation:slipin .5s cubic-bezier(.2,1,.3,1)}
+@keyframes slipin{from{opacity:0;transform:translateY(-10px) rotate(-.8deg)}to{opacity:1;transform:none}}
+/* 复印的第二联：比原件淡（.copy2），纸张不涂黑 */
+.cv-copy .snap{filter:contrast(.92) brightness(1.02)}
+.cv-copy .copy-tag{margin-top:10px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="logo" href="index.html">你拼我猜<span class="no">1管51</span></a>
+    <nav>
+      <a href="plaza.html">广场</a>
+      <a href="banks.html">词库</a>
+      <a href="works.html">我的作品</a>
+      <a href="me.html">我的主页</a>
+      <a href="login.html">退出</a>
+    </nav>
+    <a class="btn sm" href="#" id="copyLink">复制房间链接</a>
+  </div>
+</header>
+
+<main class="room">
+
+  <!-- ============ 房间头 · 调度单抬头 ============ -->
+  <div class="wrap">
+    <div class="sheet creased">
+      <div class="sheet-hd rh-hd">
+        <span class="tag-no">NO. 1管51</span>
+        <span class="rh-title tk-sm">调 度 单</span>
+        <span class="tag-out">阿野</span>
+        <span class="tag-out" id="modeTag">经典 · 同房</span>
+        <span class="cast quiet" id="castBar" title="本页在后台时，到站消息记在这里">
+          <span id="castTxt">暂无新到站</span>
+        </span>
+        <div class="rh-set" id="rhSet"></div>
+      </div>
+      <div class="sheet-bd rh-bar">
+        <span class="tag-no blue" id="qNo">第 3 题</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 三栏主体 ============ -->
+  <div class="wrap">
+    <div class="grid3">
+
+      <!-- 左 · 玩家调度单（纸）-->
+      <section class="col">
+        <div class="col-hd">
+          <span class="tag-no">A</span>
+          <span class="lbl r" id="seatCount">4 / 6 席</span>
+        </div>
+        <div class="board light bind seats" id="seats"></div>
+        <div class="rules">
+          <span class="lbl">本 房 规 程</span>
+          <div class="rule"><span>抢猜</span><b>允许</b></div>
+          <div class="rule"><span>禁用</span><b>无</b></div>
+          <div class="rule"><span>可见性</span><b>仅链接</b></div>
+          <div class="rule"><span>歪解投票</span><b>开</b></div>
+        </div>
+      </section>
+
+      <!-- 中 · 当前谜面 -->
+      <section class="col">
+        <div class="sheet">
+          <div class="sheet-hd">
+            <span class="tag-no blue">谜面</span>
+            <span class="tag-out" id="copyTag">未 复 印</span>
+            <span class="lbl" style="margin-left:auto">谜底 封 存 中</span>
+          </div>
+          <div class="sheet-bd">
+
+            <!-- 抽签筒：这一题还剩几张牌没抽出来（说明文字已删，筒自己会说） -->
+            <div class="slotbar">
+              <div class="slot" title="牌从这个筒里一张张抽出来">
+                <div class="k">抽 签 筒</div>
+                <div class="v"><span id="tubeLeft">3</span><i> / 7 张</i></div>
+              </div>
+            </div>
+
+            <div class="snap canvas" id="canvas" role="img" aria-label="当前谜面：阿野正在拼">
+              <div class="canvas-fine"></div>
+              <span class="cv-stamp"><span class="stamp blue crooked">抢 猜 中</span></span>
+              <!-- 常驻柜台入口：一个 emoji 图标代替「在谜面上点右键」那句话（律二） -->
+              <button class="ibtn cv-ctx" type="button" id="cvCtx"
+                      title="柜台操作：撕下票根 / 盖一个章 / 复印这份" aria-label="柜台操作">🧾</button>
+            </div>
+            <hr class="dash">
+            <div class="cd-strip">
+              <span class="hint" title="本题时限">⏱ <b id="limitTxt">60</b>s</span>
+              <span class="cd-box">
+                <span class="k">本 题 剩 余</span>
+                <span class="cd-v" id="cd">47</span><span class="cd-u" style="color:#A9A597">秒</span>
+              </span>
+            </div>
+            <div class="tick" id="tick"><i id="tickFill" style="width:78%"></i></div>
+            <div class="stats st3">
+              <div class="st"><div class="v" id="elapsedV">13</div><div class="n">本 题 已 用</div></div>
+              <div class="st"><div class="v" id="pieceV">4/7</div><div class="n">谜 面 已 落</div></div>
+              <div class="st"><div class="v blue" id="hitV">1</div><div class="n">已 猜 中</div></div>
+            </div>
+            <div id="copyOut"></div>
+
+          </div>
+        </div>
+
+        <!-- 柜台窗口牌 + 叫号 -->
+        <div class="winbar">
+          <div class="q">
+            <span class="k">叫 号</span>
+            <span class="queue-no" id="queueNo">A06</span>
+          </div>
+          <div class="signs" id="winSigns"></div>
+          <span class="hint" id="queueHint">听 号 动 身</span>
+        </div>
+
+        <div class="stub-out" id="stubOut"></div>
+      </section>
+
+      <!-- 右 · 猜测流 -->
+      <section class="col">
+        <div class="col-hd">
+          <button class="stamp round flow-mark faded" type="button" id="flowMark"
+                  title="没有新猜测">无</button>
+          <span class="lbl">猜 测 流</span>
+          <span class="lbl r" id="flowCount">9 条</span>
+        </div>
+        <div class="flow-wrap">
+          <ol class="flow" id="flow" role="log" aria-label="猜测流"></ol>
+          <hr class="dash">
+          <!-- 合计：emoji 说名词，数字是内容（律五） -->
+          <div class="flow-sum" id="flowSum"></div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <!-- ============ 底部得分板（常驻，不弹窗；屏） ============ -->
+  <div class="wrap">
+    <div class="sheet torn-bottom" style="padding-bottom:9px">
+      <div class="sheet-hd">
+        <span class="tag-no red">得分</span>
+        <span class="lbl">得 分 板</span>
+        <span class="stamp bar amber">本 局 结 算 中</span>
+      </div>
+      <div class="board" id="score"></div>
+    </div>
+  </div>
+
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <span>你拼我猜 · 用 emoji 说话</span>
+    <span>1管51 站 · 调度单当场打印</span>
+  </div>
+</footer>
+
+<script>
+/* ============================================================
+   房间页脚本：一份数据 → 三块渲染 → 几个定时器
+   v3：柜台的物理动作（撕 / 盖 / 印 / 打孔 / 叫号 / 翻牌）
+   ============================================================ */
+
+/* ---------- 1. 数据 ---------- */
+const LIMIT0=60;                       // 时限（秒），房间头可改
+const OPEN=4;                          // 载入时阿野已经落下的牌
+const SEATS=[                          // 席位：四种状态都要看得见
+  {no:"01",n:"阿野",av:"阿",st:"composing",live:true,sc:120,gain:40},
+  {no:"02",n:"小舟",av:"舟",st:"guessing",stTxt:"猜题中 · 已猜 4 次",sc:80,gain:20},
+  {no:"03",n:"Lina",av:"L",st:"solved",stTxt:"已猜中 · 用时 8.2s",sc:200,gain:80},
+  {no:"04",n:"访客",av:"访",st:"offline",stTxt:"离线 · 刚离开",sc:30,gain:0}
+];
+const JOINER={no:"05",n:"阿麦",av:"麦",st:"guessing",stTxt:"猜题中 · 刚入座",sc:0,gain:null};
+const DOT_TXT={composing:"拼图中",guessing:"猜题中",solved:"已猜中",offline:"离线"};
+/* 轴 3：一枚章 = 一个状态。四态四枚，一章一义，不重复用。 */
+const SEAL={
+  composing:{cls:"round amber",      txt:"拼图中<br>进行"},
+  guessing: {cls:"round blue double",txt:"猜题中<br>存档"},
+  solved:   {cls:"round double",     txt:"已猜中<br>验讫"},
+  offline:  {cls:"steel faded",      txt:"离线<br>缺墨"}
+};
+const PUZZLE=[                         // 谜面快照：保留大小与角度（--s / --r）
+  {e:"🌊",x:50,y:74,s:2.6,r:-3},
+  {e:"🌙",x:73,y:24,s:1.65,r:12},
+  {e:"🥄",x:43,y:52,s:1.5,r:-24},
+  {e:"🕳️",x:46,y:87,s:1.3,r:0},
+  {e:"🐟",x:22,y:63,s:1.2,r:-14},
+  {e:"✨",x:19,y:20,s:1.1,r:8},
+  {e:"🪣",x:80,y:70,s:1.2,r:16}
+];
+const GUESSES=[                        // 开局 13 秒内已经发生的猜测（d = 距现在几秒）
+  {d:13.0,w:"小舟",t:"是海吗"},
+  {d:12.4,w:"访客",t:"猴子捞月",star:"★ 最佳歪解 3 票"},
+  {d:11.1,w:"Lina",t:"水里的月亮"},
+  {d:9.7, w:"小舟",t:"海底捞针"},
+  {d:8.3, w:"访客",t:"捞金鱼"},
+  {d:6.9, w:"Lina",t:"月亮掉进水里了"},
+  {d:6.0, w:"小舟",t:"捞月亮的人"},
+  {d:4.8, w:"Lina",t:"海底捞月",hit:"✓ 猜中 8.2s"},
+  {d:2.2, w:"访客",t:"捞了个寂寞"}
+];
+const POOL=[                           // 之后每隔几秒从底部滑入一条
+  {w:"小舟",t:"水中捞月"},{w:"阿麦",t:"海底捞火锅"},
+  {w:"小舟",t:"打水漂"},  {w:"阿麦",t:"李白捞月"},
+  {w:"小舟",t:"捞星星"},{w:"阿麦",t:"月亮掉海里了"},
+  {w:"小舟",t:"潜水员"},  {w:"阿麦",t:"捞了个空"},
+  {w:"小舟",t:"月光宝盒"},{w:"阿麦",t:"深海恐惧症"},
+  {w:"小舟",t:"捞鱼"},    {w:"阿麦",t:"海钓"}
+];
+const SETS=[                           // 房间设置：点一下换一个取值并广播
+  {k:"模式",i:0,v:["经典","接力","同题","合作"]},
+  {k:"词库",i:0,v:["成语俗语","日常短语","影视"]},
+  {k:"牌数",i:0,v:["10 张","5 张","3 张","2 张"]},
+  {k:"时限",i:0,v:["60s","120s","30s"]}
+];
+const STAMPS=["歪","已 阅","存 疑","作 废","甜 区","重 拼"];
+const CALLERS=["阿野","小舟","Lina","访客","阿麦"];
+const WINDOWS=[                        // 三个窗口牌：叫到谁，谁亮
+  {w:"1 号窗口",t:"拼图"},
+  {w:"2 号窗口",t:"抢猜"},
+  {w:"3 号窗口",t:"结算"}
+];
+
+/* ---------- 2. 节点 ---------- */
+const $=id=>document.getElementById(id);
+const seatsEl=$("seats"),scoreEl=$("score"),flowEl=$("flow"),cvEl=$("canvas"),
+      cdEl=$("cd"),tickEl=$("tick"),tickFill=$("tickFill"),
+      pieceV=$("pieceV"),elapsedV=$("elapsedV"),qNoEl=$("qNo"),limitTxt=$("limitTxt"),
+      flowCount=$("flowCount"),flowSum=$("flowSum"),seatCount=$("seatCount"),
+      rhSet=$("rhSet"),modeTag=$("modeTag"),hitV=$("hitV"),
+      flowMark=$("flowMark"),copyTag=$("copyTag"),copyOut=$("copyOut"),stubOut=$("stubOut"),
+      tubeLeft=$("tubeLeft"),queueNo=$("queueNo"),winSigns=$("winSigns"),queueHint=$("queueHint"),
+      castBar=$("castBar"),castTxt=$("castTxt");
+const pad=n=>String(n).padStart(2,"0");
+const stamp=ms=>{const t=new Date(ms);return pad(t.getHours())+":"+pad(t.getMinutes())+":"+pad(t.getSeconds())};
+/* 重放一次签名动画（翻牌 / 盖章 / 打孔 / 抽签 共用）*/
+function reanim(el,cls){
+  if(!el) return;
+  el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls);
+}
+
+/* ---------- 3. 状态 ---------- */
+let limit=LIMIT0, elapsed=13, round=3, pieceI=OPEN, pi=0, joined=false, noteT=0;
+let unread=0, copies=0, stubs=0, stampI=0, door=6, callT=0, castN=0;
+const prevSc={};
+
+/* ---------- 4. 渲染 ---------- */
+function renderChips(){
+  rhSet.innerHTML=SETS.map((s,i)=>
+    `<button type="button" class="setchip" data-i="${i}" title="点击切换并广播">
+       ${s.k}<b>${s.v[s.i]}</b><i>▾</i>
+     </button>`).join("");
+}
+function sealHTML(p){
+  const s=SEAL[p.st];
+  return `<span class="sealcell"><span class="stamp no ${s.cls}" title="${DOT_TXT[p.st]}">${s.txt}</span></span>`;
+}
+/* 席位状态色块：四态四色，与印章并列 —— 不再写整句状态文字（律一） */
+const PIP={composing:"warm",guessing:"on",solved:"hot",offline:"lock"};
+function seatHTML(p){
+  return `<div class="row seat" data-no="${p.no}">
+    <div class="c1">${p.no}</div>
+    <div class="c2 who">
+      <span class="av">${p.av}</span>
+      <span class="pn"><b>${p.n}</b>
+        <span class="sc"${p.live?' data-live="1"':''}>+${p.gain==null?"—":p.gain} 分</span></span>
+    </div>
+    <div class="c3">${sealHTML(p)}</div>
+  </div>`;
+}
+function renderSeats(){
+  seatsEl.innerHTML=SEATS.map(seatHTML).join("")+
+    (joined?"":`<div class="row seat-empty"><div class="c3">
+       空 席 · 等 待 入 座<a class="btn sm ghost" href="#" data-copy>邀请</a></div></div>`);
+  seatCount.textContent=SEATS.length+" / 6 席";
+  const lv=document.querySelector("[data-live]");
+  if(lv) lv.textContent="+"+(limit-elapsed>0?limit-elapsed:0)+" 秒";
+  /* 席位表是纸：四点五秒盖一次，只盖新章，不重盖满墙 */
+  const row=seatsEl.querySelector('.seat[data-no="02"] .stamp');
+  if(row && !row.dataset.inked){
+    const iv=setInterval(()=>{
+      if(row.dataset.inked){clearInterval(iv);return;}
+      if(document.body.contains(row)){row.dataset.inked="1";reanim(row,"stamping");clearInterval(iv);}
+    },4500);
+  }
+}
+function renderScore(){
+  const rows=[...SEATS].sort((a,b)=>b.sc-a.sc);
+  scoreEl.innerHTML=rows.map((p,i)=>`<div class="row srow" data-no="${p.no}">
+      <div class="c1">${pad(i+1)}</div>
+      <div class="c2"><span class="pip ${PIP[p.st]}"></span>${p.n}</div>
+      <div class="c3">${p.gain==null?"—":"+"+p.gain}</div>
+      <div class="c4"><b class="sc">${p.sc}</b> 分</div>
+    </div>`).join("");
+  /* 分数变化 = 翻牌（.flip），不是淡入 */
+  rows.forEach(p=>{
+    if(prevSc[p.no]!==undefined && prevSc[p.no]!==p.sc){
+      const el=scoreEl.querySelector(`.srow[data-no="${p.no}"] .sc`);
+      if(el) reanim(el,"flip");
+    }
+    prevSc[p.no]=p.sc;
+  });
+}
+function guessHTML(g,anim){
+  const cls=["g"];
+  if(g.hit) cls.push("hit");
+  if(g.star) cls.push("star");
+  if(anim) cls.push("in");
+  const mark=(g.hit?`<b class="g-mark">${g.hit}</b>`:"")+(g.star?`<b class="g-mark">${g.star}</b>`:"");
+  return `<li class="${cls.join(" ")}">
+    <span class="g-t">${stamp(g.ts)}</span>
+    <span class="g-who">${g.w}</span>
+    <span class="g-main">${g.t}${mark}</span>
+  </li>`;
+}
+function renderFlow(){
+  flowEl.innerHTML=GUESSES.map(g=>guessHTML({...g,ts:Date.now()-g.d*1000},false)).join("");
+  updateFlowMeta();
+}
+function sysLine(txt){
+  flowEl.insertAdjacentHTML("beforeend",`<li class="g sys in">${txt}</li>`);
+  trimFlow();
+}
+function appendGuess(g){
+  flowEl.insertAdjacentHTML("beforeend",guessHTML({...g,ts:Date.now()},true));
+  trimFlow();
+  flowEl.scrollTop=flowEl.scrollHeight;
+  updateFlowMeta();
+  bumpUnread();          /* 待办角标：一枚小圆印 */
+  broadcast();           /* 页面在后台时，记进本站广播条 */
+}
+function trimFlow(){
+  while(flowEl.children.length>18) flowEl.removeChild(flowEl.firstElementChild);
+  flowEl.scrollTop=flowEl.scrollHeight;
+}
+function updateFlowMeta(){
+  const n=flowEl.querySelectorAll(".g:not(.sys)").length;
+  const hits=flowEl.querySelectorAll(".g.hit").length;
+  flowCount.textContent=n+" 条";
+  /* 合计用 emoji 说名词（律五）：✓ 猜中 / ✕ 猜歪 / ⚡ 最快 */
+  flowSum.innerHTML=`<span><i class="ico-solo">✓</i> <b>${hits}</b></span>`+
+    `<span><i class="ico-solo">✕</i> <b>${n-hits}</b></span>`+
+    `<span><i class="ico-solo">⚡</i> <b>8.2s</b></span>`;
+  if(hitV) hitV.textContent=hits;
+}
+
+/* ---------- 5. 谜面：从抽签筒里一张张抽出来 ---- */
+function paintTube(){
+  const left=PUZZLE.length-pieceI;
+  tubeLeft.textContent=left;
+  reanim(tubeLeft,"flip");
+}
+function place(i,anim){
+  const p=PUZZLE[i];
+  if(!p) return;
+  const el=document.createElement("span");
+  el.className=anim?"pc slot-draw":"pc";
+  el.textContent=p.e;
+  el.style.cssText=`left:${p.x}%;top:${p.y}%;--s:${p.s};--r:${p.r}deg`;
+  cvEl.appendChild(el);
+  pieceV.textContent=(i+1)+"/"+PUZZLE.length;
+  reanim(pieceV,"flip");
+  paintTube();
+  cvEl.setAttribute("aria-label",`当前谜面：阿野正在拼，已落 ${i+1} 枚 emoji`);
+}
+
+/* ---------- 6. 叫号：轮到谁，哪个窗口牌就亮 ---- */
+function renderSigns(act){
+  winSigns.innerHTML=WINDOWS.map(w=>
+    `<span class="window-sign${w.w===act?' on':''}"><b>${w.w}</b>${w.t}</span>`).join("");
+}
+function callNext(){
+  const who=CALLERS[door% CALLERS.length];
+  door++;
+  const no="A"+pad(door);
+  queueNo.textContent=no;
+  reanim(queueNo,"called");
+  const act=WINDOWS[door%WINDOWS.length].w;
+  renderSigns(act);
+  queueHint.innerHTML=`<b style="color:var(--amber)">${no}</b> · ${who} · ${act}`;
+  sysLine(`叫号 ${no} · ${who} · ${act}`);
+}
+
+/* ---------- 7. 倒计时：真走，到 0 重置 ---- */
+function paint(){
+  const left=Math.max(0,limit-elapsed);
+  if(cdEl.textContent!==String(left)) reanim(cdEl,"flip");
+  cdEl.textContent=left;
+  tickFill.style.width=(left/limit*100).toFixed(1)+"%";
+  const urgent=left<=15;
+  cdEl.classList.toggle("urgent",urgent);
+  tickEl.classList.toggle("urgent",urgent);
+  if(elapsedV.textContent!==String(elapsed)) reanim(elapsedV,"flip");
+  elapsedV.textContent=elapsed;
+  /* 席位上的实时读数：只剩一个数字加单位，不再写「拼图中 · 剩 Xs」（律一） */
+  const lv=document.querySelector("[data-live]");
+  if(lv) lv.textContent="+"+left+" 秒";
+}
+function newRound(){
+  elapsed=0; round++;
+  qNoEl.textContent="第 "+round+" 题";
+  sysLine(`第 ${round} 题 · 开始 · 阿野 重新拼 · 时限 ${limit}s`);
+  cvEl.querySelectorAll(".pc").forEach(n=>n.remove());
+  pieceI=0;
+  place(pieceI++,true);
+  updateFlowMeta();
+  paint();
+}
+
+/* ---------- 8. 猜测流：每隔几秒滑入一条 ---- */
+function pushGuess(){
+  let g=POOL[pi++%POOL.length];
+  if(g.w==="阿麦"&&!joined){pi--;g={w:"小舟",t:"再想想"};}
+  appendGuess(g);
+}
+function joinGuest(){
+  if(joined) return;
+  joined=true;
+  SEATS.push({...JOINER});
+  renderSeats();renderScore();
+  sysLine("阿麦 入座 05 席 · 加入抢猜");
+  updateFlowMeta();
+  broadcast();
+}
+
+/* ---------- 9. 房间设置：点一下换值 + 广播 ---------- */
+/* 反馈靠两件事：chip 自己闪一下 + 数值变了。文字条只在广播发生的 2.6 秒里存在 */
+let rhNote=null;
+function note(txt){
+  if(!txt){ if(rhNote){rhNote.remove();rhNote=null;} return; }
+  if(!rhNote){
+    rhNote=document.createElement("span");
+    rhNote.className="lbl rh-note on";
+    $("rhSet").parentNode.insertBefore(rhNote,$("rhSet"));
+  }
+  rhNote.textContent=txt;
+}
+rhSet.addEventListener("click",e=>{
+  const btn=e.target.closest(".setchip");
+  if(!btn) return;
+  const s=SETS[+btn.dataset.i];
+  s.i=(s.i+1)%s.v.length;
+  btn.querySelector("b").textContent=s.v[s.i];
+  btn.classList.add("flash");
+  setTimeout(()=>btn.classList.remove("flash"),420);
+  let extra="";
+  if(s.k==="模式"){modeTag.textContent=s.v[s.i]+" · 同房";}
+  if(s.k==="时限"){
+    limit=parseInt(s.v[s.i],10);
+    limitTxt.textContent=limit;
+    if(limit-elapsed<5){elapsed=0;extra=" · 重开";}
+    paint();
+  }
+  note(`√ ${s.k} ${s.v[s.i]}${extra}`);
+  clearTimeout(noteT);
+  noteT=setTimeout(()=>note(""),2600);
+});
+
+/* ---------- 10. 复制房间链接（导航按钮 + 空席「邀请」共用）---------- */
+async function copyRoomLink(btn){
+  const label=btn.textContent;
+  const done=()=>{btn.textContent="已复制房间链接 ✓";setTimeout(()=>btn.textContent=label,1600);};
+  const fail=()=>{btn.textContent="复制失败 · 请用地址栏";setTimeout(()=>btn.textContent=label,2200);};
+  try{ await navigator.clipboard.writeText(location.href); done(); }
+  catch(err){
+    const ta=document.createElement("textarea");
+    ta.value=location.href;ta.style.cssText="position:fixed;top:-99px;opacity:0";
+    document.body.appendChild(ta);ta.select();
+    let ok=false;try{ok=document.execCommand("copy");}catch(e2){ok=false;}
+    ta.remove();
+    ok?done():fail();
+  }
+}
+document.addEventListener("click",e=>{
+  const btn=e.target.closest("#copyLink,[data-copy]");
+  if(!btn) return;
+  e.preventDefault();
+  copyRoomLink(btn);
+});
+
+/* ============================================================
+   柜台（轴 8 + 轴 3）
+   ============================================================ */
+
+/* ---------- 11. 本站广播：页面在后台时，新到站记在页头那张条上 ---------- */
+function broadcast(){
+  if(!document.hidden) return;
+  castN++;
+  castTxt.textContent=`您有 ${castN} 条新到站`;
+  castBar.classList.remove("quiet");
+}
+document.addEventListener("visibilitychange",()=>{
+  if(document.hidden) return;
+  if(castN){castN=0;castTxt.textContent="暂无新到站";castBar.classList.add("quiet");}
+});
+
+/* ---------- 12. 待办角标：一枚小圆印，点一下就是「戳掉」 ---------- */
+function bumpUnread(){
+  unread++;
+  flowMark.textContent=unread>9?"9+":String(unread);
+  flowMark.classList.remove("faded");
+  flowMark.title=`${unread} 条新猜测 · 点一下戳掉`;
+  reanim(flowMark,"stamping");
+}
+flowMark.addEventListener("click",()=>{
+  if(!unread) return;
+  unread=0;
+  flowMark.textContent="无";
+  flowMark.classList.add("faded");
+  flowMark.title="没有新猜测";
+});
+
+/* ---------- 13. 柜台操作：右键谜面，撕 / 盖 / 印 ---------- */
+const CTX_ITEMS=[
+  {act:"tear", ico:"✂", label:"撕下票根", sub:"存进我的作品"},
+  {act:"stamp",ico:"◉", label:"盖一个章", sub:"盖在你点的地方，一定是歪的"},
+  {act:"copy", ico:"⎘", label:"复印这份", sub:"第二联比原件淡"},
+  {act:"close",ico:"✕", label:"收起操作台", sub:"也可以按 Esc"}
+];
+let ctxAt={x:0,y:0};
+function closeCtx(){
+  const m=$("ctxMenu");
+  if(m) m.remove();
+}
+function openCtx(x,y){
+  closeCtx();
+  ctxAt={x,y};
+  const m=document.createElement("div");
+  m.className="ctx"; m.id="ctxMenu"; m.setAttribute("role","menu");
+  m.innerHTML=`<div class="ctx-h"><span>柜 台 操 作 · 谜面 NO.1管51</span>
+      <span class="x" data-act="close" title="关闭">✕</span></div>`+
+    CTX_ITEMS.map(it=>`<button type="button" role="menuitem" data-act="${it.act}">
+      <span class="ci">${it.ico}</span>
+      <span class="cl">${it.label}<i>${it.sub}</i></span></button>`).join("")+
+    `<div class="ctx-f">柜台的，不是浏览器的</div>`;
+  document.body.appendChild(m);
+  const r=m.getBoundingClientRect();
+  m.style.left=Math.max(8,Math.min(x,innerWidth-r.width-8))+"px";
+  m.style.top=Math.max(8,Math.min(y,innerHeight-r.height-8))+"px";
+}
+cvEl.addEventListener("contextmenu",e=>{
+  e.preventDefault();
+  openCtx(e.clientX,e.clientY);
+});
+/* 画布上那枚常驻图标：同一个操作台的第二个入口（给不知道要右键的人） */
+const cvCtx=$("cvCtx");
+if(cvCtx) cvCtx.addEventListener("click",e=>{
+  e.stopPropagation();
+  const r=cvCtx.getBoundingClientRect();
+  openCtx(r.left,r.bottom+6);
+});
+document.addEventListener("click",e=>{
+  if(e.target.closest("#ctxMenu")) return;
+  closeCtx();
+});
+addEventListener("keydown",e=>{
+  if(e.key!=="Escape") return;
+  closeCtx();
+});
+addEventListener("scroll",closeCtx,{passive:true});
+addEventListener("resize",closeCtx);
+document.addEventListener("click",e=>{
+  const b=e.target.closest("#ctxMenu [data-act]");
+  if(!b) return;
+  const act=b.dataset.act;
+  closeCtx();
+  if(act==="tear") tearStub();
+  else if(act==="stamp") stampAt();
+  else if(act==="copy") copySheet();
+});
+
+/* 盖一个章：.stamping 落下来，盖在你右键的地方，一定是歪的 */
+function stampAt(){
+  const r=cvEl.getBoundingClientRect();
+  const x=Math.max(6,Math.min(94,(ctxAt.x-r.left)/r.width*100));
+  const y=Math.max(8,Math.min(92,(ctxAt.y-r.top)/r.height*100));
+  const txt=STAMPS[stampI++%STAMPS.length];
+  const s=document.createElement("span");
+  s.className="stamp crooked canvas-stamp";
+  s.textContent=txt;
+  s.style.left=x.toFixed(1)+"%";
+  s.style.top=y.toFixed(1)+"%";
+  s.style.transform=`translate(-50%,-50%) rotate(${(Math.random()*36-18).toFixed(1)}deg)`;
+  cvEl.appendChild(s);
+  reanim(s,"stamping");
+  while(cvEl.querySelectorAll(".canvas-stamp").length>6) cvEl.querySelector(".canvas-stamp").remove();
+  sysLine(`已盖章 · 「${txt}」 · 盖在 ${x.toFixed(0)}% / ${y.toFixed(0)}%`);
+}
+
+/* 复印这份：多印一联，第二联比原件淡（.copy2） */
+let printT=0;
+function copySheet(){
+  copies++;
+  copyTag.textContent="已 复 印 "+copies+" 份";
+  copyOut.innerHTML=`
+    <div class="cv-copy copy2" style="margin-top:14px">
+      <span class="snap" style="display:block;max-width:400px;margin:0 auto">${
+        [...cvEl.querySelectorAll(":scope > .pc")].map(p=>
+          `<span class="pc" style="left:${p.style.left};top:${p.style.top};--s:${p.style.getPropertyValue("--s")};--r:${p.style.getPropertyValue("--r")}">${p.textContent}</span>`
+        ).join("")}</span>
+      <div class="copy-tag">
+        <span class="tag-no blue">副 本</span>
+        <span class="lbl">第 ${copies} 联</span>
+      </div>
+    </div>`;
+  clearTimeout(printT);
+  printT=setTimeout(()=>{copyOut.innerHTML="";},4200);
+  sysLine(`已复印 1 份 · 共 ${copies} 份 · 第二联比原件淡`);
+}
+
+/* 撕下票根：撕线一压，真的掉出来一张存根，并在纸上打一个归档孔 */
+function tearStub(){
+  if(stubs>=3){ sysLine("已经撕到第三联了 · 再撕就没有了"); return; }
+  stubs++;
+  const no="1管51-"+(300+stubs*7);
+  if(!cvEl.querySelector(".cv-tear")){
+    const t=document.createElement("span");
+    t.className="cv-tear";
+    cvEl.appendChild(t);
+  }
+  copyOut.insertAdjacentHTML("beforeend",`
+    <div class="stubcard in torn-bottom" style="margin-top:14px">
+      <div class="top">
+        <span class="tag-no red">票 根</span>
+        <span class="tk-sm" style="font-size:12.5px">撕 下 · 第 ${stubs} 联</span>
+        <span class="lbl" style="margin-left:auto">NO. ${no}</span>
+      </div>
+      <div class="barcode"></div>
+      <div class="hint">房间 NO.1管51 · 第 ${round} 题 · 谜面由 阿野 拼</div>
+    </div>`);
+  const card=copyOut.querySelectorAll(".stubcard");
+  const last=card[card.length-1];
+  setTimeout(()=>{
+    const h=document.createElement("span");
+    h.className="hole";
+    h.style.right="12px";h.style.top="12px";
+    last.appendChild(h);
+    reanim(h,"punching");
+  },420);
+  sysLine(`票根已撕下 · NO.${no} · 存进「我的作品」`);
+}
+
+/* ---------- 14. 来访登记计数器：全站重复的装饰，本次简化删除（docs/07 病灶④） ---------- */
+
+/* ---------- 15. 控制台：给会看控制台的人留一句 ---- */
+console.log("%c 1 管 51 站 · 调 度 单 ","background:#17171B;color:#F2EFE4;font-weight:700;letter-spacing:3px;padding:3px 6px;border-bottom:3px solid #C98A0E");
+console.log("%c画布左下角那枚 🧾 就是柜台：撕下票根 / 盖一个章 / 复印这份。\n"+
+  "  谜面上点右键也行，两个入口是同一张操作台。",
+  "color:#4A4841;line-height:1.9");
+console.log("%c会看控制台的人，柜台直接放行，不用取号。","color:#1F4E9C;font-weight:700");
+
+/* ---------- 17. 启动 ---- */
+renderChips();
+renderSeats();
+renderScore();
+renderFlow();
+renderSigns("");
+for(let i=0;i<OPEN;i++) place(i,false);   // 已经落下的牌：载入即实心，不参与进场动画
+paint();
+setInterval(()=>{ if(pieceI<PUZZLE.length) place(pieceI++,true); },3400);  // 抽签筒继续出牌
+setInterval(()=>{ elapsed++; paint(); if(limit-elapsed<=0) newRound(); },1000); // 倒计时
+setInterval(pushGuess,7000);                                          // 猜测流
+setTimeout(joinGuest,10000);                                          // 阿麦入座
+callT=setTimeout(callNext,2600);                                      // 第一次叫号
+setInterval(callNext,14000);                                          // 之后每 14 秒叫一次
+</script>
+</body>
+</html>

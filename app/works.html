@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>我的作品 · 归档票根册 NO. 1管5 — 你拼我猜</title>
+<link rel="stylesheet" href="base.css">
+<style>
+/* ============================================================
+   我的作品 /me/works —— 归档票根册（v3）
+   v1 物料：票根 · 存根 · 硬投影 · 等宽 · 几乎全直角
+   轴 8：.bind 装订 / .hole 归档孔 / .tearline 撕线 /
+        .struck 红笔划掉 / .slot-draw 递出回执
+   本页只写自己的版面，零件一律取自 base.css。
+   ============================================================ */
+
+/* ---------- 页头 ---------- */
+.whead{padding:26px 0 0}
+.crumb{font-family:var(--mono);font-size:11.5px;letter-spacing:.12em;color:var(--ink-3);
+  text-decoration:none;display:inline-block;margin-bottom:20px}
+.crumb:hover{color:var(--red)}
+.mla{margin-left:auto}
+
+/* ---------- 驳回通知单：一张纸 + 一枚盖歪的红章 ---------- */
+.notice{margin-bottom:22px}
+.notice .sheet-hd .stamp{margin-left:auto}
+.ntc-t{font-size:14.5px;color:var(--ink-2);line-height:1.9}
+.ntc-t b{color:var(--ink)}
+.ntc-t b.bad{color:var(--red)}
+.notice .btn-row{margin-top:14px}
+
+/* ---------- 调阅台：筛选 / 排序 / 复印申请 ---------- */
+.ctrl{margin-bottom:8px}
+.ctrl .sheet-hd{padding:13px 18px}
+.ctrl-bd{padding:16px 20px 14px;display:grid;gap:13px}
+.ctrl-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.ctrl-row .btn{margin-left:0}
+.seg{display:inline-flex;flex-wrap:wrap;border:2px solid var(--ink);border-radius:3px;
+  overflow:hidden;background:var(--paper-4)}
+.seg button{font-family:var(--mono);font-size:12.5px;letter-spacing:.06em;padding:8px 15px;
+  border:none;border-right:1.5px solid var(--ink-4);background:var(--paper-4);color:var(--ink-2);
+  cursor:pointer;transition:.14s}
+.seg button:last-child{border-right:none}
+.seg button:hover{background:var(--paper-2);color:var(--ink)}
+.seg button.on{background:var(--paper-2);color:var(--ink);font-weight:700;
+  box-shadow:inset 0 -4px 0 var(--red)}
+.ctrl-out{border-top:1.5px dashed var(--ink-4);padding-top:10px;font-size:12px;color:var(--ink-3);
+  letter-spacing:.1em}
+.ctrl-out b{color:var(--ink)}
+/* 甜区：一条刻度（零件取自 base.css 第 17 节），不再写「太偏没人玩…」 */
+.sweetnote{display:inline-flex;align-items:center;gap:8px;margin-left:auto;
+  font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--ink-2)}
+.sweetnote .gauge{flex:none;width:104px}
+
+/* ---------- 纸质复印申请单（替代数据导出弹窗） ---------- */
+.copyform{margin-top:14px}
+.copyform .sheet-hd .stamp{margin-left:auto}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:0 26px}
+@media(max-width:620px){.fgrid{grid-template-columns:1fr}}
+.copybar{display:flex;align-items:center;gap:12px;margin-top:6px;
+  font-family:var(--mono);font-size:11.5px;letter-spacing:.14em;color:var(--ink-2)}
+.copybar .bar{flex:1;height:14px;border:2px solid var(--ink);background:var(--paper-4);
+  position:relative;overflow:hidden}
+.copybar .bar i{position:absolute;left:0;top:0;bottom:0;width:0;transition:width .2s;
+  background:repeating-linear-gradient(90deg,var(--ink) 0 3px,var(--paper-2) 3px 5px)}
+.copybar b{color:var(--red);font-variant-numeric:tabular-nums}
+.copy-ok{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;font-size:14.5px}
+.copy-ok .num{font-family:var(--mono);font-weight:700;letter-spacing:.08em;color:var(--red)}
+.urge{margin-top:10px;font-family:var(--mono);font-size:11.5px;color:var(--ink-3);
+  border-top:1.5px dashed var(--ink-4);padding-top:8px}
+.urge b{color:var(--ink)}
+
+/* ---------- 装订成册：孔要穿透装订带 ---------- */
+.bind::before{z-index:3}
+.bind-strip{z-index:2}
+
+/* ---------- 票根列表 ---------- */
+#list{display:grid;gap:24px}
+.work{scroll-margin-top:96px}
+.work .hole{right:12px;top:12px}
+.work .stub{gap:12px;padding:18px 16px;border-right:none}
+.stub-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.stub-top .wid{font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:.08em}
+.work .snap{width:100%;height:auto}
+.work .snap .pc{font-size:19px}
+.stub-bot{margin-top:auto;display:grid;gap:4px;padding-top:12px;
+  border-top:1.5px dashed var(--ink-3)}
+.stub-bot .kv{font-family:var(--mono);font-size:11px;color:var(--ink-2);letter-spacing:.04em;
+  display:flex;justify-content:space-between;gap:8px}
+.stub-bot .kv span:last-child{color:var(--ink-3)}
+
+/* 本页版式：存根与票面之间的竖撕线（.tearline 竖过来用） */
+.work .tearline.v{border-top:none;border-left:2px dashed var(--ink-3);
+  position:absolute;left:189px;top:16px;bottom:16px;width:0;margin:0;z-index:4}
+.work .tearline.v::after{left:-8px;top:-5px;padding:0 0 5px;line-height:1}
+
+.work .face{padding:20px 24px 18px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.face-hd{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-right:26px}
+.face-hd .date{margin-left:auto}
+.vis{font-size:10px;padding:3px 9px;border-width:2px}
+.work .ans{font-size:clamp(22px,2.7vw,30px);font-weight:900;letter-spacing:.24em;text-indent:.24em;
+  line-height:1.35}
+.kvs{font-family:var(--mono);font-size:12.5px;color:var(--ink-3);letter-spacing:.06em;
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.kvs b{color:var(--ink);font-weight:700}
+.kvs .sep{color:var(--ink-4)}
+
+/* 被调阅到的那张票根：打一下朱红高亮（不闪荧光） */
+.work.flash .snap{animation:flash .9s ease-out 2}
+@keyframes flash{0%,100%{box-shadow:none}
+  40%{box-shadow:0 0 0 4px rgba(211,58,44,.45)}}
+
+/* 已注销：红笔划掉，票根留在册上 */
+.work.is-void .snap{filter:grayscale(.55);opacity:.72}
+.work.is-void .kvs{color:var(--ink-4)}
+.work.is-void .kvs b{color:var(--ink-3)}
+.work.is-void .best{opacity:.72}
+/* 最佳歪解：整页最该被看到的东西 */
+.best{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;padding:8px 12px;
+  border-left:3px solid var(--red);background:rgba(211,58,44,.055)}
+.best .bq{font-family:var(--mono);font-weight:700;font-size:15.5px;color:var(--red);
+  letter-spacing:.04em;line-height:1.5}
+.best .who{font-family:var(--mono);font-size:11px;color:var(--ink-3);margin-left:auto}
+
+/* 操作 */
+.acts{display:flex;gap:8px;flex-wrap:wrap;padding-top:2px}
+.act{font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;color:var(--ink-2);
+  background:var(--paper-4);border:1.5px solid var(--ink-4);border-radius:2px;padding:5px 11px;
+  cursor:pointer;transition:.14s}
+.act:hover{border-color:var(--ink);color:var(--ink);background:var(--paper-2)}
+.act.del{color:var(--red);border-color:rgba(211,58,44,.45)}
+.act.del:hover{border-color:var(--red);background:rgba(211,58,44,.07)}
+
+/* ---------- 折叠时间线 ---------- */
+.tlwrap{margin-top:2px;padding-top:11px;border-top:1.5px dashed var(--ink-3)}
+.tlwrap>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:9px;
+  font-family:var(--mono);font-size:12px;letter-spacing:.12em;color:var(--ink-2)}
+.tlwrap>summary::-webkit-details-marker{display:none}
+.tlwrap>summary:hover{color:var(--blue)}
+.tlwrap>summary .n{color:var(--ink-3)}
+.tlwrap>summary .caret{margin-left:auto;color:var(--ink-3);transition:.2s}
+.tlwrap[open]>summary .caret{transform:rotate(180deg)}
+.tlwrap[open]>summary{color:var(--ink)}
+.tl{margin-top:12px;padding-bottom:2px}
+.tl-row{display:grid;grid-template-columns:58px 22px 1fr auto;gap:10px;align-items:start;padding:7px 0}
+.tl-t{font-family:var(--mono);font-size:12px;color:var(--ink-3);letter-spacing:.04em}
+.tl-x{position:relative;width:22px;height:22px;display:grid;place-items:center}
+.tl-row:not(:last-child) .tl-x::before{content:"";position:absolute;left:11px;top:15px;
+  bottom:-14px;border-left:1.5px dashed var(--ink-3)}
+.tl-c{font-size:13.5px;color:var(--ink-2);letter-spacing:.02em;min-width:0}
+.tl-c b{color:var(--ink);font-weight:700;margin-right:3px}
+.tl-c .g{font-family:var(--mono);color:var(--ink);letter-spacing:.04em}
+.tl-mark{font-family:var(--mono);font-size:11px;letter-spacing:.08em;white-space:nowrap}
+.tl-mark.hit{color:var(--blue);font-weight:700}
+.tl-mark.best{color:var(--red);font-weight:700}
+.tl-row.is-hit .tl-c .g{color:var(--blue)}
+.tl-row.is-best .tl-c .g{color:var(--red)}
+.tl-sum{display:flex;gap:16px;flex-wrap:wrap;margin-top:12px;padding-top:10px;
+  border-top:1.5px dashed var(--ink-4);font-family:var(--mono);font-size:10.5px;
+  letter-spacing:.08em;color:var(--ink-3)}
+.tl-sum b{color:var(--blue);font-weight:700}
+.tl-sum i{font-style:normal;color:var(--red);font-weight:700}
+
+/* ---------- 卷宗调阅（真分页，换成档案的说法） ---------- */
+.pager{margin-top:26px}
+.pager-bd{padding:16px 18px 14px;display:grid;gap:12px}
+.vol-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.vol{font-family:var(--mono);font-size:12.5px;letter-spacing:.08em;color:var(--ink-2);
+  background:var(--paper-4);border:2px solid var(--ink);border-radius:2px;padding:6px 12px;
+  cursor:pointer;box-shadow:var(--sh-1);transition:.14s;min-width:34px;text-align:center}
+.vol:hover:not(:disabled){transform:translate(-1px,-1px);box-shadow:2px 2px 0 var(--ink);color:var(--ink)}
+.vol.now{background:var(--paper-2);color:var(--ink);font-weight:700;cursor:default;
+  box-shadow:inset 0 -4px 0 var(--red)}
+.vol:disabled{opacity:.38;cursor:not-allowed;box-shadow:none}
+.vol.dots{border:none;box-shadow:none;background:none;cursor:default;color:var(--ink-4);min-width:14px}
+.vol-jump{display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+  border-top:1.5px dashed var(--ink-4);padding-top:11px}
+.vol-jump input{width:52px;border:2px solid var(--ink);border-radius:2px;background:var(--paper-4);
+  font-family:var(--mono);font-size:12.5px;text-align:center;padding:5px 2px;color:var(--ink);
+  outline:none}
+.vol-jump input:focus{border-color:var(--blue)}
+.meta{font-family:var(--mono);font-size:11px;color:var(--ink-2);letter-spacing:.06em;line-height:1.8}
+.meta b{color:var(--ink)}
+.fk{font-family:var(--mono);font-size:11.5px;letter-spacing:.14em;color:var(--ink-2)}
+.doc-t{font-family:var(--mono);font-size:11.5px;letter-spacing:.2em;color:var(--ink-2)}
+.kvs b.sweet{color:var(--red)}
+
+/* ---------- 册尾 ---------- */
+.listsec{padding-top:32px}
+.tail{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-top:34px;padding-top:18px;
+  border-top:2.5px solid var(--ink)}
+.tail .meta{margin-right:auto}
+.empty{padding:34px 22px;text-align:center}
+
+/* ---------- 回执：一张纸，签收就收走（Cookie 条的替身） ---------- */
+.receipt{position:fixed;left:0;right:0;bottom:0;z-index:900;display:flex;align-items:center;
+  gap:14px;flex-wrap:wrap;padding:14px 18px;background:var(--paper-4);
+  border-top:3px solid var(--ink);box-shadow:0 -5px 0 rgba(23,23,27,.10)}
+.receipt .rc-t{flex:1;min-width:220px;font-family:var(--mono);font-size:12px;color:var(--ink-2);
+  line-height:1.85;letter-spacing:.02em}
+.receipt .rc-t a{color:var(--blue)}
+.receipt .btn[disabled]{opacity:.4}
+
+/* ---------- 柜台递出来的回执条 ---------- */
+.slip{position:fixed;left:18px;bottom:calc(18px + var(--rch,0px));z-index:890;
+  max-width:min(440px,calc(100vw - 36px));display:flex;gap:12px;align-items:flex-start;
+  background:var(--paper-4);border:2px solid var(--ink);border-left:6px solid var(--blue);
+  border-radius:2px;box-shadow:var(--sh-2);padding:12px 14px;
+  font-family:var(--mono);font-size:12.5px;line-height:1.7;color:var(--ink-2)}
+.slip .tx{flex:1;min-width:0}
+.slip .tx b{color:var(--ink)}
+.slip .x3{flex:none;background:none;border:none;color:var(--ink-3);font-family:var(--mono);
+  font-size:14px;line-height:1;cursor:pointer;padding:2px}
+.slip .x3:hover{color:var(--red)}
+
+@media(max-width:720px){
+  .whead{padding:20px 0 0}
+  .work .stub{display:grid;grid-template-columns:104px 1fr;gap:12px 14px;align-items:center;
+    padding:14px}
+  .work .snap{grid-column:1;grid-row:1/span 2;width:104px}
+  .work .snap .pc{font-size:12.5px}
+  .stub-top{grid-column:2;grid-row:1}
+  .stub-bot{grid-column:2;grid-row:2;margin-top:0;padding-top:0;border-top:none;gap:2px}
+  /* 单栏时撕线横过来，回到 .tearline 的默认摆法 */
+  .work .tearline.v{position:static;grid-column:1/-1;border-left:none;
+    border-top:2px dashed var(--ink-3);width:auto;margin:0 14px}
+  .work .tearline.v::after{left:-4px;top:-11px;padding:0 6px 0 0}
+  .work .face{padding:14px 16px 16px}
+  .face-hd{padding-right:22px}
+  .tl-row{grid-template-columns:46px 18px 1fr;gap:8px}
+  .tl-x{width:18px}
+  .tl-row:not(:last-child) .tl-x::before{left:9px}
+  .tl-mark{grid-column:3}
+  .sweetnote{margin-left:0}
+  .bind{padding-left:26px}
+  .bind::before{left:7px}
+  .bind-strip{left:3px;width:20px}
+  .receipt{padding:12px 14px}
+  .receipt .rc-t{font-size:11.5px}
+}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="logo" href="index.html">你拼我猜<span class="no">1管51</span></a>
+    <nav>
+      <a href="plaza.html">广场</a>
+      <a href="banks.html">词库</a>
+      <a href="works.html" aria-current="page">我的作品</a>
+      <a href="me.html">我的主页</a>
+      <a href="login.html">退出</a>
+    </nav>
+    <a class="btn sm" href="#">开始拼一题</a>
+  </div>
+</header>
+
+<main>
+
+<!-- ============ 页头 · 驳回通知单 · 调阅台 ============ -->
+<section class="whead">
+  <div class="wrap">
+    <a class="crumb" href="me.html">← 返回通行证 NO. 1管51</a>
+
+    <!-- 驳回通知单：不作弹窗，就是一张钉在册子最上面的纸 -->
+    <div class="sheet notice" id="notice">
+      <div class="sheet-hd">
+        <span class="tag-no red">驳 回 通 知 单</span>
+        <span class="meta">本册第 <span id="psIdx">1 / 3</span> 单</span>
+        <span class="stamp crooked" id="psStamp">驳 回</span>
+      </div>
+      <div class="sheet-bd">
+        <p class="ntc-t" id="psTxt">—</p>
+        <div class="btn-row">
+          <button class="btn sm" id="psGo" type="button">调阅这件作品</button>
+          <button class="btn ghost sm" id="psNext" type="button">下一条</button>
+          <button class="btn ghost sm" id="psX" type="button">收 起</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec-head reveal">
+      <span class="tag">归 档 票 根</span>
+      <h2>我的作品</h2>
+    </div>
+
+    <div class="sheet ctrl reveal">
+      <div class="sheet-hd">
+        <span class="tag-no">归档册 NO. 1管5</span>
+        <span class="meta">出题人 阿野 · 1管51-051</span>
+        <span class="meta mla">全册 128 件 · 平均猜中率 47%</span>
+      </div>
+      <div class="sheet-bd ctrl-bd">
+        <div class="ctrl-row">
+          <span class="fk">可 见 性</span>
+          <div class="seg" id="visSeg">
+            <button data-vis="all" class="on" type="button">全部 8</button>
+            <button data-vis="public" type="button">公开 5</button>
+            <button data-vis="private" type="button">私密 3</button>
+          </div>
+        </div>
+        <div class="ctrl-row">
+          <span class="fk">排 序</span>
+          <div class="seg" id="sortSeg">
+            <button data-sort="new" class="on" type="button">最新</button>
+            <button data-sort="hot" type="button">最热</button>
+            <button data-sort="rate" type="button">最难在前</button>
+          </div>
+          <span class="sweetnote">甜区
+            <span class="gauge" title="甜区 40~60%"><span class="track"><i class="band" style="left:40%;right:40%"></i></span></span>
+          </span>
+        </div>
+        <div class="ctrl-row">
+          <span class="fk">数 据</span>
+          <button class="btn sm dark" id="expBtn" type="button">申 请 复 印</button>
+        </div>
+        <div class="ctrl-out mono" id="countLine">显示 8 / 8 件</div>
+      </div>
+    </div>
+
+    <!-- 纸质复印申请单（内联，不走弹窗） -->
+    <div class="sheet copyform" id="copyForm" hidden>
+      <div class="sheet-hd">
+        <span class="tag-no">表 NO. 1管51-C</span>
+        <span class="doc-t">纸 质 复 印 申 请 单</span>
+        <span class="stamp round" id="copySeal" hidden>受 理</span>
+      </div>
+      <div class="sheet-bd">
+        <div class="fgrid">
+          <div class="field">
+            <label>申 请 人</label>
+            <input type="text" id="expName" value="阿野" maxlength="20">
+          </div>
+          <div class="field">
+            <label>证 件 编 号</label>
+            <input type="text" id="expId" value="1管51-051" maxlength="20">
+          </div>
+          <div class="field">
+            <label>复 印 用 途</label>
+            <input type="text" id="expWhy" value="存档 / 自娱自乐 / 说不清" maxlength="40">
+          </div>
+          <div class="field">
+            <label>份 数 与 格 式</label>
+            <input type="text" id="expFmt" value="1 份 · CSV（柜台电脑上那份）" maxlength="40">
+          </div>
+        </div>
+        <p class="meta">受理人 柜台那位 · 午休不在</p>
+
+        <div class="btn-row" id="copyAct1" style="margin-top:16px">
+          <button class="btn" id="copySubmit" type="button">提 交 申 请</button>
+          <button class="btn ghost" id="copyCancel" type="button">不必了</button>
+        </div>
+
+        <div id="copyRun" hidden style="margin-top:16px">
+          <div class="copybar"><span>复 印 中</span><span class="bar"><i id="copyBar"></i></span><b id="expPct">0%</b></div>
+          <p class="meta" style="margin-top:10px">正在读取 128 件作品 …</p>
+        </div>
+
+        <div id="copyDone" hidden>
+          <hr class="dash">
+          <p class="copy-ok">✓ 已受理 · 编号 <span class="num" id="expNo">EX-20251004-0517</span>
+            <span class="tag-out copy2">第 2 份 · 复印件</span></p>
+          <p class="meta" style="margin-top:8px">预计 <b>3-5 个工作日</b> · 放置于柜台电脑桌面</p>
+          <div class="btn-row" style="margin-top:14px">
+            <button class="btn sm ghost" id="copyUrge" type="button">催 办</button>
+            <button class="btn sm ghost" id="copyClose" type="button">收 起 申 请 单</button>
+          </div>
+          <p class="urge" id="expUrge">催办记录 · 0 次</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 票根册（装订 + 打孔） ============ -->
+<section class="listsec">
+  <div class="wrap">
+    <div class="bind">
+      <span class="bind-strip" aria-hidden="true"></span>
+      <div id="list" class="reveal"></div>
+    </div>
+
+    <!-- 卷宗调阅（真分页） -->
+    <div class="pager sheet" id="pager" aria-label="卷宗调阅"></div>
+
+    <div class="tail">
+      <span class="meta">本册 128 件 · 收录 <b id="tailN">8</b> 件 · 每卷 4 件</span>
+      <button class="btn ghost sm" id="psBack" type="button">调阅驳回单</button>
+      <a class="btn ghost sm" href="me.html">回通行证</a>
+      <a class="btn sm" href="#">再拼一题</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <span>你拼我猜 · 用 emoji 说话</span>
+    <span>归档票根册 NO. 1管5 · 制册处</span>
+  </div>
+</footer>
+
+<!-- ============ 回执（Cookie 条的替身：签收就收走） ============ -->
+<div class="receipt" id="receipt" hidden>
+  <span class="tag-no">回 执</span>
+  <span class="rc-t">小纸条记住你翻到第几卷 · <a href="#" id="rcMore">《账号协议》</a>在通行证背面</span>
+  <button class="btn sm" id="rcOk" type="button">签 收</button>
+  <button class="btn ghost sm" id="rcNo" type="button">拒 签</button>
+</div>
+
+<!-- ============ 柜台递出来的回执条 ============ -->
+<div class="slip" id="slip" hidden role="status">
+  <span class="tx" id="slipTx"></span>
+  <button class="x3" id="slipX" type="button" aria-label="收起回执">✕</button>
+</div>
+
+<script>
+/* 归档册 NO. 1管5 · 页面脚本 */
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+
+/* ---------- 落点表：前 u 个生效；--s / --r 原样保留，那是作品的笔迹 ---------- */
+const LAYOUT=[
+  {x:50,y:70,s:2.5,r:-5},{x:52,y:44,s:1.5,r:4},{x:75,y:58,s:1.35,r:24},
+  {x:25,y:30,s:1.15,r:-15},{x:78,y:22,s:1.05,r:18},{x:24,y:76,s:1.25,r:-24}
+];
+
+/* ---------- 作品 ---------- */
+const WORKS=[
+ {id:"1管5-128",a:"火上浇油",cat:"成语俗语",u:3,vis:"public",at:"2025.10.02",
+  hits:212,rate:38,best:"烧开水",bestWho:"访客",open:true,
+  d:["🔥","⛽","💧","🪵","🌫️","🧯","🕯️","☀️","🥵","🚒"],
+  tl:[{t:"14:02",w:"小舟",g:"烧开水"},
+      {t:"14:05",w:"Lina",g:"火上浇油",hit:1,ms:"8.2s"},
+      {t:"14:07",w:"老陈",g:"灭火器广告"},
+      {t:"14:09",w:"访客",g:"厨房事故",best:1},
+      {t:"14:12",w:"小舟",g:"油炸冰溜子"},
+      {t:"14:16",w:"阿白",g:"火锅底料"}]},
+
+ {id:"1管5-127",a:"让子弹飞",cat:"影视",u:4,vis:"public",at:"2025.09.26",
+  hits:86,rate:24,best:"打鸟",bestWho:"老陈",limit:"猜中率过低 · 已驳回",
+  d:["🔫","🎯","💨","🕊️","🎬","🎥","🍿","🏃","🪶","🧨"],
+  tl:[{t:"09:31",w:"老陈",g:"打鸟",best:1},
+      {t:"09:34",w:"小舟",g:"子弹出膛"},
+      {t:"09:40",w:"Lina",g:"让子弹飞",hit:1,ms:"42.0s"},
+      {t:"09:47",w:"阿白",g:"和平鸽"},
+      {t:"10:02",w:"访客",g:"瞄准月亮"}]},
+
+ {id:"1管5-126",a:"一剪梅",cat:"歌名歌词",u:3,vis:"public",at:"2025.09.14",
+  hits:41,rate:51,best:"剪花枝",bestWho:"小舟",
+  d:["✂️","🌸","🌺","🎵","🏮","❄️","🌿","🖌️","📜","🍃"],
+  tl:[{t:"21:10",w:"小舟",g:"剪花枝",best:1},
+      {t:"21:16",w:"Lina",g:"一剪梅",hit:1,ms:"11.3s"},
+      {t:"21:19",w:"访客",g:"梅花三弄"},
+      {t:"21:24",w:"阿白",g:"冬天来了"}]},
+
+ {id:"1管5-119",a:"海底捞月",cat:"成语俗语",u:4,vis:"private",at:"2025.08.30",
+  hits:63,rate:41,best:"水里的月亮",bestWho:"阿白",
+  d:["🌊","⬇️","🥄","🌙","🐟","🪣","⛵","🕳️","✨","🎣"],
+  tl:[{t:"20:41",w:"阿白",g:"水里的月亮",best:1},
+      {t:"20:45",w:"小舟",g:"捞鱼"},
+      {t:"20:52",w:"访客",g:"海底捞月",hit:1,ms:"19.6s"},
+      {t:"21:03",w:"老陈",g:"月亮掉海里了"}]},
+
+ {id:"1管5-112",a:"加班到天亮",cat:"日常短语",u:3,vis:"public",at:"2025.08.11",
+  hits:45,rate:19,best:"程序员续命",bestWho:"老陈",limit:"猜中率过低 · 已驳回",
+  d:["💻","🌙","🌅","☕","😵","🕛","📊","🍜","🔋","🛋️"],
+  tl:[{t:"01:12",w:"老陈",g:"程序员续命",best:1},
+      {t:"01:20",w:"小舟",g:"熬夜"},
+      {t:"01:44",w:"阿白",g:"上班摸鱼"},
+      {t:"02:06",w:"访客",g:"日出"},
+      {t:"09:31",w:"Lina",g:"加班到天亮",hit:1,ms:"3m08s"}]},
+
+ {id:"1管5-104",a:"亡羊补牢",cat:"成语俗语",u:6,vis:"private",at:"2025.07.23",
+  hits:97,rate:29,best:"给羊盖房子",bestWho:"小舟",
+  d:["🐑","💨","🕳️","🧱","🔨","🏠","🚧","🪚","🐺","🌾"],
+  tl:[{t:"16:20",w:"小舟",g:"给羊盖房子",best:1},
+      {t:"16:24",w:"Lina",g:"修羊圈"},
+      {t:"16:31",w:"老陈",g:"亡羊补牢",hit:1,ms:"27.4s"},
+      {t:"16:40",w:"访客",g:"牧羊人"},
+      {t:"16:52",w:"阿白",g:"羊跑了"}]},
+
+ {id:"1管5-097",a:"望梅止渴",cat:"成语俗语",u:4,vis:"public",at:"2025.06.30",
+  hits:158,rate:22,best:"画饼充饥",bestWho:"访客",limit:"猜中率过低 · 已驳回",
+  d:["👀","🍑","💧","🏜️","🥵","🧠","☀️","🐎","🫗","😋"],
+  tl:[{t:"12:04",w:"访客",g:"画饼充饥",best:1},
+      {t:"12:11",w:"小舟",g:"想吃梅子"},
+      {t:"12:19",w:"老陈",g:"望梅止渴",hit:1,ms:"15.8s"},
+      {t:"12:30",w:"Lina",g:"沙漠行军"}]},
+
+ {id:"1管5-088",a:"半途而废",cat:"成语俗语",u:5,vis:"private",at:"2025.06.08",
+  hits:38,rate:57,best:"走到一半回家",bestWho:"阿白",
+  d:["🚶","🛣️","⛰️","🎒","🕛","↩️","🛑","🍜","😮‍💨","🏠"],
+  tl:[{t:"18:40",w:"阿白",g:"走到一半回家",best:1},
+      {t:"18:47",w:"小舟",g:"放弃"},
+      {t:"19:02",w:"老陈",g:"半途而废",hit:1,ms:"36.2s"}]}
+];
+
+/* ---------- 工具 ---------- */
+const PER=4;
+const visName=v=>v==="all"?"全部":v==="public"?"公开":"私密";
+const isLimited=w=>!!w.limit;
+const isSweet=r=>r>=40&&r<=60;
+
+/* ---------- 回执条：柜台递出来的那张小纸 ---------- */
+const slipEl=$("#slip");
+let slipT=null;
+function slip(html,ms){
+  $("#slipTx").innerHTML=html;
+  slipEl.hidden=false;
+  slipEl.classList.remove("slot-draw");void slipEl.offsetWidth;
+  slipEl.classList.add("slot-draw");
+  clearTimeout(slipT);
+  slipT=setTimeout(()=>{slipEl.hidden=true;},ms||5400);
+}
+$("#slipX").onclick=()=>{clearTimeout(slipT);slipEl.hidden=true;};
+
+/* ---------- 票根 ---------- */
+function snapHTML(w){
+  return `<div class="snap">`+w.d.slice(0,w.u).map((e,i)=>
+    `<span class="pc" style="left:${LAYOUT[i].x}%;top:${LAYOUT[i].y}%;--s:${LAYOUT[i].s};--r:${LAYOUT[i].r}deg">${e}</span>`
+  ).join("")+`</div>`;
+}
+
+function rowHTML(r){
+  const cls=r.hit?"is-hit":(r.best?"is-best":"");
+  const dot=r.hit?"guessing":(r.best?"solved":"offline");
+  const mark=r.hit?`<span class="tl-mark hit">✓ 猜中 · 用时 ${r.ms}</span>`
+           :r.best?`<span class="tl-mark best">★ 最佳歪解</span>`
+           :`<span class="tl-mark" style="color:var(--ink-4)">未 中</span>`;
+  return `<div class="tl-row ${cls}">
+    <span class="tl-t">${r.t}</span>
+    <span class="tl-x"><i class="dot ${dot}"></i></span>
+    <span class="tl-c"><b>${r.w}</b>猜「<span class="g">${r.g}</span>」</span>
+    ${mark}
+  </div>`;
+}
+
+function cardHTML(w){
+  const voided=!!w.void;
+  const vis=w.vis==="public"
+    ? `<span class="stamp oval blue vis">公 开</span>`
+    : `<span class="stamp ink vis">私 密</span>`;
+  const hits=w.tl.filter(r=>r.hit).length;
+  const rej=isLimited(w)?`<span class="tag-out">已驳回</span>`:"";
+  const delBtn=voided
+    ? `<button class="act" data-act="del">恢复入册</button>`
+    : `<button class="act del" data-act="del">注销</button>`;
+  return `<article class="ticket work${voided?" is-void":""}" id="w-${w.id}" data-id="${w.id}" data-vis="${w.vis}">
+    <span class="hole punching" aria-hidden="true"></span>
+    <div class="stub">
+      <div class="stub-top">
+        <span class="wid">NO. ${w.id}</span>${rej}
+      </div>
+      ${snapHTML(w)}
+      <div class="stub-bot">
+        <div class="kv"><span>用 牌</span><span>${w.u} / 10 张</span></div>
+        <div class="kv"><span>收 录</span><span>${w.at}</span></div>
+        <div class="kv"><span>册 内</span><span>${voided?`<span class="pip off" title="已注销"></span>`:"在册"}</span></div>
+      </div>
+    </div>
+    <span class="tearline v" aria-hidden="true"></span>
+    <div class="face">
+      <div class="face-hd">
+        <span class="tag-out">${w.cat}</span>
+        ${vis}
+      </div>
+      <h3 class="tk-sm ans${voided?" struck":""}">${w.a}</h3>
+      <div class="kvs">
+        <span>用了 <b>${w.u}</b> 张</span><span class="sep">·</span>
+        <span>被猜 <b>${w.hits}</b> 次</span><span class="sep">·</span>
+        <span>猜中 <b${isSweet(w.rate)?' class="sweet"':""}>${w.rate}%</b></span>
+      </div>
+      <div class="best">
+        <span class="tag-no red">最佳歪解</span>
+        <span class="bq${voided?" struck":""}">「${w.best}」</span>
+        <span class="who">— ${w.bestWho}</span>
+      </div>
+      <div class="acts">
+        <button class="act" data-act="resend">重发链接</button>
+        <button class="act" data-act="edit">改答案</button>
+        <button class="act" data-act="vis">改可见性</button>
+        ${delBtn}
+      </div>
+      <details class="tlwrap"${w.open?" open":""} data-tl="${w.id}">
+        <summary>猜测时间线<span class="n">${w.tl.length} 条</span><span class="caret">▾</span></summary>
+        <div class="tl">${w.tl.map(rowHTML).join("")}</div>
+        <div class="tl-sum">
+          <span>本段时间线 · 猜中 <b>${hits}</b> 次</span>
+        </div>
+      </details>
+    </div>
+  </article>`;
+}
+
+/* ============================================================
+   状态：筛选 / 排序 / 卷（真分页）
+   ============================================================ */
+const state={vis:"all",sort:"new",page:1};
+const openSet=new Set(WORKS.filter(w=>w.open).map(w=>w.id));
+const sortName=()=>state.sort==="new"?"最新":state.sort==="hot"?"最热":"猜中率（最难在前）";
+const voidCount=()=>WORKS.filter(w=>w.void).length;
+
+function filtered(){
+  let list=WORKS.filter(w=>state.vis==="all"||w.vis===state.vis);
+  if(state.sort==="new")  list=list.slice().sort((a,b)=>b.at.localeCompare(a.at)||b.id.localeCompare(a.id));
+  if(state.sort==="hot")  list=list.slice().sort((a,b)=>b.hits-a.hits);
+  if(state.sort==="rate") list=list.slice().sort((a,b)=>a.rate-b.rate);
+  return list;
+}
+let pageCount=()=>Math.max(1,Math.ceil(filtered().length/PER));
+
+function render(){
+  refreshSeg();
+  const all=filtered(), pages=Math.max(1,Math.ceil(all.length/PER));
+  if(state.page>pages)state.page=pages;
+  if(state.page<1)state.page=1;
+  const list=all.slice((state.page-1)*PER,state.page*PER);
+
+  $("#list").innerHTML=list.length?list.map(cardHTML).join("")
+    :`<div class="sheet stubcard empty">
+        <span class="tag-out">空 册</span>
+        <p class="meta" style="margin-top:12px">本卷无票根</p>
+      </div>`;
+  $("#list").querySelectorAll("details").forEach(d=>{d.open=openSet.has(d.dataset.tl)});
+
+  const vc=voidCount();
+  $("#countLine").innerHTML=`显示 <b>${list.length}</b> / ${all.length} 件`
+    +` · 第 <b>${state.page}</b> / ${pages} 卷`
+    +` · 排序 <b>${sortName()}</b>`
+    +` · 可见性 <b>${visName(state.vis)}</b>`
+    +(vc?` · 已注销 <b>${vc}</b> 件`:"");
+  $("#tailN").textContent=all.length;
+  renderPager(all.length,pages);
+}
+
+/* 分段按钮上的件数跟着数据走 */
+function refreshSeg(){
+  document.querySelectorAll("#visSeg button").forEach(b=>{
+    const v=b.dataset.vis;
+    b.textContent=`${visName(v)} ${v==="all"?WORKS.length:WORKS.filter(w=>w.vis===v).length}`;
+  });
+}
+
+/* ---------- 卷宗调阅：首卷 上一卷 一二三… 下一卷 末卷 + 调阅第 N 卷 ---------- */
+function pageList(cur,total){
+  if(total<=7) return Array.from({length:total},(_,i)=>i+1);
+  if(cur<=4)   return [1,2,3,4,5,"…",total];
+  if(cur>=total-3) return [1,"…",total-4,total-3,total-2,total-1,total];
+  return [1,"…",cur-1,cur,cur+1,"…",total];
+}
+function renderPager(n,pages){
+  const P=$("#pager"),cur=state.page;
+  P.innerHTML=`
+    <div class="sheet-hd">
+      <span class="tag-no">调 阅 卷 宗</span>
+      <span class="meta">每卷 ${PER} 件</span>
+      <span class="meta mla">现存 ${pages} 卷</span>
+    </div>
+    <div class="sheet-bd pager-bd">
+      <div class="vol-row">
+        <button class="vol" data-p="1" ${cur===1?"disabled":""} type="button">首 卷</button>
+        <button class="vol" data-p="${cur-1}" ${cur===1?"disabled":""} type="button">上一卷</button>
+        ${pageList(cur,pages).map(p=>p==="…"
+          ? `<span class="vol dots">…</span>`
+          : `<button class="vol ${p===cur?"now":""}" data-p="${p}" ${p===cur?"disabled":""} type="button">${p}</button>`).join("")}
+        <button class="vol" data-p="${cur+1}" ${cur===pages?"disabled":""} type="button">下一卷</button>
+        <button class="vol" data-p="${pages}" ${cur===pages?"disabled":""} type="button">末 卷</button>
+      </div>
+      <div class="vol-jump">
+        <span class="fk">调 阅 第</span>
+        <input id="pgIn" type="text" inputmode="numeric" value="${cur}" aria-label="卷号">
+        <span class="fk">卷</span>
+        <button class="vol" id="pgJump" type="button">调 阅</button>
+        <span class="meta" style="margin-left:auto">正在调阅 <b class="flip">第 ${cur} 卷</b> / 共 ${pages} 卷</span>
+      </div>
+      <p class="meta">本册共 ${n} 件 · 每卷 ${PER} 件</p>
+    </div>`;
+
+  P.querySelectorAll("button[data-p]").forEach(b=>b.onclick=()=>goto(+b.dataset.p));
+  $("#pgJump").onclick=()=>goto(+($("#pgIn").value||1));
+  $("#pgIn").addEventListener("keydown",e=>{if(e.key==="Enter")goto(+($("#pgIn").value||1))});
+}
+function goto(p){
+  const pages=pageCount();
+  state.page=Math.min(Math.max(1,p|0),pages);
+  render();
+  $("#pager").scrollIntoView({block:"start",behavior:"smooth"});
+}
+
+/* ---------- 筛选 / 排序交互 ---------- */
+document.querySelectorAll("#visSeg button").forEach(b=>b.onclick=()=>{
+  state.vis=b.dataset.vis;
+  state.page=1;   /* 换筛选后回到第 1 卷，否则会落在空白卷 */
+  document.querySelectorAll("#visSeg button").forEach(x=>x.classList.toggle("on",x===b));
+  render();
+});
+document.querySelectorAll("#sortSeg button").forEach(b=>b.onclick=()=>{
+  state.sort=b.dataset.sort;
+  state.page=1;
+  document.querySelectorAll("#sortSeg button").forEach(x=>x.classList.toggle("on",x===b));
+  render();
+});
+
+/* 记住哪些时间线是展开的（toggle 不冒泡，用捕获） */
+$("#list").addEventListener("toggle",e=>{
+  const d=e.target;
+  if(!d.dataset||!d.dataset.tl)return;
+  d.open?openSet.add(d.dataset.tl):openSet.delete(d.dataset.tl);
+},true);
+
+/* ---------- 票根操作：注销 = 红笔划掉，票根留在册上 ---------- */
+$("#list").addEventListener("click",e=>{
+  const b=e.target.closest(".act");if(!b)return;
+  const card=b.closest(".work"),id=card.dataset.id;
+  const w=WORKS.find(x=>x.id===id);if(!w)return;
+  const act=b.dataset.act;
+
+  if(act==="vis"){
+    w.vis=w.vis==="public"?"private":"public";
+    render();
+    slip(`NO. ${id} 已改为 <b>${visName(w.vis)}</b>`);
+    return;
+  }
+  if(act==="del"){
+    if(!w.void){
+      if(!b.dataset.confirm){
+        b.dataset.confirm="1";b.textContent="确认用红笔划掉？";
+        setTimeout(()=>{if(document.body.contains(b)){b.textContent="注销";delete b.dataset.confirm;}},2800);
+        return;
+      }
+      w.void=true;render();
+      slip(`NO. ${id} 已用红笔划掉 · 票根仍留存本册`);
+      return;
+    }
+    w.void=false;render();
+    slip(`NO. ${id} 已恢复入册`);
+    return;
+  }
+  if(act==="resend"){slip(`NO. ${id} 链接已重新生成`);return;}
+  if(act==="edit"){slip(`NO. ${id} 修改单已取出 · 改完交回 3 号窗口`);return;}
+});
+
+/* ============================================================
+   驳回通知单：一张纸，一条一条翻（原「平台限流通知」）
+   ============================================================ */
+const limited=WORKS.filter(isLimited);
+const NOTICES=[
+  {t:`本册第 <b>{ID}</b> 件《<b>{NAME}</b>》· <b class="bad">猜中率过低（{RATE}%）</b> · <b class="bad">不予放行</b> · 票根仍留存本册`,
+   go:`调阅这件作品`},
+  {t:`本册数据备份已完成 · 介质：柜台显示器上那张便利贴`,
+   go:`调阅备份说明`},
+  {t:`本册印制 <b>12</b> 卷 · 第 <b>7</b> 卷为空白卷（正常）`,
+   go:`前往调阅卷宗`}
+];
+let nIdx=0;
+function noticeRender(){
+  const p=NOTICES[nIdx];
+  let t=p.t;
+  if(nIdx===0&&limited[0]){
+    t=t.replace("{NAME}",limited[0].a).replace("{ID}",limited[0].id).replace("{RATE}",limited[0].rate);
+  }
+  $("#psTxt").innerHTML=t;
+  $("#psIdx").textContent=`${nIdx+1} / ${NOTICES.length}`;
+  $("#psGo").textContent=p.go;
+  const s=$("#psStamp");
+  s.classList.remove("stamping");void s.offsetWidth;s.classList.add("stamping");
+}
+$("#psX").onclick=()=>{$("#notice").hidden=true;};
+$("#psBack").onclick=()=>{
+  $("#notice").hidden=false;
+  $("#notice").scrollIntoView({block:"start",behavior:"smooth"});
+  noticeRender();
+};
+$("#psNext").onclick=()=>{nIdx=(nIdx+1)%NOTICES.length;noticeRender()};
+$("#psGo").onclick=()=>{
+  if(nIdx===0&&limited[0]){
+    const target=limited[0];
+    /* 被驳回的票根可能被筛选/排序/卷藏起来，先把册子翻到它那一卷 */
+    state.vis="all";state.sort="new";
+    document.querySelectorAll("#visSeg button").forEach(x=>x.classList.toggle("on",x.dataset.vis==="all"));
+    document.querySelectorAll("#sortSeg button").forEach(x=>x.classList.toggle("on",x.dataset.sort==="new"));
+    const idx=filtered().findIndex(w=>w.id===target.id);
+    state.page=Math.floor(idx/PER)+1;
+    render();
+    flash(target.id);
+    $("#notice").hidden=true;
+  }else if(nIdx===1){
+    $("#notice").hidden=true;
+    $("#expBtn").scrollIntoView({block:"center"});
+    $("#expBtn").focus();
+  }else{
+    $("#notice").hidden=true;
+    $("#pager").scrollIntoView({block:"center"});
+  }
+};
+function flash(id){
+  const el=document.getElementById("w-"+id);
+  if(!el)return;
+  el.scrollIntoView({block:"center",behavior:"smooth"});
+  el.classList.remove("flash");void el.offsetWidth;el.classList.add("flash");
+  setTimeout(()=>el.classList.remove("flash"),2200);
+}
+
+/* ============================================================
+   申请复印：一张纸质申请单，受理了才盖章（原「数据导出」三步弹窗）
+   ============================================================ */
+let urgeN=0;
+function pad(n){return String(n).padStart(2,"0")}
+function mkNo(){
+  const d=new Date();
+  return `EX-${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}`;
+}
+$("#expBtn").onclick=()=>{
+  const f=$("#copyForm");
+  f.hidden=false;
+  $("#copyAct1").hidden=false;
+  $("#copyRun").hidden=true;
+  $("#copyDone").hidden=true;
+  $("#copySeal").hidden=true;
+  $("#copyBar").style.width="0%";
+  $("#expPct").textContent="0%";
+  urgeN=0;
+  $("#expUrge").innerHTML="催办记录 · 0 次";
+  $("#expNo").textContent=mkNo();
+  f.scrollIntoView({block:"center",behavior:"smooth"});
+  setTimeout(()=>$("#expName").focus(),320);
+};
+$("#copyCancel").onclick=()=>{$("#copyForm").hidden=true;};
+$("#copyClose").onclick=()=>{$("#copyForm").hidden=true;};
+$("#copySubmit").onclick=()=>{
+  $("#copyAct1").hidden=true;
+  $("#copyRun").hidden=false;
+  let p=0;
+  const iv=setInterval(()=>{
+    p=Math.min(100,p+6+Math.ceil(Math.random()*8));
+    $("#copyBar").style.width=p+"%";
+    $("#expPct").textContent=p+"%";
+    if(p>=100){
+      clearInterval(iv);
+      setTimeout(()=>{
+        $("#copyRun").hidden=true;
+        $("#copyDone").hidden=false;
+        const s=$("#copySeal");
+        s.hidden=false;
+        requestAnimationFrame(()=>s.classList.add("stamping"));
+        slip(`复印申请已受理 · 编号 <b>${$("#expNo").textContent}</b>`);
+      },420);
+    }
+  },260);
+};
+$("#copyUrge").onclick=()=>{
+  urgeN++;
+  const lines=["柜台正在午休。","已升级至「老板」。","顺序不变，已记录在案。","建议 3-5 个工作日后再来。"];
+  $("#expUrge").innerHTML=`催办记录 · <b>${urgeN}</b> 次。${lines[Math.min(urgeN,lines.length)-1]}`;
+  slip(`催办第 <b>${urgeN}</b> 次已登记 · 顺序不变`);
+};
+
+/* ============================================================
+   回执：一张纸，签收就收走（原 Cookie 同意条）
+   ============================================================ */
+const rc=$("#receipt");
+function setRch(){document.documentElement.style.setProperty("--rch",(rc.hidden?0:rc.offsetHeight+8)+"px");}
+(function(){
+  let ok=false;
+  try{ok=sessionStorage.getItem("ypwc_receipt")==="1"}catch(e){}
+  if(!ok)rc.hidden=false;
+  setRch();
+})();
+function signRc(kind){
+  try{sessionStorage.setItem("ypwc_receipt","1")}catch(e){}
+  const s=document.createElement("span");
+  s.className="pip "+(kind==="ok"?"on":"lock");
+  s.textContent=kind==="ok"?"已签收":"拒签";
+  rc.appendChild(s);
+  requestAnimationFrame(()=>s.classList.add("stamping"));
+  rc.querySelectorAll("button").forEach(b=>b.disabled=true);
+  setTimeout(()=>{
+    rc.hidden=true;setRch();
+    slip(kind==="ok"?"回执已签收 · 归入本册第 1 卷":"回执已拒签 · 仍记入本册第 1 卷");
+  },780);
+}
+$("#rcOk").onclick=()=>signRc("ok");
+$("#rcNo").onclick=()=>signRc("no");
+$("#rcMore").onclick=e=>{
+  e.preventDefault();
+  slip("《账号协议》在通行证背面，共 12 条");
+  setTimeout(()=>{location.href="me.html#agr"},700);
+};
+window.addEventListener("resize",setRch);
+
+/* ---------- 控制台留言 ---------- */
+console.log("%c你拼我猜 · 归档票根册 NO. 1管5（v3）","background:#F2EFE4;color:#D33A2C;border:2px solid #17171B;font-family:monospace;padding:4px 10px;letter-spacing:.2em");
+console.log("%c这一册 128 件，页面上只印了 8 件。","color:#4A4841;font-family:monospace");
+console.log("%c注销不撕票根，只划一道红笔。","color:#1F4E9C;font-family:monospace");
+
+/* ---------- 进场 ---------- */
+const io=new IntersectionObserver(es=>es.forEach(e=>{
+  if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target)}}),{threshold:.06});
+document.querySelectorAll(".reveal").forEach(el=>io.observe(el));
+
+render();
+noticeRender();
+/* 带锚点进站时，帮忙翻到那一卷（回到通行证的私密件链接） */
+if(location.hash){
+  const id=decodeURIComponent(location.hash.slice(1)).replace(/^w-/,"");
+  const idx=filtered().findIndex(w=>w.id===id);
+  if(idx>=0){state.page=Math.floor(idx/PER)+1;render();setTimeout(()=>flash(id),260);}
+}
+</script>
+</body>
+</html>
