@@ -18,8 +18,11 @@
 .head h1{margin:12px 0 12px}
 .head .from{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 
-.solve{display:grid;grid-template-columns:1fr 380px;gap:26px;align-items:start;padding-top:24px}
-@media(max-width:1000px){.solve{grid-template-columns:1fr;gap:30px}}
+/* 子元素解除 min-width 下限：grid 的 1fr 是 minmax(auto,1fr)，
+   那个 auto 等于内容的 min-content，窄屏下列会被顶住不缩。 */
+.solve>*{min-width:0}
+.solve{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:26px;align-items:start;padding-top:24px}
+@media(max-width:1000px){.solve{grid-template-columns:minmax(0,1fr);gap:30px}}
 
 /* ---------- 谜面 ---------- */
 .puzzle .snap{max-width:520px;margin:0 auto;aspect-ratio:1}

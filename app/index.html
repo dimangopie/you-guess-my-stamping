@@ -31,11 +31,21 @@ section[id]{scroll-margin-top:130px}
 
 /* ---------- 首屏 ---------- */
 .hero{padding:46px 0 36px}
-.hero-grid{display:grid;grid-template-columns:1fr 1.02fr;gap:52px;align-items:center}
+/* 右列权重 1.02 → 1.15。
+   1.02 时右列最多 (1180-48-52)×1.02/2.02 = 545 —— 永远给不满 .bay 的 568，
+   于是 768px 单列下画布 504，反而比 1280px 两列下的 481 更大（非单调）。
+   1.15 时右列 = 1080×1.15/2.15 = 578 ≥ 568，两种布局一致。 */
+.hero-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:52px;align-items:center}
 /* 1240 是「右列刚好能给满 568px」的位置。
    低于它继续用两列的话，画布会被挤到 399~487 —— 比更窄的 960 还小，
    缩小窗口画布反而变大。提到 1240 之后曲线单调。 */
-@media(max-width:1240px){.hero-grid{grid-template-columns:1fr;gap:44px}}
+@media(max-width:1240px){.hero-grid{grid-template-columns:minmax(0,1fr);gap:44px}}
+/* ⚠ grid 的 1fr 其实是 minmax(auto, 1fr) —— 那个 auto 下限等于内容的 min-content。
+   .hand-row 是 10 列，min-content 约 306px，于是窄屏下列被顶住不缩，
+   画布卡在 306 不再随屏幕变小，页面横向溢出。
+   显式给 0 才能让列收缩到内容以下。 */
+.hero-grid>*{min-width:0}
+.sheet-bd>*{min-width:0}
 
 .eyebrow{display:inline-block;font-family:var(--mono);font-size:12px;letter-spacing:.2em;
   color:var(--ink-2);border:1.5px dashed var(--ink-3);border-radius:2px;
@@ -54,7 +64,7 @@ section[id]{scroll-margin-top:130px}
    而 .stage 是 aspect-ratio:1，宽度一变高度跟着变，整个 hero 随之重排。
    用户看到的就是「这块大小会突变」。
    justify-self:end 只做对齐、不参与尺寸计算，宽度从此与内容无关。 */
-.bay{display:grid;gap:10px;width:100%;max-width:568px;justify-self:end}
+.bay{display:grid;grid-template-columns:minmax(0,1fr);gap:10px;width:100%;max-width:568px;justify-self:end}
 @media(max-width:1240px){.bay{justify-self:center}}   /* 不能再用 margin:0 auto —— 会让宽度退化成 fit-content */
 .bay-hd{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 
@@ -149,7 +159,7 @@ section[id]{scroll-margin-top:130px}
    之前用 min-height + .tile 的 aspect-ratio（高度由宽度算），
    放牌过程中行高会随内容变化，一路把 .sheet-bd → .tpaper → .bay 撑大。
    现在：行高钉死，牌填满行高，不再用 aspect-ratio 反推高度。 */
-.hand-row{display:grid;grid-template-columns:repeat(10,1fr);gap:5px;height:53px}
+.hand-row{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:5px;height:53px}
 .tile{position:relative;width:auto;height:100%;min-width:0;
   border-radius:2px;display:grid;place-items:center;font-family:var(--emoji);font-size:19px;
   background:var(--paper-2);border:1.5px solid var(--ink-4);transition:.3s}
@@ -179,7 +189,7 @@ section[id]{scroll-margin-top:130px}
 
 /* ---------- 作品墙：装订成册的归档票根 ---------- */
 .archive{padding:22px 22px 22px 34px}
-.wall{display:grid;grid-template-columns:repeat(auto-fit,minmax(272px,1fr));gap:20px}
+.wall{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(272px, 100%), 1fr));gap:20px}
 .work{display:grid;grid-template-columns:108px 1fr;gap:16px}
 .work .snap{width:108px;height:108px}
 .work .snap .pc{font-size:22px}

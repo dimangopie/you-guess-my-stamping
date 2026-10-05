@@ -59,7 +59,9 @@
 .idmain .sig{margin-top:12px;font-size:12px;color:var(--ink-2);letter-spacing:.04em}
 
 /* 档案行 */
-.facts{margin:0;display:grid;grid-template-columns:repeat(2,minmax(146px,1fr));gap:12px 28px;
+/* repeat(2, …) 的硬下限是 2×146+28 = 320px，320 视口减去 padding 只有 272，必溢出。
+   min(146px,100%) 救不了两列布局（100% 更大，min 仍取 146）—— 要让**列数**能塌。 */
+.facts{margin:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(146px,100%),1fr));gap:12px 28px;
   border-left:1.5px dashed var(--ink-3);padding-left:26px}
 .facts>div{min-width:0}
 .facts dt{font-family:var(--mono);font-size:10px;letter-spacing:.18em;color:var(--ink-3)}

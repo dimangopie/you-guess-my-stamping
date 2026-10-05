@@ -21,10 +21,13 @@
 .head{padding:46px 0 6px}
 .head h1{margin:12px 0 14px}
 
-.bench{display:grid;grid-template-columns:300px 1fr 244px;gap:22px;align-items:start;
+/* 子元素解除 min-width 下限：grid 的 1fr 是 minmax(auto,1fr)，
+   那个 auto 等于内容的 min-content，窄屏下列会被顶住不缩。 */
+.bench>*{min-width:0}
+.bench{display:grid;grid-template-columns:300px minmax(0,1fr) 244px;gap:22px;align-items:start;
   padding-top:26px}
-@media(max-width:1120px){.bench{grid-template-columns:1fr 1fr}.bench .order{grid-column:1/-1}}
-@media(max-width:820px){.bench{grid-template-columns:1fr}
+@media(max-width:1120px){.bench{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.bench .order{grid-column:1/-1}}
+@media(max-width:820px){.bench{grid-template-columns:minmax(0,1fr)}
   .bench .canvas-box{order:1}.bench .wheel-box{order:2}.bench .order{order:3}}
 
 /* ---------- 转盘（静止）---------- */

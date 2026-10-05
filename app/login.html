@@ -71,7 +71,7 @@
 
 /* ---- 右栏 ---- */
 .rail{display:grid;gap:18px}
-@media(max-width:1000px){.rail{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}}
+@media(max-width:1000px){.rail{grid-template-columns:repeat(auto-fit,minmax(min(240px, 100%), 1fr))}}
 
 .take-no{text-align:center;padding:22px 18px}
 .take-no .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.24em;color:var(--ink-3)}

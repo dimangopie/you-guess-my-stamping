@@ -216,7 +216,7 @@ p.lead{color:var(--ink-2);font-size:16.5px;max-width:34em}
 .stamp.double{box-shadow:1.5px 1.5px 0 rgba(211,58,44,.32)}               /* 重影 */
 
 /* 印章墙：网格排列的章，未得留空框 */
-.sealwall{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:12px}
+.sealwall{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(112px, 100%), 1fr));gap:12px}
 .sealwall .s{aspect-ratio:1;border:1.5px dashed var(--ink-4);border-radius:2px;
   display:grid;place-items:center;padding:8px;text-align:center;background:var(--paper-4);position:relative}
 .sealwall .s.got{border-style:solid;border-color:var(--ink)}
@@ -318,7 +318,7 @@ p.lead{color:var(--ink-2);font-size:16.5px;max-width:34em}
 .g2{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
 .g3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
 .g4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
-.auto{display:grid;grid-template-columns:repeat(auto-fit,minmax(248px,1fr));gap:18px}
+.auto{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(248px, 100%), 1fr));gap:18px}
 @media(max-width:900px){.g4{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:620px){.g2,.g3,.g4{grid-template-columns:1fr}}
 
