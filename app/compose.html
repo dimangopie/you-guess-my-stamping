@@ -131,6 +131,23 @@ main>*{width:100%}
    移进制作单之后：按钮是面板里的普通块，画布列只剩一个元素，尺寸计算不再有歧义。 */
 .canvas-box{position:relative;min-height:0;min-width:0;overflow:hidden}
 /* 平时半透明、hover 才实心：不抢画布的注意力，但一直在手边。 */
+
+/* 工序自检：填满右栏下半，同时是一件真有用的东西 */
+.proc{margin-top:auto;border-top:1.5px dashed var(--ink-4);padding-top:12px}
+.proc-h{font-family:var(--mono);font-size:10px;letter-spacing:.28em;color:var(--ink-3);margin-bottom:9px}
+.proc-list{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.proc-list li{display:flex;align-items:center;gap:9px;font-family:var(--mono);font-size:11.5px;
+  color:var(--ink-3);letter-spacing:.06em}
+.proc-list li i{flex:0 0 auto;width:13px;height:13px;border:1.5px solid var(--ink-4);
+  border-radius:2px;position:relative}
+.proc-list li b{margin-left:auto;font-weight:400;color:var(--ink-3);font-size:11px}
+.proc-list li.done{color:var(--ink)}
+.proc-list li.done i{background:var(--blue);border-color:var(--blue)}
+.proc-list li.done i::after{content:"";position:absolute;left:3.5px;top:1px;width:3px;height:7px;
+  border-right:1.8px solid var(--paper);border-bottom:1.8px solid var(--paper);transform:rotate(40deg)}
+.proc-list li.done b{color:var(--blue)}
+.proc-tip{margin-top:10px;font-family:var(--mono);font-size:10.5px;line-height:1.65;
+  color:var(--ink-3);border-left:2px solid var(--amber);padding-left:8px}
 .canvas-reset{position:absolute;right:10px;bottom:10px;z-index:4;opacity:.42;
   transition:opacity .16s}
 .canvas-reset:hover,.canvas-reset:focus-visible{opacity:1}
@@ -394,6 +411,21 @@ main>*{width:100%}
         <button class="btn" id="fileBtn" disabled>封 存 交 题</button>
       </div>
       <div class="hint" style="margin-top:10px" id="fileHint">先放一张牌，再填答案</div>
+
+      <!-- 工序自检：制作单本来就该有这一栏。
+           评委：「右栏『制作单』表头到标题之间约 115px 的空带，
+           『可以封存了』以下约 115px 到底全空 —— 右栏将近四成都荒着。」
+           与其填装饰，不如填一件真有用的：告诉玩家还差哪一步。 -->
+      <div class="proc" id="proc" aria-live="polite">
+        <div class="proc-h">工 序 自 检</div>
+        <ol class="proc-list">
+          <li data-k="pick"><i></i><span>放 牌</span><b id="pkPick">0 / 10</b></li>
+          <li data-k="mark"><i></i><span>选 主 牌</span><b id="pkMark">未 选</b></li>
+          <li data-k="name"><i></i><span>填 答 案</span><b id="pkName">空</b></li>
+          <li data-k="seal"><i></i><span>封 存 交 题</span><b id="pkSeal">待 办</b></li>
+        </ol>
+        <div class="proc-tip" id="procTip">从左边转盘拖一张牌过来。</div>
+      </div>
     </div>
   </aside>
 
@@ -687,12 +719,32 @@ addEventListener("pointerup",()=>{ mode=null; });
 /* ============================================================
    制作单 / 交题
    ============================================================ */
+/* 工序自检的更新 —— 挂在已有的 refresh() 里，不另开一套状态。 */
+function refreshProc(){
+  const n=pieces.length;
+  const el=id=>document.getElementById(id);
+  const named=!!(el("ans") && el("ans").value.trim().length>0);
+  const marked=!!sel;
+  const set=(k,ok,txt)=>{const li=document.querySelector('.proc-list li[data-k="'+k+'"]');
+    if(!li) return; li.classList.toggle("done",!!ok);
+    const b=li.querySelector("b"); if(b&&txt!=null) b.textContent=txt;};
+  set("pick", n>0, n+" / 10");
+  set("mark", marked, marked?"已 选":"未 选");
+  set("name", named, named?"已 填":"空");
+  set("seal", false, "待 办");
+  const tip=el("procTip");
+  if(tip) tip.textContent = n===0 ? "从左边转盘拖一张牌过来。"
+    : !named ? "牌够了。给这堆 emoji 起个答案。"
+    : "可以封存了 —— 交到广场让别人猜。";
+}
+
 function refresh(){
   $("used").textContent=usedCount+" / 10";
   const ok=pieces.length>0 && $("ans").value.trim().length>0;
   $("fileBtn").disabled=!ok;
   $("fileHint").textContent = !pieces.length ? "先放一张牌，再填答案"
                             : (!$("ans").value.trim() ? "还差一个答案" : "可以封存了");
+  refreshProc();
 }
 $("ans").addEventListener("input",refresh);
 
