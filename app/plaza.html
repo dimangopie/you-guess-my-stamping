@@ -49,7 +49,7 @@
 .today .cd b{font-variant-numeric:tabular-nums;margin-left:9px}
 .today .cd{background:var(--screen);color:#A8B2C6;border-radius:2px;padding:9px 18px;text-align:center;
   font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;white-space:nowrap}
-.today .cd b{display:block;font-size:26px;color:var(--amber-ink);letter-spacing:.06em;
+.today .cd b{display:block;font-size:26px;color:var(--amber);letter-spacing:.06em;
   font-variant-numeric:tabular-nums;margin-top:3px}
 @media(max-width:700px){.today{grid-template-columns:1fr}.today .cd{text-align:center}}
 
@@ -113,7 +113,7 @@
 .rk .row{grid-template-columns:38px 1fr auto}
 .rk .c1{text-align:center;padding-left:8px;padding-right:8px}
 .rk .c3{text-align:right;white-space:nowrap}
-.rk .c3 b{color:var(--amber-ink)}
+.rk .c3 b{color:var(--amber)}
 .rk .sub{font-family:var(--mono);font-size:10.5px;color:#6F6C61;display:block;margin-top:2px}
 .rk .row.top1 .c1{color:var(--red-ink)}
 .rk .row.top1 .c2{color:#fff}
@@ -129,14 +129,11 @@
 .thinbar i{display:block;height:2px;width:0;background:var(--ink)}
 
 /* ---------- 夹页广告：塞在公告栏里的一张折过的纸 ---------- */
-.insert{position:relative;background:var(--paper-4);border:2px solid var(--ink);border-radius:var(--rad);
-  box-shadow:var(--sh-soft);padding:15px 44px 15px 16px;display:flex;gap:14px;align-items:center;
-  flex-wrap:wrap}
-.insert .txt{flex:1;min-width:190px;font-size:13.5px;line-height:1.7}
-.insert .txt b{color:var(--red-ink)}
-.insert .ad-x{position:absolute;top:8px;right:10px;background:none;border:none;color:var(--ink-3);
-  font-size:15px;line-height:1;cursor:pointer;padding:2px 4px}
-.insert .ad-x:hover{color:var(--ink)}
+
+
+
+
+
 .ad-note{margin:0;text-align:center;padding:2px 0}
 
 /* ---------- 热门词库 ---------- */
@@ -179,7 +176,7 @@
     <nav>
       <a href="plaza.html" aria-current="page">广场</a>
       <a href="banks.html">词库</a>
-      <a href="works.html">我的作品<span style="color:var(--amber-ink);font-size:11px"> 3</span></a>
+      <a href="works.html">我的作品<span style="color:var(--amber);font-size:11px"> 3</span></a>
       <a href="me.html">我的主页</a>
       <a href="login.html">退出</a>
     </nav>
@@ -418,26 +415,8 @@ const listEl=$("notices");
 listEl.innerHTML=NOTICES.map(p=>noticeHtml(p,false)).join("");
 
 /* ---------- 公告栏里被塞的那张广告纸（能撕，是出口） ---------- */
-function mountAd(){
-  const second=listEl.querySelectorAll(".notice")[1];
-  if(!second) return;
-  const ad=document.createElement("div");
-  ad.className="insert creased";
-  ad.innerHTML=`
-    <span class="tag-no red">夹 页</span>
-    <span class="txt">开通会员可以撤掉这张纸，<b>以及下一张</b>。</span>
-    <a class="btn sm ghost" href="index.html">了 解 一 下</a>
-    <button class="ad-x" type="button" title="撕掉这张广告纸" aria-label="撕掉这张广告纸">✕</button>`;
-  second.insertAdjacentElement("afterend",ad);
-  ad.querySelector(".ad-x").addEventListener("click",()=>{
-    const note=document.createElement("div");
-    note.className="hint ad-note";
-    note.textContent="已 撕 下 · 本 站 少 赚 0.03 元";
-    ad.insertAdjacentElement("afterend",note);
-    ad.remove();
-  });
-}
-mountAd();
+/* 夹页广告已整段删除（K3 连续两轮列为 P0）。
+   这是一个承诺「免费办理」的产品，塞收费转化话术与价目表都是自相矛盾。 */
 
 /* ---------- 筛选（读 dataset，追加的条目也吃得到） ---------- */
 let curF="all";

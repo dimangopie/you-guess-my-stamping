@@ -90,28 +90,7 @@ done
 [ "$bad" -eq 0 ] && ok "全部页面 JS 通过 node --check" || no "$bad 页语法错误"
 
 echo "── 5. 交付物新鲜度 ──"
-python3 - <<'PY' || fail=1
-import pathlib, sys
-app=pathlib.Path("app"); pv=pathlib.Path("preview")
-stale=[]
-for p in sorted(app.glob("*.html")):
-    v=pv/f"app-{p.stem}.png"
-    if not v.exists(): stale.append(f"{p.stem}(无图)")
-    elif p.stat().st_mtime>v.stat().st_mtime: stale.append(p.stem)
-for f in sorted((pv/"full").glob("*.png")):
-    sp=app/f"{f.name.split('-')[0]}.html"
-    if sp.exists() and sp.stat().st_mtime>f.stat().st_mtime: stale.append(f"full/{f.name}")
-if stale: print(f"  \033[31m✗\033[0m 截图过期: {', '.join(stale)}"); sys.exit(1)
-print("  \033[32m✓\033[0m 全部截图新于源文件")
-PY
-
-# 已删除的元素不该再出现在交付物里
-stale_kw=0
-for kw in '001337' '开通会员' '回 执' '签收' '物理拨杆' '自转转盘'; do
-  hits=$(grep -rl "$kw" preview/ README.md index.html 2>/dev/null | tr '\n' ' ')
-  [ -n "$hits" ] && { echo "     过期关键词「$kw」出现在: $hits"; stale_kw=$((stale_kw+1)); }
-done
-[ "$stale_kw" -eq 0 ] && ok "交付物无已删元素的残留描述" || no "$stale_kw 个过期关键词"
+python3 "$(dirname "$0")/tools/delivery_audit.py" || fail=1
 
 echo "── 6. 布局不变量（锁死已修过的坑）──"
 python3 "$(dirname "$0")/tools/layout_invariants.py" || fail=1

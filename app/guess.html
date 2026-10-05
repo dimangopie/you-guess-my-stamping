@@ -67,7 +67,7 @@
 .wrong .locked{padding:26px 20px;text-align:center;background:var(--screen);color:#A9B4CB;
   font-family:var(--mono);font-size:12px;line-height:2;border:2px solid var(--ink);
   border-radius:var(--rad)}
-.wrong .locked b{color:var(--amber-ink)}
+.wrong .locked b{color:var(--amber)}   /* 深底：amber-ink 只有 2.27:1 */
 .vote{background:none;border:1.5px solid #4A4841;border-radius:2px;color:#A8B2C6;
   font-family:var(--mono);font-size:11px;padding:2px 8px;cursor:pointer;line-height:1.5}
 .vote:hover{border-color:var(--amber-ink);color:var(--amber-ink)}
@@ -77,7 +77,12 @@
 .fromcard{display:flex;align-items:center;gap:12px}
 .fromcard .av{width:40px;height:40px;border:2px solid var(--ink);border-radius:2px;
   display:grid;place-items:center;font-family:var(--emoji);font-size:20px;background:var(--paper-2)}
-</style>
+
+/* .lbl 提到 --ink-2 之后，落在这块深色统计条上只有 1.43:1 ——
+   「已被猜 212 次」「猜中率 38%」等于没画。
+   深面要配深面专用的那一档（base.css 里 nav/footer 用的就是它）。 */
+.guessstat .lbl, .statm .lbl{color:#A8B2C6}
+
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#22304F">
 <link rel="icon" href="icon.svg" type="image/svg+xml">

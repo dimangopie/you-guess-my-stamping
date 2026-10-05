@@ -36,9 +36,13 @@
 .wheel .ring{position:absolute;inset:0;border:1.5px dashed var(--ink-3);border-radius:50%}
 .wheel .ring2{position:absolute;inset:16%;border:1px solid rgba(23,23,27,.16);border-radius:50%}
 
+/* 十张号码牌改矩形。base.css 白纸黑字写着「唯一的圆是转盘与印章」，
+   而这里的牌就是圆的 —— 设计系统里唯一一条被写下来的禁令，
+   被它自己的核心物件违反了。而且 23px 的 emoji 装不进 46px 的圆，
+   消防车、灭火器都溢出环外，那个圆读作「盖在 emoji 上的镜片」。 */
 .spoke{position:absolute;top:50%;left:50%;width:46px;height:46px;margin:-23px;
   display:grid;place-items:center;font-family:var(--emoji);font-size:23px;line-height:1;
-  background:var(--paper-4);border:2px solid var(--ink);border-radius:50%;
+  background:var(--paper-4);border:2px solid var(--ink);border-radius:2px;
   box-shadow:3px 3px 0 rgba(23,23,27,.16);cursor:grab;padding:0;touch-action:none;
   transform:rotate(var(--a)) translateY(-104px) rotate(calc(-1 * var(--a)));
   transition:box-shadow .14s,opacity .2s}
