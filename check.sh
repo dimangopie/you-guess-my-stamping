@@ -31,7 +31,7 @@ for f in app/*.html; do
 done
 [ "$miss" -eq 0 ] && ok "无悬空链接" || no "悬空链接 $miss 处"
 
-echo "── 1.5 标签配平 ──"
+echo "── 2. 标签配平 ──"
 python3 - <<'PY' || fail=1
 import pathlib, re, sys
 bad=[]
@@ -50,7 +50,7 @@ if not bad: print(f"  \033[32m✓\033[0m {_n} 页的 style/script/head/body/html
 sys.exit(1 if bad else 0)
 PY
 
-echo "── 2. 引用完整性（死 id / 死锚点）──"
+echo "── 3. 引用完整性（死 id / 死锚点）──"
 python3 - <<'PY' || fail=1
 import re, pathlib, sys
 bad=0
@@ -69,7 +69,7 @@ print("  \033[32m✓\033[0m 无死引用 / 无死锚点" if not bad else f"  \03
 sys.exit(1 if bad else 0)
 PY
 
-echo "── 3. 设计系统纪律 ──"
+echo "── 4. 设计系统纪律 ──"
 redef=$(grep -lE '^\.(nav|btn|sheet|ticket|stamp|seal|board|stats|meters|dot|mode|idx|stubcard|snap|hole|bind|label|slot|creased|laminated|struck|field|window-sign|queue-no|gauge|pip|ico|ibtn|say)\{' app/*.html 2>/dev/null | wc -l)
 [ "$redef" -eq 0 ] && ok "无顶格零件重定义" || no "有 $redef 页重定义了共享零件"
 
@@ -99,7 +99,7 @@ ext=$(grep -o 'https\?://' app/*.html | wc -l)
 neon=$(grep -l -E 'neon|cookiebar|captcha|sysbar' app/*.html 2>/dev/null | wc -l)
 [ "$neon" -eq 0 ] && ok "无已撤回的 v2 语言残留" || no "$neon 页残留 v2 元素"
 
-echo "── 4. 脚本语法 ──"
+echo "── 5. 脚本语法 ──"
 bad=0
 for f in app/*.html; do
   python3 -c "
@@ -113,25 +113,7 @@ if js.strip():
 done
 [ "$bad" -eq 0 ] && ok "全部页面 JS 通过 node --check" || no "$bad 页语法错误"
 
-echo "── 5. 交付物新鲜度 ──"
-python3 "$(dirname "$0")/tools/delivery_audit.py" || fail=1
-
-echo "── 6. 布局不变量（锁死已修过的坑）──"
-python3 "$(dirname "$0")/tools/layout_invariants.py" || fail=1
-
-echo "── 7. PWA 接线 ──"
-python3 "$(dirname "$0")/tools/pwa_selectors.py" || fail=1
-
-echo "── 8. 整改台账 ──"
-python3 "$(dirname "$0")/tools/verify_quotes.py" || fail=1
-if [ -f app/issues.html ]; then
-  n=$(grep -c 'class="s-' app/issues.html 2>/dev/null || echo 0)
-  [ "$n" -gt 0 ] && ok "整改台账 app/issues.html（$n 条）" || no "台账页为空"
-else
-  no "缺 app/issues.html"
-fi
-
-echo "── 3.5 对比度普查（按底色）──"
+echo "── 6. 对比度普查（按底色）──"
 python3 "$(dirname "$0")/tools/contrast_audit.py" >/tmp/_ct.txt 2>&1 || {
   grep -E '✗|画在' /tmp/_ct.txt | sed 's/^/  /' | head -12; fail=1; }
 if grep -q '全部达标' /tmp/_ct.txt; then
@@ -139,7 +121,13 @@ if grep -q '全部达标' /tmp/_ct.txt; then
   ok "对比度全部达标（$n）"
 fi
 
-echo "── 6.5 画布不变量（浏览器级）──"
+echo "── 7. 交付物新鲜度 ──"
+python3 "$(dirname "$0")/tools/delivery_audit.py" || fail=1
+
+echo "── 8. 布局不变量（锁死已修过的坑）──"
+python3 "$(dirname "$0")/tools/layout_invariants.py" || fail=1
+
+echo "── 9. 画布不变量（浏览器级）──"
 # 真渲染真测量。静态检查抓不到 fixed 溢出、横向滚动条、元素重叠、overflow 裁切 ——
 # 这几条全是「量了数值但没量关系」，必须把浏览器拉进来。
 if command -v firefox >/dev/null 2>&1 || [ -x /snap/firefox/current/usr/lib/firefox/firefox ]; then
@@ -148,13 +136,26 @@ else
   echo "     （无浏览器，跳过）"
 fi
 
-echo "── 7.5 路由单元测试 ──"
+echo "── 10. PWA 接线 ──"
+python3 "$(dirname "$0")/tools/pwa_selectors.py" || fail=1
+
+echo "── 11. 路由单元测试 ──"
 # routeTo 是纯函数，可以直接断言。跳转本身没法截图验证 ——
 # Firefox headless 的 --screenshot 抓不到「加载期就 location.replace」的页面（截图直接失败）。
 if [ -x /snap/firefox/current/usr/lib/firefox/firefox ] || command -v firefox >/dev/null 2>&1; then
   python3 "$(dirname "$0")/tools/route_test.py" || fail=1
 else
   echo "     （无浏览器，跳过）"
+fi
+
+
+echo "── 12. 整改台账 ──"
+python3 "$(dirname "$0")/tools/verify_quotes.py" || fail=1
+if [ -f app/issues.html ]; then
+  n=$(grep -c 'class="s-' app/issues.html 2>/dev/null || echo 0)
+  [ "$n" -gt 0 ] && ok "整改台账 app/issues.html（$n 条）" || no "台账页为空"
+else
+  no "缺 app/issues.html"
 fi
 
 echo
