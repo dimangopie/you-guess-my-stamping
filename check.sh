@@ -108,6 +108,9 @@ for kw in '001337' '开通会员' '回 执' '签收' '物理拨杆' '自转转�
 done
 [ "$stale_kw" -eq 0 ] && ok "交付物无已删元素的残留描述" || no "$stale_kw 个过期关键词"
 
+echo "── 6. 布局不变量（锁死已修过的坑）──"
+python3 "$(dirname "$0")/tools/layout_invariants.py" || fail=1
+
 echo
 [ "$fail" -eq 0 ] && printf '\033[32m全部通过\033[0m\n' || printf '\033[31m有检查未通过\033[0m\n'
 exit $fail

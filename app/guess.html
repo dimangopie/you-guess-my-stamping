@@ -187,7 +187,7 @@
           <b>先猜，再看别人的</b><br>
           <span style="font-size:11px">否则你会被别人的答案带走</span>
         </div>
-        <div class="board" id="board" hidden></div>
+        <div class="board scan glow-soft" id="board" hidden></div>
       </div>
     </div>
 
@@ -337,7 +337,7 @@ function renderBoard(){
       <div class="c3">${g.w}${g.you?' <span class="tag-no red" style="font-size:9.5px">刚交</span>':''}</div>
       <div class="c4">
         <button class="vote${myVote===i?" on":""}" data-i="${i}"
-                ${myVote!==null?"disabled":""}>${g.v} 票</button>
+                ${myVote!==null?"disabled":""}><span class="glow">${g.v}</span> 票</button>
       </div>
     </div>`).join("");
 }

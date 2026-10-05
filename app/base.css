@@ -232,9 +232,12 @@ p.lead{color:var(--ink-2);font-size:16.5px;max-width:34em}
    ③ **唯一可靠的路径是页面内联 <svg><defs><filter> + filter:url(#id)**。
       代价是每页多一段 6 行的 svg（见各页 <body> 之后）。
    另：作用域（x/y/width/height）必须给足 260% —— 给 140% 时位移几乎不可见。
-   参数：低频噪声 + scale 6~9 → 轮廓摆动但笔画不糊。 */
-.stamp, .wet{filter:url(#ink-soft)}
-.seal, .stamp.deep, .wet-hard{filter:url(#ink-hard)}
+   参数：低频噪声 + scale 3.2~4.6（早先用 6~9，用户反馈「太夸张」，已收）。 */
+/* 覆盖面：凡是「印上去的标记」都该有同样的油墨边缘 ——
+   只给印章加、不给标签加，会让同一套语言里出现两种质感（这是用户指出的问题）。
+   纳入：印章 · 压印 · 编号牌 · 标签 · 页眉小牌 · 窗口牌 · 票根外的各式贴标 */
+.stamp, .wet, .tag, .tag-no, .tag-out, .label, .eyebrow, .window-sign{filter:url(#ink-soft)}
+.seal, .stamp.deep, .wet-hard, .stamp.wax{filter:url(#ink-hard)}
 
 /* 圆形压印（头像/钢印用） */
 .seal{width:96px;height:96px;border:3px solid var(--red);border-radius:50%;

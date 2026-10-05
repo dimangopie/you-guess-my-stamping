@@ -61,9 +61,13 @@ section[id]{scroll-margin-top:130px}
 .gate-top{display:flex;align-items:center;gap:10px;padding-bottom:8px}
 .gate-top .gk{font-family:var(--mono);font-size:12.5px;letter-spacing:.22em;color:var(--paper)}
 /* 出票读数：编号是内容，进度是那条细实线 */
-.feed{display:flex;align-items:center;gap:12px;padding-bottom:10px}
-.feed-no{font-family:var(--mono);font-size:12px;letter-spacing:.1em;color:#B0BACC;white-space:nowrap}
-.thinbar{flex:1;height:2px;background:rgba(242,239,228,.18);min-width:80px}
+/* 出票读数行：高度必须与内容无关。
+   编号是变长的（演示循环会换号），若编号变长而 .thinbar 有 min-width:80px 顶着，
+   整行会溢出；高度也可能随字号/换行变化。这里把高度钉死、编号用等宽数字。 */
+.feed{display:flex;align-items:center;gap:12px;padding-bottom:10px;height:30px}
+.feed-no{font-family:var(--mono);font-size:12px;letter-spacing:.1em;color:#B0BACC;
+  white-space:nowrap;font-variant-numeric:tabular-nums;min-width:15ch}
+.thinbar{flex:1 1 0;min-width:0;height:2px;background:rgba(242,239,228,.18)}
 /* 细实线进度：一格一格跳，不做缓动 —— 机器是机械的 */
 .thinbar i{display:block;height:2px;width:0;background:var(--amber)}
 .gate-slot{height:9px;background:#000;margin:0 -14px;position:relative}
@@ -80,11 +84,14 @@ section[id]{scroll-margin-top:130px}
   background-size:13px 16px;background-repeat:repeat-y}
 .tpaper::before{left:4px}
 .tpaper::after{right:4px}
-.tpaper>.sheet-hd{margin:0 calc(var(--pp) * -1)}
+/* 样张抬头：#ans 会从「— — — —」变成真答案，宽度变化。
+   base 的 .sheet-hd 是 flex-wrap:wrap —— 一旦换行就 +1 行高，整个 hero 跟着跳。
+   这里是展示位，钉成单行 + 超出省略。 */
+.tpaper>.sheet-hd{flex-wrap:nowrap;overflow:hidden;margin:0 calc(var(--pp) * -1)}
 .tpaper.fed{animation:feed-out 1s cubic-bezier(.18,.85,.25,1) both}
 @keyframes feed-out{from{transform:translateY(-36px);opacity:.4}to{transform:none;opacity:1}}
 .tpaper .sheet-bd{padding:18px}
-.ans-lbl{margin-left:auto;white-space:nowrap}
+.ans-lbl{margin-left:auto;white-space:nowrap;min-width:0;overflow:hidden;text-overflow:ellipsis}
 .ans-lbl b{color:var(--ink-3)}
 .tear-full{margin:14px calc(var(--pp) * -1) 8px}
 @media(max-width:520px){.tpaper{--pp:18px}}

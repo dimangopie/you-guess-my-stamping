@@ -585,6 +585,28 @@ syncOnline();
 const io=new IntersectionObserver(es=>es.forEach(e=>{
   if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target)}}),{threshold:.1});
 document.querySelectorAll(".reveal").forEach(el=>io.observe(el));
+
+/* ── 倒计时换成翻牌 ──
+   只观察 #cd 的文本变化并重绘，不改动原有计时逻辑。
+   每次只让变了的位翻（真翻牌屏就是这样跳的）。
+   重绘后 el.textContent 与 dataset.v 相同，observer 回调早退，不会自激。 */
+(function(){
+  var el=document.getElementById("cd"); if(!el) return;
+  el.classList.add("flap");
+  function paint(){
+    var s=el.textContent;
+    if(el.dataset.v===s) return;
+    var prev=el.dataset.v||"";
+    el.dataset.v=s;
+    el.innerHTML=Array.prototype.map.call(s,function(ch,i){
+      if(!/\d/.test(ch)) return '<span style="align-self:center;opacity:.55">'+ch+'</span>';
+      var go=(prev.charAt(i)!==ch&&prev)?" go":"";
+      return '<span class="d'+go+'"><i>'+ch+'</i>'+ch+'</span>';
+    }).join("");
+  }
+  new MutationObserver(paint).observe(el,{childList:true,characterData:true,subtree:true});
+  paint();
+})();
 </script>
 </body>
 </html>

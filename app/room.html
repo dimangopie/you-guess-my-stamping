@@ -122,7 +122,7 @@
 .cd-strip{display:flex;align-items:flex-end;justify-content:space-between;gap:16px}
 .cd-box{background:var(--screen);border-radius:2px;padding:8px 18px;text-align:right}
 .cd-box .k{font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:#A8B2C6}
-.cd-v{font-family:var(--mono);font-weight:700;font-size:clamp(32px,4.4vw,50px);line-height:.95;
+/* 字号交给 .flap 控制 */.cd-v{font-size:inherit;font-family:var(--mono);font-weight:700;font-size:clamp(32px,4.4vw,50px);line-height:.95;
   color:var(--amber);font-variant-numeric:tabular-nums;transition:color .25s}
 .cd-v.urgent{color:var(--red)}
 .cd-u{font-family:var(--mono);font-size:11.5px;color:var(--ink-3);margin-left:7px;letter-spacing:.1em}
@@ -926,6 +926,28 @@ setInterval(pushGuess,7000);                                          // 猜测�
 setTimeout(joinGuest,10000);                                          // 阿麦入座
 callT=setTimeout(callNext,2600);                                      // 第一次叫号
 setInterval(callNext,14000);                                          // 之后每 14 秒叫一次
+
+/* ── 倒计时换成翻牌 ──
+   只观察 #cd 的文本变化并重绘，不改动原有计时逻辑。
+   每次只让变了的位翻（真翻牌屏就是这样跳的）。
+   重绘后 el.textContent 与 dataset.v 相同，observer 回调早退，不会自激。 */
+(function(){
+  var el=document.getElementById("cd"); if(!el) return;
+  el.classList.add("flap");
+  function paint(){
+    var s=el.textContent;
+    if(el.dataset.v===s) return;
+    var prev=el.dataset.v||"";
+    el.dataset.v=s;
+    el.innerHTML=Array.prototype.map.call(s,function(ch,i){
+      if(!/\d/.test(ch)) return '<span style="align-self:center;opacity:.55">'+ch+'</span>';
+      var go=(prev.charAt(i)!==ch&&prev)?" go":"";
+      return '<span class="d'+go+'"><i>'+ch+'</i>'+ch+'</span>';
+    }).join("");
+  }
+  new MutationObserver(paint).observe(el,{childList:true,characterData:true,subtree:true});
+  paint();
+})();
 </script>
 </body>
 </html>
