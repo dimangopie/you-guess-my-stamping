@@ -8,119 +8,124 @@
 <style>
 /* ============================================================
    拼图台 · 制作单
-   转盘发牌 → 盖章落牌 → 拨杆调姿 → 封存交题
-   物理动作：抽签（转盘）· 盖章（落牌）· 打孔（用掉）· 装订（存档）
-   声音：Web Audio 合成，不加载任何音频文件
+   转盘取牌 → 拖到画布 → 控制点调姿 → 封存交题
+
+   四条修正：
+   ① 画布是固定比例的「画板」，牌用画布相对单位定尺寸 ——
+      构图在任何尺寸下长得一样（此前用绝对 px，缩小视口就撑破画布）
+   ② 转盘不转（旋转会让点选变成打移动靶）
+   ③ 取牌 = 从转盘拖到画布，落点由玩家决定
+   ④ 缩放 / 旋转 / 图层都由控制点决定，不用滑杆
    ============================================================ */
 
 .head{padding:46px 0 6px}
 .head h1{margin:12px 0 14px}
 
-.bench{display:grid;grid-template-columns:326px 1fr 268px;gap:22px;align-items:start;
+.bench{display:grid;grid-template-columns:300px 1fr 244px;gap:22px;align-items:start;
   padding-top:26px}
-@media(max-width:1180px){.bench{grid-template-columns:1fr 1fr}.bench .order{grid-column:1/-1}}
-@media(max-width:860px){.bench{grid-template-columns:1fr}}
+@media(max-width:1120px){.bench{grid-template-columns:1fr 1fr}.bench .order{grid-column:1/-1}}
+@media(max-width:820px){.bench{grid-template-columns:1fr}
+  .bench .canvas-box{order:1}.bench .wheel-box{order:2}.bench .order{order:3}}
 
-/* ---------- 转盘发牌器 ---------- */
+/* ---------- 转盘（静止）---------- */
 .wheel-box{text-align:center}
-.wheel{position:relative;width:min(300px,80vw);aspect-ratio:1;margin:6px auto 0}
+.wheel{position:relative;width:min(268px,74vw);aspect-ratio:1;margin:4px auto 0}
 .wheel .ring{position:absolute;inset:0;border:1.5px dashed var(--ink-3);border-radius:50%}
-.wheel .ring2{position:absolute;inset:15%;border:1px solid rgba(23,23,27,.16);border-radius:50%}
-.wheel .spin{position:absolute;inset:0;animation:spin 72s linear infinite}
-.wheel:hover .spin,.wheel:focus-within .spin{animation-play-state:paused}   /* 悬停暂停，便于点选 */
-@keyframes spin{to{transform:rotate(360deg)}}
+.wheel .ring2{position:absolute;inset:16%;border:1px solid rgba(23,23,27,.16);border-radius:50%}
 
-.spoke{position:absolute;top:50%;left:50%;width:48px;height:48px;margin:-24px;
-  display:grid;place-items:center;font-family:var(--emoji);font-size:24px;line-height:1;
+.spoke{position:absolute;top:50%;left:50%;width:46px;height:46px;margin:-23px;
+  display:grid;place-items:center;font-family:var(--emoji);font-size:23px;line-height:1;
   background:var(--paper-4);border:2px solid var(--ink);border-radius:50%;
-  box-shadow:3px 3px 0 rgba(23,23,27,.16);cursor:pointer;padding:0;
-  transform:rotate(var(--a)) translateY(-118px) rotate(calc(-1 * var(--a)));
-  transition:transform .16s,box-shadow .16s,border-color .16s}
-.spoke:hover{transform:rotate(var(--a)) translateY(-118px) rotate(calc(-1 * var(--a))) scale(1.14)}
-.spoke:active{box-shadow:1px 1px 0 rgba(23,23,27,.16)}
-/* 用掉即打孔 —— 孔留在牌上（轴 B） */
-.spoke .hole{width:11px;height:11px;right:5px;top:5px;opacity:0}
+  box-shadow:3px 3px 0 rgba(23,23,27,.16);cursor:grab;padding:0;touch-action:none;
+  transform:rotate(var(--a)) translateY(-104px) rotate(calc(-1 * var(--a)));
+  transition:box-shadow .14s,opacity .2s}
+.spoke:hover{box-shadow:0 0 0 4px rgba(31,78,156,.16),3px 3px 0 rgba(23,23,27,.16)}
+.spoke:active{cursor:grabbing}
+/* 用掉即打孔 —— 孔留在牌上 */
+.spoke .hole{width:11px;height:11px;right:4px;top:4px;opacity:0;transition:opacity .2s}
+.spoke.used{opacity:.38;cursor:default}
 .spoke.used .hole{opacity:1}
-.spoke.used{opacity:.42;cursor:default}
-.spoke.used:hover{transform:rotate(var(--a)) translateY(-118px) rotate(calc(-1 * var(--a)))}
+.spoke.used:hover{box-shadow:3px 3px 0 rgba(23,23,27,.16)}
 
 .wheel .hub{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-  width:92px;height:92px;border-radius:50%;background:var(--paper-2);border:2px solid var(--ink);
+  width:84px;height:84px;border-radius:50%;background:var(--paper-2);border:2px solid var(--ink);
   display:grid;place-items:center;z-index:4;text-align:center;padding:6px}
-.wheel .hub::after{content:"";position:absolute;inset:-9px;border:1.5px dotted var(--ink-3);border-radius:50%}
-.wheel .hub .n{font-family:var(--mono);font-weight:700;font-size:24px;line-height:1}
+.wheel .hub::after{content:"";position:absolute;inset:-8px;border:1.5px dotted var(--ink-3);border-radius:50%}
+.wheel .hub .n{font-family:var(--mono);font-weight:700;font-size:23px;line-height:1}
 .wheel .hub .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;color:var(--ink-3);margin-top:3px}
+.wheel-note{margin-top:12px;display:flex;gap:10px;justify-content:center;align-items:center}
 
-.wheel-note{margin-top:14px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
-
-/* ---------- 画布 ---------- */
-.canvas-box{position:relative}
-.canvas{position:relative;aspect-ratio:1/1;max-width:560px;margin:0 auto;overflow:hidden;
-  background:var(--paper-4);border:2px solid var(--ink);border-radius:var(--rad);
-  box-shadow:var(--sh-soft);cursor:default;
+/* ---------- 画板 ---------- */
+.canvas-box{min-width:0}
+.canvas{position:relative;width:100%;max-width:520px;aspect-ratio:1/1;margin:0 auto;
+  overflow:hidden;background:var(--paper-4);border:2px solid var(--ink);border-radius:var(--rad);
+  box-shadow:var(--sh-soft);touch-action:none;
   background-image:
     repeating-linear-gradient(0deg,rgba(23,23,27,.055) 0 1px,transparent 1px 33.4%),
     repeating-linear-gradient(90deg,rgba(23,23,27,.055) 0 1px,transparent 1px 33.4%)}
+.canvas.armed{outline:2px dashed var(--blue);outline-offset:-7px}
 .canvas .ph{position:absolute;inset:0;display:grid;place-items:center;text-align:center;
   font-family:var(--mono);font-size:12px;color:var(--ink-4);line-height:2;pointer-events:none}
 
+/* 牌：尺寸用画布相对单位（--u = 画布宽度的 1%，由 JS 维护）
+   —— 这样构图在任何视口下长得一模一样 */
 .pc{position:absolute;font-family:var(--emoji);line-height:1;cursor:grab;user-select:none;
+  font-size:calc(var(--u) * 12);
   transform:translate(-50%,-50%) scale(var(--s)) rotate(var(--r));
-  filter:drop-shadow(1px 2px 0 rgba(23,23,27,.14));padding:2px;border-radius:4px;
-  outline:2px solid transparent;outline-offset:2px}
-.pc.sel{outline-color:var(--blue);cursor:grabbing}
-.pc.stamping{animation:stamp-down .3s cubic-bezier(.3,1.5,.5,1)}
+  filter:drop-shadow(1px 2px 0 rgba(23,23,27,.14));
+  padding:.04em;border-radius:.06em;touch-action:none}
+.pc.sel{cursor:move}
+.pc .g{pointer-events:none}
+.pc.stamping{animation:stamp-down .28s cubic-bezier(.3,1.5,.5,1)}
+@keyframes stamp-down{
+  0%{transform:translate(-50%,-50%) scale(calc(var(--s) * 2)) rotate(var(--r));opacity:.2}
+  60%{transform:translate(-50%,-50%) scale(calc(var(--s) * .94)) rotate(var(--r));opacity:1}
+  100%{transform:translate(-50%,-50%) scale(var(--s)) rotate(var(--r))}}
 
-/* 画布左下角常驻操作提示（图标，不是文字 —— 律二） */
-.cv-btn{position:absolute;left:10px;bottom:10px;z-index:5}
+/* 选中框与控制点：控制点反向缩放，尺寸恒定 */
+.pc.sel::before{content:"";position:absolute;inset:-.12em;border:1.5px dashed var(--blue);
+  border-radius:.1em;pointer-events:none}
+.pc .h{position:absolute;width:16px;height:16px;background:#fff;border:2px solid var(--blue);
+  border-radius:50%;transform:scale(calc(1 / var(--s)));cursor:pointer;display:none;z-index:2}
+.pc.sel .h{display:block}
+.pc .h-rot{left:50%;top:-30px;margin-left:-8px;cursor:grab}
+.pc .h-rot::after{content:"↻";position:absolute;inset:0;display:grid;place-items:center;
+  font-size:10px;color:var(--blue)}
+.pc .h-scale{right:-9px;bottom:-9px;cursor:nwse-resize;background:var(--blue)}
+.pc .h-scale::after{content:"";position:absolute;inset:3px;border-right:1.5px solid #fff;
+  border-bottom:1.5px solid #fff}
+/* 图层与删除：贴在选中框下方的小工具条 */
+.pc .pbar{position:absolute;left:50%;bottom:-46px;transform:translateX(-50%) scale(calc(1 / var(--s)));
+  display:none;gap:4px;background:var(--paper-4);border:1.5px solid var(--ink);
+  border-radius:3px;padding:3px;box-shadow:2px 2px 0 rgba(23,23,27,.18);z-index:3}
+.pc.sel .pbar{display:flex}
+.pc .pbar button{width:24px;height:24px;display:grid;place-items:center;cursor:pointer;
+  background:var(--paper-2);border:1.5px solid var(--ink-4);border-radius:2px;
+  font-family:var(--emoji);font-size:12px;line-height:1;padding:0}
+.pc .pbar button:hover{background:var(--paper-3);border-color:var(--ink)}
 
-/* ---------- 三个物理拨杆 ---------- */
-.levers{margin:16px auto 0;max-width:560px;display:grid;gap:9px;
-  background:var(--paper-2);border:2px solid var(--ink);border-radius:var(--rad);padding:14px 16px}
-.levers.off{opacity:.42;pointer-events:none}
-.lever{display:grid;grid-template-columns:58px 1fr 54px;align-items:center;gap:12px}
-.lever .nm{font-family:var(--mono);font-size:11px;letter-spacing:.16em;color:var(--ink-2)}
-.lever .vl{font-family:var(--mono);font-size:11.5px;text-align:right;color:var(--ink);
-  font-variant-numeric:tabular-nums}
-.lever input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:24px;
-  background:transparent;margin:0;cursor:pointer}
-.lever input[type=range]::-webkit-slider-runnable-track{height:8px;background:var(--paper-3);
-  border:1.5px solid var(--ink-4);border-radius:2px}
-.lever input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:15px;height:22px;
-  margin-top:-8px;background:var(--ink);border-radius:2px;border:none;
-  box-shadow:2px 1px 0 rgba(23,23,27,.28)}
-.lever input[type=range]::-moz-range-track{height:8px;background:var(--paper-3);
-  border:1.5px solid var(--ink-4);border-radius:2px}
-.lever input[type=range]::-moz-range-thumb{width:15px;height:22px;background:var(--ink);
-  border-radius:2px;border:none;box-shadow:2px 1px 0 rgba(23,23,27,.28)}
+/* 拖动中的浮牌（跟手） */
+.ghost{position:fixed;z-index:999;pointer-events:none;font-family:var(--emoji);line-height:1;
+  font-size:40px;filter:drop-shadow(2px 4px 0 rgba(23,23,27,.3));opacity:.92;
+  transform:translate(-50%,-50%)}
+.ghost.out{opacity:.35}
 
-/* ---------- 制作单（右栏） ---------- */
+/* ---------- 制作单 ---------- */
 .order .sheet-hd{gap:8px}
 .order .sheet-hd .stamp{margin-left:auto;font-size:10px;padding:3px 8px}
-.od{display:flex;align-items:baseline;gap:8px;padding:8px 0;border-bottom:1px dotted var(--ink-4);
-  font-family:var(--mono);font-size:12.5px}
-.od:last-of-type{border-bottom:none}
-.od .k{color:var(--ink-3);font-size:11px;letter-spacing:.1em;white-space:nowrap}
-.od .d{flex:1;border-bottom:1px dotted var(--ink-4);transform:translateY(-4px)}
-.od b{color:var(--ink);white-space:nowrap}
-.od b.red{color:var(--red)}.od b.blue{color:var(--blue)}
-
-.ansrow{display:flex;gap:8px;margin:6px 0 4px}
+.ansrow{display:flex;gap:8px;margin:4px 0 2px}
 .ansrow input{flex:1;border:none;border-bottom:2px solid var(--ink);background:transparent;
   font-family:var(--mono);font-size:17px;padding:6px 2px;color:var(--ink);outline:none;
   letter-spacing:.1em;border-radius:0;min-width:0}
 .ansrow input:focus{border-bottom-color:var(--blue)}
 .ansrow input::placeholder{color:var(--ink-4)}
-
-/* 音效开关 */
-.snd{display:flex;align-items:center;gap:9px;margin-top:14px;padding-top:12px;
-  border-top:1.5px dashed var(--ink-4);font-family:var(--mono);font-size:11.5px;color:var(--ink-3)}
-.snd .ibtn{margin-left:auto}
-
-/* ---------- 交题后的结果 ---------- */
-.filed{margin-top:0}
-.filed .cert{position:relative;background:var(--paper-4);border:2px solid var(--ink);
-  border-radius:var(--rad);box-shadow:var(--sh-soft);padding:22px}
+.od{display:flex;align-items:baseline;gap:8px;padding:7px 0;border-bottom:1px dotted var(--ink-4);
+  font-family:var(--mono);font-size:12.5px}
+.od:last-of-type{border-bottom:none}
+.od .k{color:var(--ink-3);font-size:11px;letter-spacing:.1em;white-space:nowrap}
+.od .d{flex:1;border-bottom:1px dotted var(--ink-4);transform:translateY(-4px)}
+.od b{color:var(--ink);white-space:nowrap}
+.od b.blue{color:var(--blue)}
 </style>
 </head>
 <body>
@@ -142,15 +147,15 @@
 
 <section class="head">
   <div class="wrap">
-    <span class="lbl-lg">拼 图 台 · 制 作 单 NO. <span id="orderNo">1管5-129</span></span>
-    <h1 class="tk">从转盘上取牌，<br>盖到画布上</h1>
+    <span class="lbl-lg">拼 图 台 · 制 作 单 NO. 1管5-129</span>
+    <h1 class="tk">从转盘上拖一张牌，<br>放到画布上</h1>
   </div>
 </section>
 
 <section class="bench wrap">
 
-  <!-- ================= 转盘发牌器 ================= -->
-  <div class="sheet xerox wheel-box">
+  <!-- ================= 转盘（静止） ================= -->
+  <div class="sheet wheel-box">
     <div class="sheet-hd">
       <span class="tag-no">发 牌 器</span>
       <span class="lbl">转 盘</span>
@@ -159,7 +164,7 @@
       <div class="wheel" id="wheel">
         <div class="ring"></div>
         <div class="ring2"></div>
-        <div class="spin" id="spin"></div>
+        <div id="spokes"></div>
         <div class="hub">
           <div>
             <div class="n" id="left">10</div>
@@ -168,37 +173,19 @@
         </div>
       </div>
       <div class="wheel-note">
-        <span class="pip on" id="wheelHint">点牌取用</span>
+        <span class="lbl" id="hintTxt">按住牌拖到画布</span>
         <button class="ibtn" id="sndBtn" title="音效开关" aria-label="音效开关">🔊</button>
       </div>
     </div>
   </div>
 
-  <!-- ================= 画布 ================= -->
+  <!-- ================= 画板 ================= -->
   <div class="canvas-box">
     <div class="canvas" id="canvas">
-      <div class="ph" id="ph">点转盘上的 emoji<br>盖到这里</div>
+      <div class="ph" id="ph">把牌拖到这里<br><span style="font-size:11px">点一下已放好的牌可以调它</span></div>
     </div>
-    <div class="levers off" id="levers">
-      <div class="lever">
-        <span class="nm">缩 放</span>
-        <input type="range" id="lScale" min="40" max="360" value="140" aria-label="缩放">
-        <span class="vl" id="vScale">140%</span>
-      </div>
-      <div class="lever">
-        <span class="nm">旋 转</span>
-        <input type="range" id="lRot" min="-180" max="180" value="0" aria-label="旋转">
-        <span class="vl" id="vRot">0°</span>
-      </div>
-      <div class="lever">
-        <span class="nm">层 级</span>
-        <input type="range" id="lZ" min="1" max="40" value="1" aria-label="层级">
-        <span class="vl" id="vZ">1</span>
-      </div>
-      <div class="btn-row" style="margin-top:2px">
-        <button class="btn sm ghost" id="delBtn" disabled>删 掉 这 张</button>
-        <button class="btn sm ghost" id="clrBtn">清 空 画 布</button>
-      </div>
+    <div class="btn-row" style="justify-content:center;margin-top:14px">
+      <button class="btn sm ghost" id="resetBtn">重 发 这 手 牌</button>
     </div>
   </div>
 
@@ -212,15 +199,14 @@
       <div class="ansrow">
         <input type="text" id="ans" placeholder="谜底答案" maxlength="12" autocomplete="off">
       </div>
-      <div class="od"><span class="k">分 类</span><span class="d"></span><b id="cat">成语</b></div>
+      <div class="od"><span class="k">分 类</span><span class="d"></span><b>成语</b></div>
       <div class="od"><span class="k">用 牌</span><span class="d"></span><b class="blue" id="used">0 / 10</b></div>
       <div class="od"><span class="k">限 时</span><span class="d"></span><b>60 秒</b></div>
-      <div class="od"><span class="k">出 题 人</span><span class="d"></span><b>阿野</b></div>
-      <div class="od"><span class="k">编 号</span><span class="d"></span><b id="no2">1管5-129</b></div>
+      <div class="od"><span class="k">编 号</span><span class="d"></span><b>1管5-129</b></div>
       <div class="btn-row" style="margin-top:16px">
         <button class="btn" id="fileBtn" disabled>封 存 交 题</button>
       </div>
-      <div class="hint" style="margin-top:10px" id="fileHint">先盖一张牌，再填答案</div>
+      <div class="hint" style="margin-top:10px" id="fileHint">先放一张牌，再填答案</div>
     </div>
   </aside>
 
@@ -237,11 +223,9 @@
 
 <script>
 const $=id=>document.getElementById(id);
-const EMOJI="font-family:var(--emoji)";
 
 /* ============================================================
-   音效：用 Web Audio 合成「盖章」，不加载任何音频文件
-   两声叠在一起 = 低频闷响（橡胶章压在纸上）+ 带通噪声（纸的脆响）
+   音效：Web Audio 合成「盖章」，不加载任何音频文件
    ============================================================ */
 let AC=null, sndOn=true;
 function ac(){
@@ -253,183 +237,247 @@ function stampSound(power){
   if(!sndOn) return;
   let c; try{ c=ac(); }catch(e){ return; }
   const t=c.currentTime, p=Math.max(.35,Math.min(1.6,power||1));
-
-  // ① 低频闷响：频率快速下滑，像章压在纸上
   const o=c.createOscillator(), g=c.createGain();
   o.type="sine";
-  o.frequency.setValueAtTime(190*p, t);
-  o.frequency.exponentialRampToValueAtTime(46, t+.11);
-  g.gain.setValueAtTime(.26*p, t);
-  g.gain.exponentialRampToValueAtTime(.0008, t+.17);
-  o.connect(g).connect(c.destination);
-  o.start(t); o.stop(t+.19);
-
-  // ② 纸/木的脆响：一段迅速衰减的噪声，走带通
+  o.frequency.setValueAtTime(190*p,t);
+  o.frequency.exponentialRampToValueAtTime(46,t+.11);
+  g.gain.setValueAtTime(.26*p,t);
+  g.gain.exponentialRampToValueAtTime(.0008,t+.17);
+  o.connect(g).connect(c.destination); o.start(t); o.stop(t+.19);
   const n=Math.floor(c.sampleRate*.045);
   const buf=c.createBuffer(1,n,c.sampleRate), d=buf.getChannelData(0);
   for(let i=0;i<n;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/n,3.2);
   const src=c.createBufferSource(); src.buffer=buf;
-  const bp=c.createBiquadFilter(); bp.type="bandpass";
-  bp.frequency.value=1700; bp.Q.value=.85;
+  const bp=c.createBiquadFilter(); bp.type="bandpass"; bp.frequency.value=1700; bp.Q.value=.85;
   const ng=c.createGain(); ng.gain.value=.16*p;
-  src.connect(bp).connect(ng).connect(c.destination);
-  src.start(t);
+  src.connect(bp).connect(ng).connect(c.destination); src.start(t);
 }
-/* 取牌时的轻微「嗒」 */
 function pickSound(){
   if(!sndOn) return;
   let c; try{ c=ac(); }catch(e){ return; }
-  const t=c.currentTime;
-  const o=c.createOscillator(), g=c.createGain();
+  const t=c.currentTime, o=c.createOscillator(), g=c.createGain();
   o.type="square"; o.frequency.setValueAtTime(880,t);
   o.frequency.exponentialRampToValueAtTime(420,t+.05);
-  g.gain.setValueAtTime(.05,t);
-  g.gain.exponentialRampToValueAtTime(.0005,t+.07);
+  g.gain.setValueAtTime(.05,t); g.gain.exponentialRampToValueAtTime(.0005,t+.07);
   o.connect(g).connect(c.destination); o.start(t); o.stop(t+.08);
 }
 
 /* ============================================================
-   转盘发牌：十张牌均分圆周（沿用 S3 的几何）
+   ① 画板单位：--u = 画布宽度的 1%
+   牌的字号 = calc(var(--u) * 12)，于是构图在任何尺寸下一致
+   ============================================================ */
+const cv=$("canvas");
+function setUnit(){ cv.style.setProperty("--u", (cv.clientWidth/100)+"px"); }
+new ResizeObserver(setUnit).observe(cv);
+setUnit();
+
+/* ============================================================
+   ② 转盘静止：十张牌按 36° 均分，不旋转
    ============================================================ */
 const POOL=["🔥","⛽","💧","🪵","🌫️","🧯","🕯️","☀️","🥵","🚒"];
 const ANGS=Array.from({length:10},(_,i)=>i*36);
-let pieces=[], zTop=1, sel=null, usedCount=0;
+$("spokes").innerHTML=POOL.map((g,k)=>
+  `<button class="spoke" style="--a:${ANGS[k]}deg" data-i="${k}" type="button"
+     title="拖到画布上"><span>${g}</span><span class="hole"></span></button>`).join("");
 
-function deal(){
-  $("spin").innerHTML=POOL.map((g,k)=>
-    `<button class="spoke" style="--a:${ANGS[k]}deg" data-i="${k}" type="button"
-       title="盖到画布"><span>${g}</span><span class="hole"></span></button>`).join("");
+let pieces=[], zTop=1, sel=null, usedCount=0, carry=null;
+
+/* ============================================================
+   ③ 取牌 = 从转盘拖到画布（落点由玩家决定）
+   鼠标：按住拖 → 松开落下
+   触屏：点一下拿起（跟手）→ 再点画布落下
+   ============================================================ */
+function pickUp(spoke,glyph,x,y){
+  const el=document.createElement("div");
+  el.className="ghost"; el.textContent=glyph;
+  el.style.left=x+"px"; el.style.top=y+"px";
+  document.body.appendChild(el);
+  carry={spoke,glyph,ghost:el,startX:x,startY:y,moved:false};
+  moveGhost(x,y); pickSound();
 }
-deal();
+function moveGhost(x,y){
+  if(!carry) return;
+  carry.ghost.style.left=x+"px"; carry.ghost.style.top=y+"px";
+  const r=cv.getBoundingClientRect();
+  const inside = x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom;
+  carry.ghost.classList.toggle("out",!inside);
+}
+function cancelCarry(){
+  if(!carry) return;
+  carry.ghost.remove(); carry=null; cv.classList.remove("armed");
+  $("hintTxt").textContent="按住牌拖到画布";
+}
+function putDown(clientX,clientY){
+  if(!carry) return false;
+  const r=cv.getBoundingClientRect();
+  const inside = clientX>=r.left&&clientX<=r.right&&clientY>=r.top&&clientY<=r.bottom;
+  if(!inside){ cancelCarry(); return false; }
+  const x=(clientX-r.left)/r.width*100, y=(clientY-r.top)/r.height*100;
+  const sp=carry.spoke, glyph=carry.glyph;
+  carry.ghost.remove(); carry=null; cv.classList.remove("armed");
+  sp.classList.add("used");
+  usedCount++; $("left").textContent=10-usedCount;
+  $("hintTxt").textContent = usedCount>=10 ? "牌发完了" : "按住牌拖到画布";
+  place(glyph,x,y,true);
+  return true;
+}
 
-$("spin").addEventListener("click",e=>{
-  const b=e.target.closest(".spoke"); if(!b||b.classList.contains("used")) return;
-  pickSound();
-  b.classList.add("used");
-  usedCount++;
-  $("left").textContent=10-usedCount;
-  $("used").textContent=usedCount+" / 10";
-  drop(b.querySelector("span").textContent, b, true);
-  refresh();
+$("spokes").addEventListener("pointerdown",e=>{
+  const sp=e.target.closest(".spoke");
+  if(!sp||sp.classList.contains("used")) return;
+  e.preventDefault();
+  cancelCarry();
+  pickUp(sp, sp.querySelector("span").textContent, e.clientX, e.clientY);
+  try{ sp.setPointerCapture(e.pointerId); }catch(_){}
 });
+$("spokes").addEventListener("pointermove",e=>{
+  if(!carry) return;
+  if(Math.hypot(e.clientX-carry.startX,e.clientY-carry.startY)>5) carry.moved=true;
+  moveGhost(e.clientX,e.clientY);
+});
+$("spokes").addEventListener("pointerup",e=>{
+  if(!carry) return;
+  if(carry.moved){                       // 拖动了 → 松手即落
+    putDown(e.clientX,e.clientY);
+  }else{                                 // 只是点了一下 → 保持跟手，等玩家点画布
+    cv.classList.add("armed");
+    $("hintTxt").textContent="已拿起 · 点画布放下";
+  }
+});
+$("spokes").addEventListener("pointercancel",cancelCarry);
+addEventListener("keydown",e=>{ if(e.key==="Escape") cancelCarry(); });
 
-/* ---------- 盖章落牌 ---------- */
-function drop(glyph, spokeEl, isNew){
-  const cv=$("canvas"), r=cv.getBoundingClientRect();
+/* ============================================================
+   放牌
+   ============================================================ */
+function place(glyph,x,y,isNew){
   const el=document.createElement("div");
   el.className="pc";
-  const n=pieces.length;
-  // 落点沿内圈螺旋排布，避免叠在一起
-  const ang=n*2.1, rad=Math.min(r.width,r.height)*(n?0.16+0.035*n:0);
-  const x=50+Math.cos(ang)*rad/r.width*100;
-  const y=50+Math.sin(ang)*rad/r.height*100;
   el.style.left=x+"%"; el.style.top=y+"%";
-  el.style.setProperty("--s",1.4);
-  el.style.setProperty("--r",(n%2?7:-6)+"deg");
-  el.style.fontSize="44px";
-  el.textContent=glyph;
-  el.dataset.z=++zTop;
-  el.style.zIndex=el.dataset.z;
-  cv.appendChild(el);
-  pieces.push(el);
-  // 盖章动效 + 音效（新落牌才响；拖动/调姿不响）
-  el.classList.add("stamping");
-  setTimeout(()=>el.classList.remove("stamping"),320);
-  if(isNew) stampSound(1);
+  el.style.setProperty("--s",1);
+  el.style.setProperty("--r","0deg");
+  el.dataset.z=++zTop; el.style.zIndex=el.dataset.z;
+  el.innerHTML=`<span class="g">${glyph}</span>
+    <span class="h h-rot" title="拖动旋转（按住 Shift 吸附 15°）"></span>
+    <span class="h h-scale" title="拖动缩放"></span>
+    <span class="pbar">
+      <button type="button" data-a="top" title="置顶">⬆</button>
+      <button type="button" data-a="bottom" title="置底">⬇</button>
+      <button type="button" data-a="del" title="删掉这张">🗑</button>
+    </span>`;
+  cv.appendChild(el); pieces.push(el);
+  clampInto(el);
+  if(isNew){ el.classList.add("stamping"); setTimeout(()=>el.classList.remove("stamping"),300); stampSound(1); }
   $("ph").style.display="none";
-  select(el);
-  return el;
+  select(el); refresh();
 }
 
-/* ---------- 选中与拨杆 ---------- */
+/* 把牌夹在画布里，不让它被裁掉 */
+function clampInto(el){
+  const s=parseFloat(el.style.getPropertyValue("--s"))||1;
+  const w=el.offsetWidth*s, h=el.offsetHeight*s;
+  const hx=Math.min(50,w/2/cv.clientWidth*100), hy=Math.min(50,h/2/cv.clientHeight*100);
+  el.style.left=Math.max(hx,Math.min(100-hx,parseFloat(el.style.left)||50))+"%";
+  el.style.top =Math.max(hy,Math.min(100-hy,parseFloat(el.style.top)||50))+"%";
+}
+
+/* ============================================================
+   ④ 控制点：移动 / 缩放 / 旋转 / 图层
+   ============================================================ */
 function select(el){
   pieces.forEach(p=>p.classList.remove("sel"));
-  sel=el;
-  const L=$("levers");
-  if(!el){ L.classList.add("off"); $("delBtn").disabled=true; return; }
-  el.classList.add("sel");
-  L.classList.remove("off");
-  const s=parseFloat(getComputedStyle(el).getPropertyValue("--s"))||1.4;
-  const r=parseFloat(getComputedStyle(el).getPropertyValue("--r"))||0;
-  $("lScale").value=Math.round(s*100);  $("vScale").textContent=Math.round(s*100)+"%";
-  $("lRot").value=Math.round(r);        $("vRot").textContent=Math.round(r)+"°";
-  $("lZ").value=el.dataset.z;           $("vZ").textContent=el.dataset.z;
-  $("delBtn").disabled=false;
-  $("lZ").max=Math.max(40,zTop);
+  sel=el; if(el) el.classList.add("sel");
 }
+function sOf(el){ return parseFloat(el.style.getPropertyValue("--s"))||1; }
+function rOf(el){ return parseFloat(el.style.getPropertyValue("--r"))||0; }
+function dist(e,cx,cy){ return Math.hypot(e.clientX-cx,e.clientY-cy); }
+function ang(e,cx,cy){ return Math.atan2(e.clientY-cy,e.clientX-cx)*180/Math.PI; }
 
-$("lScale").addEventListener("input",e=>{
-  if(!sel) return; const v=+e.target.value;
-  sel.style.setProperty("--s",v/100); $("vScale").textContent=v+"%";
-});
-$("lRot").addEventListener("input",e=>{
-  if(!sel) return; const v=+e.target.value;
-  sel.style.setProperty("--r",v+"deg"); $("vRot").textContent=v+"°";
-});
-$("lZ").addEventListener("input",e=>{
-  if(!sel) return; const v=+e.target.value;
-  sel.dataset.z=v; sel.style.zIndex=v; $("vZ").textContent=v;
-});
+let mode=null;
 
-/* ---------- 拖动 ---------- */
-let drag=null;
-$("canvas").addEventListener("pointerdown",e=>{
+cv.addEventListener("pointerdown",e=>{
+  if(carry){ e.preventDefault(); putDown(e.clientX,e.clientY); return; }   // 跟手模式下点画布落下
   const p=e.target.closest(".pc");
   if(!p){ select(null); return; }
   select(p);
-  p.classList.add("stamping"); setTimeout(()=>p.classList.remove("stamping"),160);
-  const r=$("canvas").getBoundingClientRect();
-  drag={el:p, dx:e.clientX-(r.left+r.width*parseFloat(p.style.left)/100),
-              dy:e.clientY-(r.top+r.height*parseFloat(p.style.top)/100), r};
-  p.setPointerCapture(e.pointerId);
+  const bar=e.target.closest(".pbar");
+  if(bar){
+    const a=e.target.closest("button")?.dataset.a;
+    if(a==="top"){ p.dataset.z=++zTop; p.style.zIndex=p.dataset.z; }
+    if(a==="bottom"){
+      const min=pieces.length?Math.min(...pieces.map(q=>+q.dataset.z)):0;
+      p.dataset.z=min-1; p.style.zIndex=p.dataset.z;
+    }
+    if(a==="del"){
+      p.remove(); pieces=pieces.filter(q=>q!==p); select(null); refresh();
+      if(!pieces.length) $("ph").style.display="";
+    }
+    return;
+  }
+  const r=cv.getBoundingClientRect();
+  const cx=r.left+r.width*parseFloat(p.style.left)/100;
+  const cy=r.top +r.height*parseFloat(p.style.top)/100;
+  if(e.target.classList.contains("h-scale"))      mode={t:"scale",el:p,d0:dist(e,cx,cy),s0:sOf(p),cx,cy};
+  else if(e.target.classList.contains("h-rot"))   mode={t:"rotate",el:p,a0:ang(e,cx,cy),r0:rOf(p),cx,cy};
+  else mode={t:"move",el:p,
+             dx:e.clientX-r.left-r.width*parseFloat(p.style.left)/100,
+             dy:e.clientY-r.top -r.height*parseFloat(p.style.top)/100};
+  try{ p.setPointerCapture(e.pointerId); }catch(_){}
 });
+
 addEventListener("pointermove",e=>{
-  if(!drag) return;
-  const x=Math.max(0,Math.min(drag.r.width,  e.clientX-drag.dx))/drag.r.width*100;
-  const y=Math.max(0,Math.min(drag.r.height, e.clientY-drag.dy))/drag.r.height*100;
-  drag.el.style.left=x+"%"; drag.el.style.top=y+"%";
+  if(!mode) return;
+  const p=mode.el;
+  if(mode.t==="move"){
+    const r=cv.getBoundingClientRect();
+    p.style.left=Math.max(0,Math.min(r.width, e.clientX-mode.dx))/r.width*100+"%";
+    p.style.top =Math.max(0,Math.min(r.height,e.clientY-mode.dy))/r.height*100+"%";
+    clampInto(p);
+  }else if(mode.t==="scale"){
+    const k=dist(e,mode.cx,mode.cy)/Math.max(mode.d0,1);
+    p.style.setProperty("--s",Math.max(.25,Math.min(4,mode.s0*k)));
+    clampInto(p);
+  }else{
+    let a=mode.r0+(ang(e,mode.cx,mode.cy)-mode.a0);
+    if(e.shiftKey) a=Math.round(a/15)*15;
+    p.style.setProperty("--r",a+"deg");
+  }
 });
-addEventListener("pointerup",()=>{ drag=null; });
+addEventListener("pointerup",()=>{ mode=null; });
 
-/* ---------- 删除 / 清空 ---------- */
-$("delBtn").addEventListener("click",()=>{
-  if(!sel) return;
-  sel.remove(); pieces=pieces.filter(p=>p!==sel);
-  select(null); refresh();
-  if(!pieces.length) $("ph").style.display="";
-});
-$("clrBtn").addEventListener("click",()=>{
-  pieces.forEach(p=>p.remove()); pieces=[]; select(null); refresh();
-  $("ph").style.display="";
-});
-
-/* ---------- 制作单状态 ---------- */
+/* ============================================================
+   制作单 / 交题
+   ============================================================ */
 function refresh(){
   $("used").textContent=usedCount+" / 10";
   const ok=pieces.length>0 && $("ans").value.trim().length>0;
   $("fileBtn").disabled=!ok;
-  $("fileHint").textContent = pieces.length===0 ? "先盖一张牌，再填答案"
-                              : (!$("ans").value.trim() ? "还差一个答案" : "可以封存了");
+  $("fileHint").textContent = !pieces.length ? "先放一张牌，再填答案"
+                            : (!$("ans").value.trim() ? "还差一个答案" : "可以封存了");
 }
 $("ans").addEventListener("input",refresh);
 
-/* ---------- 封存交题：盖章 + 打孔 ---------- */
+$("resetBtn").addEventListener("click",()=>{
+  if(pieces.length && !confirm("重发这手牌？画布会清空，十张牌都会回来。")) return;
+  pieces.forEach(p=>p.remove()); pieces=[]; select(null);
+  usedCount=0; $("left").textContent=10;
+  document.querySelectorAll(".spoke").forEach(s=>s.classList.remove("used"));
+  $("ph").style.display=""; $("hintTxt").textContent="按住牌拖到画布";
+  cancelCarry(); refresh();
+});
+
 $("fileBtn").addEventListener("click",()=>{
   stampSound(1.5);
   const st=$("stateStamp");
   st.className="stamp bar"; st.textContent="已 封 存";
   st.classList.add("stamping");
-  $("fileBtn").disabled=true;
-  $("fileHint").textContent="已交到广场";
-  // 画布右上角打一个归档孔
+  $("fileBtn").disabled=true; $("fileHint").textContent="已交到广场";
   const h=document.createElement("span");
   h.className="hole"; h.style.right="10px"; h.style.top="10px";
-  $("canvas").appendChild(h);
-  requestAnimationFrame(()=>h.classList.add("punching"));
+  cv.appendChild(h); requestAnimationFrame(()=>h.classList.add("punching"));
   setTimeout(()=>{ location.href="plaza.html"; },900);
 });
 
-/* ---------- 音效开关 ---------- */
 $("sndBtn").addEventListener("click",()=>{
   sndOn=!sndOn;
   $("sndBtn").textContent=sndOn?"🔊":"🔇";
@@ -437,9 +485,7 @@ $("sndBtn").addEventListener("click",()=>{
   if(sndOn) stampSound(.7);
 });
 $("sndBtn").classList.add("on");
-
-/* ---------- 首屏给一张示例牌，让人知道能点 ---------- */
-setTimeout(()=>{ if(!pieces.length) $("spin").querySelector(".spoke")?.focus(); },400);
+refresh();
 </script>
 </body>
 </html>
