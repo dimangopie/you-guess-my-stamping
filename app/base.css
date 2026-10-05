@@ -36,6 +36,7 @@
   /* 深面（--screen / --screen-2）文字专用的亮色档。
      原型在深面上只有 4.44:1（amber）/ 2.75:1（red），都不过 AA。 *
       （--red 没有对应的深面档：普查 369 条规则后确认没有红字画在深面上的地方） */
+  --red-lit:#EE8A7A;   /* 深面专用红 · --screen 上 5.33:1（--red 只有 2.75） */
   --amber-lit:#C98C12;
   --red-ink:#A82A1F;     /* 纸上 ≥4.5:1 */
 
@@ -80,10 +81,13 @@
     drop-shadow(1.6px 0 0 var(--paper-4)) drop-shadow(-1.6px 0 0 var(--paper-4))
     drop-shadow(0 1.6px 0 var(--paper-4)) drop-shadow(0 -1.6px 0 var(--paper-4))
     drop-shadow(3px 4px 0 rgba(23,23,27,.30));
+  /* ⚠ 边宽 2px 而不是 1px。边色是 --paper-4（米白），缩略图底也是米白 ——
+     1px 时它只在 emoji 自身的彩色像素上留一圈 1px 亮边，在 172px 尺寸下读不出来。
+     （K3 第 10 轮 8× 最近邻放大后说「没有任何白边/模切边」。） */
   --sticker-sm:saturate(.90) contrast(.94) brightness(1.02)
-    drop-shadow(1px 0 0 var(--paper-4)) drop-shadow(-1px 0 0 var(--paper-4))
-    drop-shadow(0 1px 0 var(--paper-4)) drop-shadow(0 -1px 0 var(--paper-4))
-    drop-shadow(2px 2.5px 0 rgba(23,23,27,.28));
+    drop-shadow(2px 0 0 var(--paper-4)) drop-shadow(-2px 0 0 var(--paper-4))
+    drop-shadow(0 2px 0 var(--paper-4)) drop-shadow(0 -2px 0 var(--paper-4))
+    drop-shadow(2.5px 3px 0 rgba(23,23,27,.32));
   /* 字体 */
   --mono:"Noto Sans Mono CJK SC",ui-monospace,"DejaVu Sans Mono",monospace;
   --sans:"Noto Sans CJK SC","Source Han Sans SC",system-ui,sans-serif;

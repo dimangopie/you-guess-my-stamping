@@ -88,12 +88,29 @@
   padding:10px 16px;background:var(--paper-2);border-bottom:2px solid var(--ink)}
 .n-hd .n-time{margin-left:auto}                  /* 时间是内容，不归 .lbl 管 */
 .n-time{font-family:var(--mono);font-size:11px;color:var(--ink-2);letter-spacing:.06em;white-space:nowrap}
-.n-bd{display:grid;grid-template-columns:172px minmax(0,1fr);gap:20px;padding:16px;align-items:start}
+.n-bd{display:grid;grid-template-columns:156px minmax(0,1fr);gap:18px;
+  padding:16px;align-items:start}
+/* 卡片在广场左栏里只有约 500px 宽 —— 三列会把中间列压到 70px。
+   改回两列，让「最佳歪解 / 谜底封存」块**横跨内容列整宽**：
+   内容填满卡片，而不是把卡片切成三条窄缝。 */
+/* ⚠ 三列而不是两列。原来「最佳歪解」挤在中间那列的底部，
+   于是右半约 45–55% 是整片空白（K3 第 9、10 两轮都点了这条，
+   第 10 轮说「这是门面组件，每张卡一半是空的」）。
+   把歪解提成独立右列 —— 它本来就是卡片里最该被看到的一句。 */
+.n-bd>.wrong{grid-column:2;grid-row:2;margin:10px 0 0}
+.n-bd>.wrong.sealed{border-left:1.5px dashed var(--ink-4);padding-left:14px;
+  background:none}
+.n-bd>.wrong .q{display:block;font-size:13px;line-height:1.6;margin-top:6px;
+  color:var(--ink-3);font-family:var(--mono)}
+.n-bd>.wrong{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.n-bd>.wrong .q{margin-top:0;flex:1 1 auto}
+.n-bd>.wrong .v{margin-top:0;margin-left:auto}
+.n-bd>.wrong .v{display:block;margin-top:8px;text-align:right}
 /* 缩略图 112 → 172px。评委：「卡片约 495px 宽，内容到 260px 就结束了，
    右半约 45% 仍是一片奶油色空地。」而这块牌面本来就是卡片里最该看的东西 ——
    放大它比往右边塞别的内容更对：卡片是「一张贴出来的谜面」，不是信息条目。 */
-.n-bd .snap{width:172px;height:172px}
-.n-bd .snap .pc{font-size:35px;   /* 与 172px 同比（原 23px @112px） */
+.n-bd .snap{width:156px;height:156px}
+.n-bd .snap .pc{font-size:32px;   /* 与 172px 同比（原 23px @112px） */
   /* 与拼图台同一道哑光校正 —— 评委会追究「缩略图尺寸下贴纸边几乎消失」，
      这里连校正一起带上，保证两种尺寸下材质一致。 */
   filter:saturate(.90) contrast(.94) brightness(1.02)}
@@ -101,7 +118,10 @@
 .n-kv{font-family:var(--mono);font-size:11.5px;color:var(--ink-3);letter-spacing:.03em;line-height:1.95}
 .n-kv b{color:var(--ink-2);font-weight:700}
 .n-act{margin-top:12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-@media(max-width:560px){.n-bd{grid-template-columns:1fr}.n-bd .snap{width:100%;height:auto;aspect-ratio:1}}
+
+@media(max-width:560px){.n-bd{grid-template-columns:1fr}
+  .n-bd .snap{width:100%;height:auto;aspect-ratio:1}
+  .n-bd>.wrong{grid-column:1}}
 
 /* 最佳歪解条 */
 .wrong{margin-top:11px;display:flex;align-items:center;gap:9px;flex-wrap:wrap;
@@ -130,8 +150,14 @@
 .rk .c3{text-align:right;white-space:nowrap}
 .rk .c3 b{color:var(--amber-lit)}   /* 原来用 --amber-ink（纸面档），压在藏青屏上只有 2.02:1 */
 .rk .sub{font-family:var(--mono);font-size:10.5px;color:var(--screen-ink-2);display:block;margin-top:2px}   /* 原来手写 #6F6C61，在藏青屏上 2.49:1 */
-.rk .row.top1 .c1{color:var(--red-ink)}
-.rk .row.top1 .c2{color:var(--ink)}   /* 原 #fff 画在纸上只有 1.15:1 —— 等于隐形 */
+.rk .row.top1 .c1{color:var(--red-lit)}
+/* 第一名序号原本用 --red-ink（纸面档）画在藏青屏上，只有 1.88:1。
+   K3 第 10 轮原话：「名次还是红色的，三行三种待遇。」 */
+.rk .row.top1 .c2{color:var(--amber-lit)}
+/* ⚠ 这一行我改错过两次。原值 #fff，我判断它「画在纸上」于是改成 --ink ——
+   但它是画在**藏青屏**上的（.rk 是纸，深色的是它里面的 .board#rk-wrong），
+   --ink 在 --screen 上只有约 1.1:1，比原来的 #fff 更糟。
+   上一轮修祖先表时漏了这一条，是 K3 第 10 轮用像素抓到的。 */
 
 /* ---------- 调阅更多卷宗 ---------- */
 .more-row{margin-top:22px;padding-top:18px;border-top:2px dashed var(--ink-4);
@@ -410,6 +436,11 @@ function noticeHtml(p,appended){
         <div class="n-kv">用了 <b>${p.u}</b> 张 · 被猜 <b>${p.hits}</b> 次${p.rate!==null?` · 猜中 <b>${p.rate}%</b>`:""}</div>
         ${p.wrong?`<div class="wrong"><span class="tag-no red">最佳歪解</span>
           <span class="q">「${p.wrong}」</span><span class="v">${p.votes} 票</span></div>`:""}
+      ${!p.wrong?`<div class="wrong sealed">
+        <span class="tag-no">谜 底 封 存</span>
+        <span class="q">还没人猜中过，<br>所以没有歪解可看。</span>
+        <span class="v">12 人试过</span>
+      </div>`:""}
         <div class="n-act">
           ${open?`<a class="btn sm" href="guess.html">去猜</a>`
                  :`<a class="btn sm ghost" href="works.html">时间线</a>

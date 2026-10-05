@@ -161,6 +161,27 @@ def effective_bg(sel):
         for seg in reversed(parts):                 # ② 单个祖先，最右优先
             rounds.append([seg])
 
+        # 祖先表里的项是「族」级的（如 ".rk .row"），而实际选择器常带复合类
+        # （".rk .row.top1 .c2"）。所以对每个前缀再试「逐层剥掉末段 .class」的变体，
+        # 否则一条 .top1 就能让整条规则退到页面默认底色。
+        extra = []
+        for cands in rounds:
+            for cand in cands:
+                segs = cand.split()
+                # ① 剥掉某一段末尾的 .class：".rk .row.top1 .c2" → ".rk .row .c2"
+                for k in range(len(segs) - 1, -1, -1):
+                    s = re.sub(r'\.[\w-]+$', '', segs[k])
+                    if s and s != segs[k]:
+                        extra.append(" ".join(segs[:k] + [s] + segs[k+1:]))
+                # ② 再逐段丢弃末尾：".rk .row .c2" → ".rk .row" → ".rk"
+                #    （祖先表里的项是「族」级的，比实际选择器短）
+                for k in range(len(segs) - 1, 0, -1):
+                    extra.append(" ".join(segs[:k]))
+                    stripped = re.sub(r'\.[\w-]+$', '', segs[k-1])
+                    if stripped:
+                        extra.append(" ".join(segs[:k-1] + [stripped]))
+        rounds = rounds + [[e] for e in extra]
+
         for cands in rounds:
             for cand in cands:
                 if cand in BG:
@@ -186,6 +207,8 @@ ANCESTRY = {
     #   深色的是它里面的 <div class="board" id="rk-wrong">。
     #   这一条猜错，让普查静默放过了两条 2.0:1 的文字（票数与副标题）。
     ".rk .c3 b": ".board", ".rk .sub": ".board", ".rk .c1": ".board",
+    ".rk .row.top1 .c2": ".board",   # 复合类（.row.top1）让 .rk .row 匹配不到
+    ".rk .row.top1 .c1": ".board", ".rk .row .c2": ".board",
     "#score": ".board", ".srow": ".board", ".throw": ".board",
 }
 # ② 豁免表：真·误报，写明理由。
@@ -241,3 +264,10 @@ else:
         print(f"        {fg} 画在 {bg} 上   ← 底色来自 {src}")
 
 sys.exit(1 if fails else 0)
+
+
+def _dump_bg(pattern=""):
+    """调试用：打印 BG 表里匹配 pattern 的项。"""
+    for k, v in BG.items():
+        if pattern in k:
+            print(f"    {k!r:26} → {v}")
