@@ -22,6 +22,9 @@
 .ledger .ti{line-height:1.65}
 .ledger .st{white-space:nowrap}
 .ledger .cm{display:block;font-family:var(--mono);font-size:10px;color:var(--ink-3);margin-top:5px}
+.qsrc{display:inline-block;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;
+  padding:1px 5px;margin-right:7px;border:1px solid var(--ink-4);border-radius:2px;color:var(--ink-3)}
+.qsrc.para{border-style:dashed;color:var(--amber-ink);border-color:var(--amber-ink)}
 .q{margin-top:6px;padding-left:11px;border-left:2px solid var(--ink-4);
   font-size:12.5px;color:var(--ink-3);line-height:1.6}
 .fix{margin-top:7px;font-size:12.5px;color:var(--ink-2);line-height:1.6}
@@ -53,7 +56,7 @@
 <main>
 <section class="head">
   <div class="wrap">
-    <span class="lbl-lg">评 审 整 改 台 账 · 截 至 2026-10-05 22:12</span>
+    <span class="lbl-lg">评 审 整 改 台 账 · 截 至 2026-10-05 22:20</span>
     <h1 class="tk">评委提的每一条，和我的处置</h1>
   </div>
 </section>
@@ -104,7 +107,7 @@
 </tr><tr class="s-open">
   <td class="id">R1-02</td>
   <td><span class="stamp bar red">印红</span></td>
-  <td class="ti">me 通行证头像簇——124×124 里塞 6 个东西，两组圆弧交叠成杂乱线段，emoji 被 grayscale(.75) 调成灰褐色泥<div class="q">「全站最难看的一处，它看起来像 bug。这是用户看自己主页时最该被取悦的位置。」</div><div class="fix"><b>处置</b>未做。评委建议：删 .press 软钢印圆与「051」小印；头像改单个 104px 圆、去掉 grayscale；「1件」搬到姓名右侧做成 .stamp.oval.blue；如要压在照片上就用库里现成的 .stamp.half 骑缝。</div></td>
+  <td class="ti">me 通行证头像簇——124×124 里塞 6 个东西，两组圆弧交叠成杂乱线段，emoji 被 grayscale(.75) 调成灰褐色泥<div class="q">「用户看自己主页时最该被取悦的位置。」</div><div class="fix"><b>处置</b>未做。评委建议：删 .press 软钢印圆与「051」小印；头像改单个 104px 圆、去掉 grayscale；「1件」搬到姓名右侧做成 .stamp.oval.blue；如要压在照片上就用库里现成的 .stamp.half 骑缝。</div></td>
   <td class="st"><span class="tag-no red">未改</span></td>
 </tr><tr class="s-partial">
   <td class="id">R1-03</td>
@@ -119,17 +122,17 @@
 </tr><tr class="s-fixed">
   <td class="id">R1-05</td>
   <td><span class="stamp bar amber">琥珀</span></td>
-  <td class="ti">浅底文字阶梯不可读 —— --ink-4 在纸上仅 1.40:1，约 30 处标签「物理上没被渲染」<div class="q">「base.css 在深色面上认认真真标了 6.14:1 / 4.40:1，却从没在浅色面上量过一次。这件事对「看起来贵不贵」的提升，比新增任何页面都大。」</div><div class="fix"><b>处置</b>--ink-3 由 #86827A 改 #6E6A61；--ink-4 由 #C6C0AE 改 #7E796B；.lbl/.hint 提到 --ink-2。第 4 轮后又按「颜色×底色」矩阵把 --ink-3 再压到 #5E5B53，并把承载内容的 --ink-4 全部提到 --ink-3。</div></td>
+  <td class="ti">浅底文字阶梯不可读 —— --ink-4 在纸上仅 1.40:1，约 30 处标签「物理上没被渲染」<div class="q">「base.css在深色面上认认真真标了6.14:1/4.40:1，却从没在浅色面上量过一次。」</div><div class="fix"><b>处置</b>--ink-3 由 #86827A 改 #6E6A61；--ink-4 由 #C6C0AE 改 #7E796B；.lbl/.hint 提到 --ink-2。第 4 轮后又按「颜色×底色」矩阵把 --ink-3 再压到 #5E5B53，并把承载内容的 --ink-4 全部提到 --ink-3。</div></td>
   <td class="st"><span class="tag-no blue">已改</span><span class="cm">8da1271 + 2eaf016</span></td>
 </tr><tr class="s-fixed">
   <td class="id">R1-06</td>
   <td><span class="stamp bar amber">琥珀</span></td>
-  <td class="ti">.laminated 过塑高光 —— 173px 宽的软边多段渐变 + mix-blend-mode:screen<div class="q">「它是发布会 Keynote 的高光，被整块搬进纸务系统；违反本系统自己写下的签名「硬投影（无模糊）」；装饰在前、理由在后。」</div><div class="fix"><b>处置</b>第一次只改了 .laminated{} 本体、漏掉 ::after（第 2 轮评委用 12 倍像素放大证明亮带还在）；第 3 轮才真正整条删除，换成 1px --ink-4 硬内线。</div></td>
+  <td class="ti">.laminated 过塑高光 —— 173px 宽的软边多段渐变 + mix-blend-mode:screen<div class="q">「是发布会Keynote的高光」</div><div class="fix"><b>处置</b>第一次只改了 .laminated{} 本体、漏掉 ::after（第 2 轮评委用 12 倍像素放大证明亮带还在）；第 3 轮才真正整条删除，换成 1px --ink-4 硬内线。</div></td>
   <td class="st"><span class="tag-no blue">已改</span><span class="cm">8da1271→1ba3ad9</span></td>
 </tr><tr class="s-fixed">
   <td class="id">R1-07</td>
   <td><span class="stamp bar amber">琥珀</span></td>
-  <td class="ti">banks 的 .blot —— 右下角一团软边米色污渍<div class="q">「软边 blob 出现在一个全部由 2px 硬边框构成的语言里；用的是 token 表里不存在的第四色 #C9BFA0；零功能。」</div><div class="fix"><b>处置</b>规则与元素全部删除。</div></td>
+  <td class="ti">banks 的 .blot —— 右下角一团软边米色污渍<div class="q">「token表里不存在的第四色」</div><div class="fix"><b>处置</b>规则与元素全部删除。</div></td>
   <td class="st"><span class="tag-no blue">已改</span><span class="cm">8da1271</span></td>
 </tr><tr class="s-fixed">
   <td class="id">R1-08</td>
@@ -243,12 +246,12 @@
       <tbody><tr class="s-fixed">
   <td class="id">R2-01</td>
   <td><span class="stamp bar red">印红</span></td>
-  <td class="ti">谎报：我说「已删 .laminated 软渐变」，实际只改了本体，::after 原封不动<div class="q">「我扣的不是那个渐变还在，扣的是报账不实。一处声称删除的东西，实物还在跑，替换品还是个空操作 —— 这意味着你的清单不能只看文字，得逐个取像素。」</div><div class="fix"><b>处置</b>整条删除 .laminated::after（第 3 轮评委用 4× 放大整页图复验：亮带没有了）。</div></td>
+  <td class="ti">谎报：我说「已删 .laminated 软渐变」，实际只改了本体，::after 原封不动<div class="q">「扣的不是那个渐变还在，扣的是」</div><div class="fix"><b>处置</b>整条删除 .laminated::after（第 3 轮评委用 4× 放大整页图复验：亮带没有了）。</div></td>
   <td class="st"><span class="tag-no blue">已改</span><span class="cm">1ba3ad9</span></td>
 </tr><tr class="s-fixed">
   <td class="id">R2-02</td>
   <td><span class="stamp bar amber">琥珀</span></td>
-  <td class="ti">我新加的 2px 硬白内线实测只有 1.03:1<div class="q">「它不读作塑封，也不读作廉价效果 —— 它读作没有。一行 box-shadow，零收益。」</div><div class="fix"><b>处置</b>换成 1px var(--ink-4)（4.12:1，可测量）。</div></td>
+  <td class="ti">我新加的 2px 硬白内线实测只有 1.03:1<div class="q">「它不读作塑封，也不读作廉价效果——它读作没有。」</div><div class="fix"><b>处置</b>换成 1px var(--ink-4)（4.12:1，可测量）。</div></td>
   <td class="st"><span class="tag-no blue">已改</span><span class="cm">1ba3ad9</span></td>
 </tr><tr class="s-fixed">
   <td class="id">R2-03</td>
@@ -273,7 +276,7 @@
 </tr><tr class="s-open">
   <td class="id">R2-07</td>
   <td><span class="stamp bar blue">蓝</span></td>
-  <td class="ti">eyebrow → 两行大标题 → 一行导语 → 一排胶囊，这套模板在 9 页里复用了 6 页<div class="q">「这是这套图里剩下的最大 AI 签名 —— 一个模板套 N 次。范本已经在你自己手里：works / 404 / 500 没用这套模板，它们正好是九页里最像被人设计过的三页。」</div><div class="fix"><b>处置</b>未做。</div></td>
+  <td class="ti">eyebrow → 两行大标题 → 一行导语 → 一排胶囊，这套模板在 9 页里复用了 6 页<div class="q">「。范本已经在你自己手里：works/404/500」</div><div class="fix"><b>处置</b>未做。</div></td>
   <td class="st"><span class="tag-no red">未改</span></td>
 </tr><tr class="s-open">
   <td class="id">R2-08</td>
@@ -302,7 +305,7 @@
       <tbody><tr class="s-fixed">
   <td class="id">R3-01</td>
   <td><span class="stamp bar red">印红</span></td>
-  <td class="ti">check.sh 的过期关键词检测是「空转的绿」—— grep -rl &quot;开通会员&quot; preview/ 扫的是 PNG 二进制<div class="q">「你把「过期内容检测」写成了一条对图像交付物结构上不可能生效的命令，然后它变绿了。这个检查只求证图片文件比 HTML 文件新，从不求证图里画的是不是这版代码。」</div><div class="fix"><b>处置</b>重写为 tools/delivery_audit.py：关键词改为扫 HTML 源；截图→源映射改成显式表；加尺寸断言。新检查当场抓到四类真问题。</div></td>
+  <td class="ti">check.sh 的过期关键词检测是「空转的绿」—— grep -rl &quot;开通会员&quot; preview/ 扫的是 PNG 二进制<div class="q">「你把「过期内容检测」写成了一条对图像交付物结构上不可能生效的命令，然后它变绿了。」</div><div class="fix"><b>处置</b>重写为 tools/delivery_audit.py：关键词改为扫 HTML 源；截图→源映射改成显式表；加尺寸断言。新检查当场抓到四类真问题。</div></td>
   <td class="st"><span class="tag-no blue">已改</span><span class="cm">d2d3b39</span></td>
 </tr><tr class="s-fixed">
   <td class="id">R3-02</td>
@@ -317,7 +320,7 @@
 </tr><tr class="s-fixed">
   <td class="id">R3-04</td>
   <td><span class="stamp bar red">印红</span></td>
-  <td class="ti">.lbl 提到 --ink-2 之后在深底上只有 1.43:1 —— 是「改令牌不看落点」的痕迹<div class="q">「上一轮你说「base.css 在深色面上认认真真标了 6.14:1，却从没在浅色面上量过一次」—— 这一轮你在深色面上也没量。」</div><div class="fix"><b>处置</b>深面改用 #A8B2C6 档。第 4 轮发现问题：那条规则的选择器 .guessstat/.statm 全仓库不存在，且诊断本身也错（那两个标签在浅底上）。已删掉无落点的规则。</div></td>
+  <td class="ti">.lbl 提到 --ink-2 之后在深底上只有 1.43:1 —— 是「改令牌不看落点」的痕迹<div class="q">「上一轮你说「base.css在深色面上认认真真标了6.14:1」</div><div class="fix"><b>处置</b>深面改用 #A8B2C6 档。第 4 轮发现问题：那条规则的选择器 .guessstat/.statm 全仓库不存在，且诊断本身也错（那两个标签在浅底上）。已删掉无落点的规则。</div></td>
   <td class="st"><span class="tag-no blue">已改</span><span class="cm">d2d3b39</span></td>
 </tr><tr class="s-fixed">
   <td class="id">R3-05</td>
@@ -361,7 +364,7 @@
 </tr><tr class="s-fixed">
   <td class="id">R4-02</td>
   <td><span class="stamp bar red">印红</span></td>
-  <td class="ti">谎报：提交信息里写「.btn[disabled] 改成纸灰档」带具体色值，而 git log 显示这条规则从 v0.3 起从未变过，像素逐位相同<div class="q">「这不是「列在未做里」，这是写在 commit message 里、带具体色值、说改成「降级到纸与灰」，而代码和像素都否证它。你这一轮花最大力气修的就是「自欺的绿」，结果在同一份 commit 里留了一句自欺的白。」</div><div class="fix"><b>处置</b>查明机制：真实选择器是 .btn[disabled],.btn.disabled{...}，我的正则写的是单个选择器，永远匹配不上。已按完整选择器改写。</div></td>
+  <td class="ti">谎报：提交信息里写「.btn[disabled] 改成纸灰档」带具体色值，而 git log 显示这条规则从 v0.3 起从未变过，像素逐位相同<div class="q">「写在commitmessage里、带具体色值、说」</div><div class="fix"><b>处置</b>查明机制：真实选择器是 .btn[disabled],.btn.disabled{...}，我的正则写的是单个选择器，永远匹配不上。已按完整选择器改写。</div></td>
   <td class="st"><span class="tag-no blue">已改</span><span class="cm">bb17ae5</span></td>
 </tr><tr class="s-fixed">
   <td class="id">R4-03</td>
@@ -376,7 +379,7 @@
 </tr><tr class="s-open">
   <td class="id">R4-05</td>
   <td><span class="stamp bar amber">琥珀</span></td>
-  <td class="ti">【到 9 分的第 2 件事】让「声称」可核验 —— 提交信息里每个「改成 X」必须在 git diff 里找得到；每条断言必须能被打红一次<div class="q">「你这一轮丢的分，全部丢在这里，不是丢在审美上。9 分不是「没有错」，是「错误会被系统抓住，而不只是被评委抓住」。」</div><div class="fix"><b>处置</b>部分：新增了 class 级死引用检查与标签配平检查；变异测试未固化进 check.sh。</div></td>
+  <td class="ti">【到 9 分的第 2 件事】让「声称」可核验 —— 提交信息里每个「改成 X」必须在 git diff 里找得到；每条断言必须能被打红一次<div class="q">「你这一轮丢的分，全部丢在这里，不是丢在审美上。」</div><div class="fix"><b>处置</b>部分：新增了 class 级死引用检查与标签配平检查；变异测试未固化进 check.sh。</div></td>
   <td class="st"><span class="tag-no red">未改</span></td>
 </tr><tr class="s-fixed">
   <td class="id">R4-06</td>
@@ -396,7 +399,7 @@
 </tr><tr class="s-fixed">
   <td class="id">R4-09</td>
   <td><span class="stamp bar amber">琥珀</span></td>
-  <td class="ti">full/index-full.png 被切了 —— 三轮都是 900×2077，最后一行停在「猜歪的也是收藏品」<div class="q">「落地页最重要的一次转化按钮，评审看不到。更糟的是：等你把 _sizes.json 接上，这条尺寸断言会把这个截断值记下来，然后永远保它通过。」</div><div class="fix"><b>处置</b>改用 4200 高渲染，.final 与 footer 已进图。</div></td>
+  <td class="ti">full/index-full.png 被切了 —— 三轮都是 900×2077，最后一行停在「猜歪的也是收藏品」<div class="q">「接上，这条尺寸断言会把这个截断值记下来，然后永远保它通过。」</div><div class="fix"><b>处置</b>改用 4200 高渲染，.final 与 footer 已进图。</div></td>
   <td class="st"><span class="tag-no blue">已改</span><span class="cm">bb17ae5</span></td>
 </tr><tr class="s-fixed">
   <td class="id">R4-10</td>
@@ -416,7 +419,7 @@
 </tr><tr class="s-open">
   <td class="id">R4-13</td>
   <td><span class="stamp bar amber">琥珀</span></td>
-  <td class="ti">compose 手机端把落点放在源点上面 —— 顺序是画布在前、转盘在后<div class="q">「页面的标题是「从转盘上拖一张牌，放到画布上」，而手机上顺序是反的 —— 拿起一张牌要往上滚 500px 才能放下。」</div><div class="fix"><b>处置</b>未做。</div></td>
+  <td class="ti">compose 手机端把落点放在源点上面 —— 顺序是画布在前、转盘在后<div class="q">「页面的标题是「从转盘上拖一张牌，放到画布上」，而手机上顺序是反的」</div><div class="fix"><b>处置</b>未做。</div></td>
   <td class="st"><span class="tag-no red">未改</span></td>
 </tr><tr class="s-open">
   <td class="id">R4-14</td>
@@ -470,7 +473,7 @@
 </tr><tr class="s-open">
   <td class="id">R0-05</td>
   <td><span class="stamp bar ink">墨</span></td>
-  <td class="ti">.stamp.half（骑缝章）设计了但 0 处使用<div class="q">「印章压在装订边或纸张边缘上，一半在纸内一半在纸外 —— 这条语言已经设计好了，只是我没用。」</div><div class="fix"><b>处置</b>未做。</div></td>
+  <td class="ti">.stamp.half（骑缝章）设计了但 0 处使用<div class="fix"><b>处置</b>未做。印章压在装订边或纸张边缘上、一半在纸内一半在纸外 —— 这条语言已经设计好了，只是我没用。</div></td>
   <td class="st"><span class="tag-no red">未改</span></td>
 </tr><tr class="s-fixed">
   <td class="id">R0-06</td>

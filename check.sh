@@ -39,7 +39,9 @@ for f in sorted(pathlib.Path("app").glob("*.html")):
 # 页面看起来正常，但结构与作者意图完全不同。作者自己踩过一次
 # （用 str.replace("</style>", X) 往前面插内容，把闭合标签替换掉了）。
 for b in bad: print("     "+b)
-if not bad: print("  \033[32m✓\033[0m 13 页的 style/script/head/body/html 全部配平")
+import pathlib as _pl
+_n = len(list(_pl.Path("app").glob("*.html")))
+if not bad: print(f"  \033[32m✓\033[0m {_n} 页的 style/script/head/body/html 全部配平")
 sys.exit(1 if bad else 0)
 PY
 
@@ -116,6 +118,7 @@ echo "── 7. PWA 接线 ──"
 python3 "$(dirname "$0")/tools/pwa_selectors.py" || fail=1
 
 echo "── 8. 整改台账 ──"
+python3 "$(dirname "$0")/tools/verify_quotes.py" || fail=1
 python3 "$(dirname "$0")/tools/build_ledger.py" >/dev/null 2>&1 || { echo "    build_ledger.py 跑不起来"; fail=1; }
 if [ -f app/issues.html ]; then
   n=$(grep -c 'class="s-' app/issues.html 2>/dev/null || echo 0)
