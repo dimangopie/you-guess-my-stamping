@@ -32,7 +32,6 @@
   --paper-2:#E7E2D2;    /* 次级面：存根、表头 */
   --paper-3:#DCD6C2;    /* 三级面：凹槽、未激活 */
   --paper-4:#FBF9F1;    /* 卡片面：比页面更亮 */
-  --kraft:#D8C7A8;      /* 牛皮纸（档案袋） */
   /* 墨 */
   --ink:#17171B;
   --ink-2:#4A4841;
@@ -86,13 +85,11 @@ section{padding:80px 0}
 .mono{font-family:var(--mono)}
 .tk{font-weight:900;letter-spacing:.28em;text-indent:.28em;line-height:1.35}
 .tk-sm{font-weight:700;letter-spacing:.2em;text-indent:.2em}
-.lbl{font-family:var(--mono);font-size:11.5px;letter-spacing:.14em;color:var(--ink-3)}
-.lbl-lg{font-family:var(--mono);font-size:12.5px;letter-spacing:.3em;color:var(--ink-2)}
+/* .lbl / .lbl-lg / .hint 定义在第 17 节（简化律）—— 那里是最新且唯一的定义 */
 h1.tk{font-size:clamp(26px,4.4vw,44px)}
 h2.tk{font-size:clamp(21px,3.2vw,32px)}
 h3{font-size:19px;font-weight:700;letter-spacing:.06em}
 p.lead{color:var(--ink-2);font-size:16.5px;max-width:34em}
-.hint{font-family:var(--mono);font-size:11px;color:var(--ink-3);letter-spacing:.06em}
 
 .sec-head{display:flex;align-items:flex-end;gap:20px;flex-wrap:wrap;
   border-bottom:2.5px solid var(--ink);padding-bottom:14px;margin-bottom:40px}
@@ -138,8 +135,6 @@ p.lead{color:var(--ink-2);font-size:16.5px;max-width:34em}
 .sheet-hd{background:var(--paper-2);border-bottom:2px solid var(--ink);
   padding:12px 18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
 .sheet-bd{padding:22px}
-/* 牛皮纸面（档案袋） */
-.sheet.kraft{background:var(--kraft);border-color:#8A7550}
 
 .ticket{position:relative;display:grid;grid-template-columns:190px 1fr;
   background:var(--paper-4);border:2px solid var(--ink);border-radius:var(--rad);
@@ -209,9 +204,6 @@ p.lead{color:var(--ink-2);font-size:16.5px;max-width:34em}
 .stamp.crooked{transform:rotate(-14deg) translate(2px,3px);opacity:.8}   /* 盖歪 */
 .stamp.faded{opacity:.4;filter:blur(.4px)}                                /* 缺墨 */
 .stamp.double{box-shadow:1.5px 1.5px 0 rgba(211,58,44,.32)}               /* 重影 */
-
-/* 旧的 crooked 别名（v2 页面用过），保留兼容 */
-.stamp.crooked{transform:rotate(-14deg) translate(2px,3px);opacity:.8}
 
 /* 印章墙：网格排列的章，未得留空框 */
 .sealwall{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:12px}
