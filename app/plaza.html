@@ -143,6 +143,14 @@
 .idx .gauge{margin-top:10px}
 .idx .gauge .val{font-size:15px}
 </style>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#22304F">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="你拼我猜">
 </head>
 <body>
 
@@ -600,5 +608,6 @@ document.querySelectorAll(".reveal").forEach(el=>io.observe(el));
   new MutationObserver(paint).observe(src,{childList:true,characterData:true,subtree:true});
   paint();
 })();</script>
+<script src="pwa.js"></script>
 </body>
 </html>

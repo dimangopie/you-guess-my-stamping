@@ -207,6 +207,14 @@ footer.site a[aria-current]{color:var(--amber)}
   .deny .stamp{position:static;margin-top:12px;display:inline-block}
 }
 </style>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#22304F">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="你拼我猜">
 </head>
 <body>
 
@@ -645,5 +653,6 @@ const io=new IntersectionObserver(es=>es.forEach(e=>{
   if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target)}}),{threshold:.08});
 $$(".reveal").forEach(el=>io.observe(el));
 </script>
+<script src="pwa.js"></script>
 </body>
 </html>

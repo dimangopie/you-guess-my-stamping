@@ -105,6 +105,14 @@
   color:var(--red)}
 .issued .cert .stamp{position:absolute;right:22px;bottom:20px}
 </style>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#22304F">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="你拼我猜">
 </head>
 <body>
 
@@ -380,5 +388,6 @@ $("doNew").addEventListener("click",()=>{
 /* ---------- 签名栏：空着也能办 ---------- */
 $("signLine").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();e.target.blur();}});
 </script>
+<script src="pwa.js"></script>
 </body>
 </html>

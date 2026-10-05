@@ -87,6 +87,14 @@
 .exits{max-width:820px;margin:0 4% 0 auto;padding-top:22px}
 @media(max-width:900px){.exits{margin:0 auto}}
 </style>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#22304F">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="你拼我猜">
 </head>
 <body>
 
@@ -371,5 +379,6 @@ console.log("%c这一页最诚实：它只信 navigator.onLine。\n" +
   "· 「重试连接」是真的去取了一次本页。如果它失败了，问题不在这一页。",
   "color:#4A4841;line-height:1.75;font-family:monospace");
 </script>
+<script src="pwa.js"></script>
 </body>
 </html>

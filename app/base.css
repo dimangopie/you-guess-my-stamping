@@ -436,6 +436,35 @@ p.lead{color:var(--ink-2);font-size:16.5px;max-width:34em}
   .stamping,.punching,.flip,.slot-draw,.queue-no.called{animation:none!important}
 }
 
+
+/* ---------- 16.8 全屏 / 安装（PWA）----------
+   导航右侧的小方块。图标是 CSS 画的两个对角括号 —— 直角、无曲线，
+   和整套语言一致；不写「全屏」二字，导航上已经有五个文字链接了。
+   由 pwa.js 注入，13 个页面共用这一处定义。 */
+.fs-btn{width:32px;height:30px;margin-left:10px;padding:0;cursor:pointer;
+  background:var(--paper);border:1.5px solid var(--ink);border-radius:2px;
+  display:grid;place-items:center;transition:background .15s,border-color .15s;flex:0 0 auto}
+.fs-btn i{position:relative;width:14px;height:14px;display:block}
+.fs-btn i::before,.fs-btn i::after{content:"";position:absolute;width:6px;height:6px;
+  border:1.5px solid var(--ink);transition:border-color .15s,inset .15s}
+.fs-btn i::before{left:0;top:0;border-right:none;border-bottom:none}
+.fs-btn i::after{right:0;bottom:0;border-left:none;border-top:none}
+.fs-btn:hover{background:var(--ink)}
+.fs-btn:hover i::before,.fs-btn:hover i::after{border-color:var(--paper)}
+/* 已在全屏：括号收紧 = 「收回来」 */
+.fs-btn[aria-pressed="true"]{background:var(--red);border-color:var(--red)}
+.fs-btn[aria-pressed="true"] i::before,.fs-btn[aria-pressed="true"] i::after{border-color:var(--paper)}
+.fs-btn[aria-pressed="true"] i::before{left:5px;top:5px}
+.fs-btn[aria-pressed="true"] i::after{right:5px;bottom:5px}
+/* 安装：同一个方块，换成向下的箭头 + 底线（落盘） */
+.fs-install i::before{left:2px;top:0;width:8px;height:8px;
+  border-right:1.5px solid var(--ink);border-bottom:1.5px solid var(--ink);
+  transform:rotate(45deg)}
+.fs-install i::after{left:0;right:auto;bottom:0;top:auto;width:14px;height:0;
+  border:none;border-top:1.5px solid var(--ink)}
+.fs-install:hover i::before{border-color:var(--paper)}
+.fs-install:hover i::after{border-top-color:var(--paper)}
+
 /* ============================================================
    17. 简化律的零件
    一次只说一件事：状态用形状 / 颜色 / emoji 表达，

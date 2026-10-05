@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <rect width="512" height="512" fill="#F2EFE4"/>
+  <rect x="24" y="24" width="464" height="464" fill="none" stroke="#17171B" stroke-width="12"/>
+  <rect x="72" y="72" width="368" height="92" fill="#17171B"/>
+  <text x="256" y="138" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="52"
+        fill="#F2EFE4" text-anchor="middle" letter-spacing="6">1管51</text>
+  <rect x="104" y="204" width="304" height="248" fill="none" stroke="#D33A2C" stroke-width="18"/>
+  <text x="256" y="392" font-family="Songti SC,SimSun,serif" font-size="182" font-weight="900"
+        fill="#D33A2C" text-anchor="middle">猜</text>
+</svg>

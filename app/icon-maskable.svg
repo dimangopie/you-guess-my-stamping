@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <rect width="512" height="512" fill="#17171B"/>
+  <rect x="286" y="196" width="30" height="30" fill="#D33A2C"/>
+  <text x="256" y="330" font-family="Songti SC,SimSun,serif" font-size="230" font-weight="900"
+        fill="#F2EFE4" text-anchor="middle">猜</text>
+</svg>

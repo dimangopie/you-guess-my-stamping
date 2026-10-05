@@ -111,6 +111,9 @@ done
 echo "── 6. 布局不变量（锁死已修过的坑）──"
 python3 "$(dirname "$0")/tools/layout_invariants.py" || fail=1
 
+echo "── 7. PWA 接线 ──"
+python3 "$(dirname "$0")/tools/pwa_selectors.py" || fail=1
+
 echo
 [ "$fail" -eq 0 ] && printf '\033[32m全部通过\033[0m\n' || printf '\033[31m有检查未通过\033[0m\n'
 exit $fail
