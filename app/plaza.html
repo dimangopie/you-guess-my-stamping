@@ -128,13 +128,6 @@
 /* 细实线进度：一格一格跳，不做缓动 */
 .thinbar i{display:block;height:2px;width:0;background:var(--ink)}
 
-/* ---------- 夹页广告：塞在公告栏里的一张折过的纸 ---------- */
-
-
-
-
-
-.ad-note{margin:0;text-align:center;padding:2px 0}
 
 /* ---------- 热门词库 ---------- */
 .bankrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(232px, 100%), 1fr));gap:16px}
@@ -431,7 +424,6 @@ function applyFilter(f){
     else if(f==="new") show=el.dataset.new==="1";
     el.style.display=show?"":"none";
   });
-  listEl.querySelectorAll(".insert").forEach(el=>{el.style.display="";});
 }
 $("filter").addEventListener("click",e=>{
   const b=e.target.closest("button"); if(!b) return;

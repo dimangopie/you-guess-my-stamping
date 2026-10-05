@@ -146,8 +146,11 @@ p.lead{color:var(--ink-2);font-size:16.5px;max-width:34em}
 .btn.blue{background:var(--blue);box-shadow:4px 4px 0 var(--ink)}
 .btn.sm{padding:8px 16px;font-size:12.5px;box-shadow:var(--sh-1)}
 .btn.sm:hover{box-shadow:3px 3px 0 var(--ink)}
-.btn[disabled],.btn.disabled{opacity:.45;cursor:not-allowed;transform:none!important;
-  box-shadow:var(--sh-1)!important;filter:grayscale(.5)}
+.btn[disabled],.btn.disabled{background:var(--paper-3);color:var(--ink-3);
+  border-color:var(--ink-4);box-shadow:none;cursor:not-allowed;opacity:1;transform:none!important}
+/* 禁用态不能用 grayscale 滤镜：opacity .45 + grayscale .5 会把印红
+   渲成 #CDAAA2 —— token 表里没有的粉色，白字在上面只有 2.07:1。
+   改用「降级到纸与灰」，这是这套语言本来就有的档。 */
 .btn-row{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
 
 /* ---------- 6. 纸面与票据 ---------- */

@@ -78,6 +78,38 @@ if SIZES.exists():
         if got and abs(got - h) / max(h, 1) > 0.03:
             bad.append(f"{img} 高度 {got}，期望 {h}（±3%）—— 图是新的但画错了尺寸")
 
+
+# ── ④ class 级死引用 ──
+# K3 第四轮原话：「.guessstat / .statm 这两个词，在整个仓库里只出现一次 ——
+# 你自己写的那行。那两行注释解释得很诚恳，但它们描述的修复没有任何落点。」
+# 现有的「无死引用」只查 id，看不见「写了选择器却没元素」。
+#
+# ⚠ 只扫 <style> 块里**出现在 { 之前**的 .class ——
+#    否则 JS 里的 x.addEventListener / a.svg / b.css 全会被当成选择器（第一版就踩了）。
+everywhere = " ".join(x.read_text(encoding="utf-8") for x in app.glob("*.html")) + \
+             (app / "base.css").read_text(encoding="utf-8")
+
+def _has_element(cls):
+    pat = re.escape(cls)
+    return bool(
+        re.search(r'class="[^"]*\b' + pat + r'\b', everywhere)
+        or re.search(r'classList\.(?:add|toggle|remove)\("' + pat + r'"', everywhere)
+        or re.search(r'className\s*=\s*"[^"]*\b' + pat + r'\b', everywhere)
+        or re.search(r'querySelector(?:All)?\("[^"]*\.' + pat + r'\b', everywhere)   # 被 JS 查询也算有落点
+        # 动态拼接也算：.seats i.free 是靠 (i<taken?"":"free") 加上的，
+        # 第一版漏了这条，把 .free / .is-off 全误报成死选择器。
+        or re.search(r'["\'][^"\']*\b' + pat + r'\b[^"\']*["\']', everywhere)
+    )
+
+for f in sorted(app.glob("*.html")):
+    src = f.read_text(encoding="utf-8")
+    for st in re.findall(r"<style>(.*?)</style>", src, re.S):
+        st = re.sub(r'/\*.*?\*/', '', st, flags=re.S)          # 先剥注释
+        for sel in re.findall(r'(?:^|[};,])\s*([^{};,]*?)\{', st):
+            for cls in re.findall(r'\.([a-z][\w-]{2,})', sel):
+                if not _has_element(cls):
+                    bad.append(f"{f.name}: 选择器 .{cls} 没有任何元素带这个 class（写了没落点）")
+
 for b in bad: print("     " + b)
 if not bad:
     print(f"  \033[32m✓\033[0m {len(MAP)} 张截图新鲜、映射显式、无过期关键词（扫源）")

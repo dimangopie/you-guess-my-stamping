@@ -63,7 +63,7 @@
 .wrong .board .c2{letter-spacing:.14em}
 .wrong .board .row.you{background:rgba(211,58,44,.16)}
 .wrong .board .row.you .c2{color:#FFD9D2}
-.wrong .board .top .c2{color:var(--amber-ink)}
+.wrong .board .top .c2{color:var(--amber)}   /* 深底 --screen：amber-ink 只有 2.27:1，原色 4.44:1 */
 .wrong .locked{padding:26px 20px;text-align:center;background:var(--screen);color:#A9B4CB;
   font-family:var(--mono);font-size:12px;line-height:2;border:2px solid var(--ink);
   border-radius:var(--rad)}
@@ -81,7 +81,6 @@
 /* .lbl 提到 --ink-2 之后，落在这块深色统计条上只有 1.43:1 ——
    「已被猜 212 次」「猜中率 38%」等于没画。
    深面要配深面专用的那一档（base.css 里 nav/footer 用的就是它）。 */
-.guessstat .lbl, .statm .lbl{color:#A8B2C6}
 
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#22304F">
