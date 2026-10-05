@@ -309,10 +309,10 @@ function cancelCarry(){
 }
 function putDown(clientX,clientY){
   if(!carry) return false;
-  const r=cv.getBoundingClientRect();
-  const inside = clientX>=r.left&&clientX<=r.right&&clientY>=r.top&&clientY<=r.bottom;
+  const b=box();
+  const inside = clientX>=b.l&&clientX<=b.l+b.w&&clientY>=b.t&&clientY<=b.t+b.h;
   if(!inside){ cancelCarry(); return false; }
-  const x=(clientX-r.left)/r.width*100, y=(clientY-r.top)/r.height*100;
+  const x=(clientX-b.l)/b.w*100, y=(clientY-b.t)/b.h*100;
   const sp=carry.spoke, glyph=carry.glyph;
   carry.ghost.remove(); carry=null; cv.classList.remove("armed");
   sp.classList.add("used");
@@ -372,13 +372,29 @@ function place(glyph,x,y,isNew){
   select(el); refresh();
 }
 
+/* ⚠ 一个数字工具：parseFloat 失败才回退，不要用 || 兜底。
+   `parseFloat(x) || 50` 是错的 —— 位置合法地等于 0 时，0 是假值，
+   会被当成"没值"而替换成 50。表现就是牌一拖到左/上边缘就弹回中心。 */
+function num(v,dflt){ const n=parseFloat(v); return isNaN(n)?dflt:n; }
+
+/* 画布的内容盒（left:% 的参照系）。
+   注意：left:% 相对的是**内边距盒**，而 getBoundingClientRect() 给的是**边框盒**，
+   两者差一个 2px 边框。统一用这一个函数取，避免两套坐标系各夹各的。 */
+function box(){
+  const r=cv.getBoundingClientRect(), cs=getComputedStyle(cv);
+  return { l:r.left+parseFloat(cs.borderLeftWidth),
+           t:r.top +parseFloat(cs.borderTopWidth),
+           w:cv.clientWidth, h:cv.clientHeight };
+}
+
 /* 把牌夹在画布里，不让它被裁掉 */
 function clampInto(el){
-  const s=parseFloat(el.style.getPropertyValue("--s"))||1;
-  const w=el.offsetWidth*s, h=el.offsetHeight*s;
-  const hx=Math.min(50,w/2/cv.clientWidth*100), hy=Math.min(50,h/2/cv.clientHeight*100);
-  el.style.left=Math.max(hx,Math.min(100-hx,parseFloat(el.style.left)||50))+"%";
-  el.style.top =Math.max(hy,Math.min(100-hy,parseFloat(el.style.top)||50))+"%";
+  const s=num(el.style.getPropertyValue("--s"),1);
+  const b=box();
+  const hx=Math.min(50, el.offsetWidth *s/2/b.w*100);
+  const hy=Math.min(50, el.offsetHeight*s/2/b.h*100);
+  el.style.left=Math.max(hx,Math.min(100-hx, num(el.style.left, 50)))+"%";
+  el.style.top =Math.max(hy,Math.min(100-hy, num(el.style.top , 50)))+"%";
 }
 
 /* ============================================================
@@ -388,8 +404,8 @@ function select(el){
   pieces.forEach(p=>p.classList.remove("sel"));
   sel=el; if(el) el.classList.add("sel");
 }
-function sOf(el){ return parseFloat(el.style.getPropertyValue("--s"))||1; }
-function rOf(el){ return parseFloat(el.style.getPropertyValue("--r"))||0; }
+function sOf(el){ return num(el.style.getPropertyValue("--s"), 1); }
+function rOf(el){ return num(el.style.getPropertyValue("--r"), 0); }   /* 0deg 是合法角度 */
 function dist(e,cx,cy){ return Math.hypot(e.clientX-cx,e.clientY-cy); }
 function ang(e,cx,cy){ return Math.atan2(e.clientY-cy,e.clientX-cx)*180/Math.PI; }
 
@@ -414,13 +430,13 @@ cv.addEventListener("pointerdown",e=>{
     }
     return;
   }
-  const r=cv.getBoundingClientRect();
-  const cx=r.left+r.width*parseFloat(p.style.left)/100;
-  const cy=r.top +r.height*parseFloat(p.style.top)/100;
+  const b=box();
+  const cx=b.l+b.w*num(p.style.left,50)/100;
+  const cy=b.t+b.h*num(p.style.top,50)/100;
   if(e.target.classList.contains("h-scale"))      mode={t:"scale",el:p,d0:dist(e,cx,cy),s0:sOf(p),cx,cy};
   else if(e.target.classList.contains("h-rot"))   mode={t:"rotate",el:p,a0:ang(e,cx,cy),r0:rOf(p),cx,cy};
-  else mode={t:"move",el:p,r,          // r 存下来给 pointermove 用（拖动期间画布不动）
-             dx:e.clientX-cx,          // 抓点相对牌心的偏移（视口坐标）
+  else mode={t:"move",el:p,b,           // b 存下来给 pointermove 用（拖动期间画布不动）
+             dx:e.clientX-cx,           // 抓点相对牌心的偏移（视口坐标）
              dy:e.clientY-cy};
   try{ p.setPointerCapture(e.pointerId); }catch(_){}
 });
@@ -429,14 +445,18 @@ addEventListener("pointermove",e=>{
   if(!mode) return;
   const p=mode.el;
   if(mode.t==="move"){
-    /* ⚠ 必须减 r.left / r.top。
-       抓取偏移 dx 是在「视口坐标」下算出来的（e.clientX - 牌心），
-       而 left% 要的是「画布内坐标」。少了这一减，X 会被整体推偏 r.left，
-       画布在中间栏时（r.left≈390 / 画布宽 520）牌会一拖就贴到右边缘。
-       r 在 pointerdown 时存进 mode —— 拖动期间画布不会动，不必每次重算。 */
-    const r=mode.r;
-    p.style.left=Math.max(0,Math.min(r.width, e.clientX-mode.dx-r.left))/r.width*100+"%";
-    p.style.top =Math.max(0,Math.min(r.height,e.clientY-mode.dy-r.top ))/r.height*100+"%";
+    /* ⚠ 两次坐标换算，缺一不可：
+       ① 减 b.l / b.t —— dx 是在「视口坐标」下算的（e.clientX - 牌心），
+          而 left% 要的是「画布内坐标」。少了这一减，X 会整体偏掉 b.l
+          （画布在中间栏时 b.l≈440 / 画布宽 516，牌一拖就贴右边缘）。
+       ② 夹取用 b.w / b.h（内容盒），和 clampInto 保持同一套坐标 ——
+          之前这里用含边框的 r.width，和 clampInto 的 clientWidth 差 4px。
+       b 在 pointerdown 时存进 mode，拖动期间画布不动，不必每帧重算。 */
+    const b=mode.b;
+    const nx=Math.max(0,Math.min(b.w, e.clientX-mode.dx-b.l))/b.w*100;
+    const ny=Math.max(0,Math.min(b.h, e.clientY-mode.dy-b.t))/b.h*100;
+    p.style.left=nx+"%";
+    p.style.top =ny+"%";
     clampInto(p);
   }else if(mode.t==="scale"){
     const k=dist(e,mode.cx,mode.cy)/Math.max(mode.d0,1);
