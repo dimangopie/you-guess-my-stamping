@@ -223,18 +223,6 @@ p.lead{color:var(--ink-2);font-size:16.5px;max-width:34em}
 .sealwall .s .n{font-family:var(--mono);font-size:11px;letter-spacing:.1em;line-height:1.5}
 .sealwall .s .d{font-family:var(--mono);font-size:9.5px;color:var(--ink-3);margin-top:5px;line-height:1.4}
 
-/* —— 油墨扩散（材质滤镜）——
-   ⚠ 三条坑，全是实测踩出来的，别再踩：
-   ① **不要用 CSS 自定义属性中转**：filter:var(--x) 里若 --x 是 data-URI 的
-      SVG 滤镜，Firefox 完全不渲染 —— 而 getComputedStyle 会返回正确的 url。
-   ② **不要用 data-URI**：同一个 data-URI 滤镜，有时渲染有时不渲染，无法预测。
-      外部表、内联 <style>、变量中转都试过，全都不稳。
-   ③ **唯一可靠的路径是页面内联 <svg><defs><filter> + filter:url(#id)**。
-      代价是每页多一段 6 行的 svg（见各页 <body> 之后）。
-   另：作用域（x/y/width/height）必须给足 260% —— 给 140% 时位移几乎不可见。
-   参数：低频噪声 + scale 3.2~4.6（早先用 6~9，用户反馈「太夸张」，已收）。 */
-.stamp, .wet{filter:url(#ink-soft)}
-.seal, .stamp.deep, .wet-hard{filter:url(#ink-hard)}
 
 /* 圆形压印（头像/钢印用） */
 .seal{width:96px;height:96px;border:3px solid var(--red);border-radius:50%;

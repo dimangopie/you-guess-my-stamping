@@ -67,9 +67,14 @@ section[id]{scroll-margin-top:130px}
 .feed{display:flex;align-items:center;gap:12px;padding-bottom:10px;height:30px}
 .feed-no{font-family:var(--mono);font-size:12px;letter-spacing:.1em;color:#B0BACC;
   white-space:nowrap;font-variant-numeric:tabular-nums;min-width:15ch}
-.thinbar{flex:1 1 0;min-width:0;height:2px;background:rgba(242,239,228,.18)}
+/* 进度条必须脱离文档流。
+   #fill 的宽度由 JS 从 0% 写到 100%，百分比相对 .thinbar 解析；
+   而 .thinbar 是 flex item，宽度又依赖 .feed-no 的文本宽度 ——
+   两者互相牵连就构成了反馈回路。position:absolute 之后 #fill 不参与
+   任何内在尺寸计算，宽度写多少都不可能影响祖先的尺寸。 */
+.thinbar{position:relative;flex:1 1 0;min-width:0;height:2px;background:rgba(242,239,228,.18)}
 /* 细实线进度：一格一格跳，不做缓动 —— 机器是机械的 */
-.thinbar i{display:block;height:2px;width:0;background:var(--amber)}
+.thinbar i{position:absolute;left:0;top:0;height:2px;width:0;background:var(--amber)}
 .gate-slot{height:9px;background:#000;margin:0 -14px;position:relative}
 .gate-slot i{position:absolute;left:14px;right:14px;top:3px;height:2px;background:rgba(255,255,255,.14)}
 
@@ -190,20 +195,6 @@ footer.site .wrap{align-items:center}
 </style>
 </head>
 <body>
-<!-- 材质滤镜：印章的油墨扩散。必须内联 —— data-URI 的 SVG 滤镜在 Firefox 上时灵时不灵，
-     CSS 自定义属性中转则完全不渲染。详见 base.css「油墨扩散」一节。 -->
-<svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute">
-  <defs>
-    <filter id="ink-soft" x="-80%" y="-80%" width="260%" height="260%">
-      <feTurbulence type="fractalNoise" baseFrequency=".07" numOctaves="3" seed="5" result="n"/>
-      <feDisplacementMap in="SourceGraphic" in2="n" scale="3.2" xChannelSelector="R" yChannelSelector="G"/>
-    </filter>
-    <filter id="ink-hard" x="-80%" y="-80%" width="260%" height="260%">
-      <feTurbulence type="fractalNoise" baseFrequency=".05" numOctaves="3" seed="11" result="n"/>
-      <feDisplacementMap in="SourceGraphic" in2="n" scale="4.6" xChannelSelector="R" yChannelSelector="G"/>
-    </filter>
-  </defs>
-</svg>
 
 
 <header class="nav">

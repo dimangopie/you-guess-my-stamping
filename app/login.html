@@ -107,20 +107,6 @@
 </style>
 </head>
 <body>
-<!-- 材质滤镜：印章的油墨扩散。必须内联 —— data-URI 的 SVG 滤镜在 Firefox 上时灵时不灵，
-     CSS 自定义属性中转则完全不渲染。详见 base.css「油墨扩散」一节。 -->
-<svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute">
-  <defs>
-    <filter id="ink-soft" x="-80%" y="-80%" width="260%" height="260%">
-      <feTurbulence type="fractalNoise" baseFrequency=".07" numOctaves="3" seed="5" result="n"/>
-      <feDisplacementMap in="SourceGraphic" in2="n" scale="3.2" xChannelSelector="R" yChannelSelector="G"/>
-    </filter>
-    <filter id="ink-hard" x="-80%" y="-80%" width="260%" height="260%">
-      <feTurbulence type="fractalNoise" baseFrequency=".05" numOctaves="3" seed="11" result="n"/>
-      <feDisplacementMap in="SourceGraphic" in2="n" scale="4.6" xChannelSelector="R" yChannelSelector="G"/>
-    </filter>
-  </defs>
-</svg>
 
 
 <header class="nav">
