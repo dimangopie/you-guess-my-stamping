@@ -162,8 +162,13 @@ main>*{width:100%}
   overflow:hidden;background:var(--paper-4);border:2px solid var(--ink);border-radius:var(--rad);
   box-shadow:var(--sh-soft);touch-action:none;
   background-image:
+    /* 纸纤维噪声 —— 原来只有 body 有，画布是纯色。
+       评委：「emoji 放上去就是悬浮的贴图 …… 和 Figma 画布没有任何血缘差别。」
+       画布本身先得是纸，贴上去的东西才可能像贴在纸上。 */
+    var(--fiber),
     repeating-linear-gradient(0deg,rgba(23,23,27,.055) 0 1px,transparent 1px 33.4%),
-    repeating-linear-gradient(90deg,rgba(23,23,27,.055) 0 1px,transparent 1px 33.4%)}
+    repeating-linear-gradient(90deg,rgba(23,23,27,.055) 0 1px,transparent 1px 33.4%);
+  background-size:160px 160px,auto,auto}
 .canvas.armed{outline:2px dashed var(--blue);outline-offset:-7px}
 .canvas .ph{padding-bottom:44px;   /* 给右下角的「重发」让位 */
   position:absolute;inset:0;display:grid;place-items:center;text-align:center;
@@ -177,7 +182,21 @@ main>*{width:100%}
   filter:drop-shadow(1px 2px 0 rgba(23,23,27,.14));
   padding:.04em;border-radius:.06em;touch-action:none}
 .pc.sel{cursor:move}
-.pc .g{pointer-events:none}
+/* ── emoji 上纸：贴纸化 ─────────────────────────────────
+   评委原话：「现在的 emoji 是亮面默认 emoji 怼在哑光纸面上，两种材质打架。
+   给所有 emoji 加统一描边/贴纸化处理。这是全站美术执行唯一的系统性裂缝。」
+   做法是两层 filter 链：
+     前四道 = 四方向白色硬描边（贴纸的白边，用画布纸色而非纯白）
+     第五道 = 统一方向的硬投影，与本语言「硬投影无模糊」一致
+   链式 filter 的顺序有意义：后一道作用于前一道的结果，
+   所以投影投的是「带白边的贴纸」而不是「emoji 本身」。 */
+.pc .g{pointer-events:none;
+  filter:
+    drop-shadow(1.6px 0 0 var(--paper-4))
+    drop-shadow(-1.6px 0 0 var(--paper-4))
+    drop-shadow(0 1.6px 0 var(--paper-4))
+    drop-shadow(0 -1.6px 0 var(--paper-4))
+    drop-shadow(3px 4px 0 rgba(23,23,27,.30))}
 .pc.stamping{animation:stamp-down .28s cubic-bezier(.3,1.5,.5,1)}
 @keyframes stamp-down{
   0%{transform:translate(-50%,-50%) scale(calc(var(--s) * 2)) rotate(var(--r));opacity:.2}
@@ -185,7 +204,7 @@ main>*{width:100%}
   100%{transform:translate(-50%,-50%) scale(var(--s)) rotate(var(--r))}}
 
 /* 选中框与控制点：控制点反向缩放，尺寸恒定 */
-.pc.sel::before{content:"";position:absolute;inset:-.12em;border:1.5px dashed var(--blue);
+.pc.sel::before{content:"";position:absolute;inset:-.2em;border:1.5px dashed var(--blue);
   border-radius:.1em;pointer-events:none}
 .pc .h{position:absolute;width:16px;height:16px;background:#fff;border:2px solid var(--blue);
   border-radius:50%;transform:scale(calc(1 / var(--s)));cursor:pointer;display:none;z-index:2}

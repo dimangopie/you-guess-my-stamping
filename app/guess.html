@@ -60,6 +60,12 @@
 .verdict .seal{position:absolute;right:18px;bottom:16px}
 
 /* ---------- 歪解榜（屏 = 深色） ---------- */
+/* ⚠ 榜单行的 grid-template-columns 从来没定义过 ——
+   plaza 有（.rk .row{grid-template-columns:38px 1fr auto}），guess 漏了。
+   结果 .board .row 退化成单列，序号/答案/作者/票数四格**竖着堆**，
+   行高被撑到 ~110px。评委原话：「每行极高，被摊到四个角落填充高度，
+   行内约六成是死空间。」—— 原因不是 padding，是列没定义。 */
+.wrong .board .row{grid-template-columns:34px minmax(0,1fr) auto auto;gap:0}
 .wrong .board .c2{letter-spacing:.14em}
 .wrong .board .row.you{background:rgba(211,58,44,.16)}
 .wrong .board .row.you .c2{color:#FFD9D2}
@@ -71,6 +77,7 @@
 .vote{background:none;border:1.5px solid #4A4841;border-radius:2px;color:var(--screen-ink);
   font-family:var(--mono);font-size:11px;padding:2px 8px;cursor:pointer;line-height:1.5}
 .vote:hover{border-color:var(--amber-lit);color:var(--amber-lit)}
+.vote .glow{color:var(--amber-lit)}   /* --amber 在藏青上 4.44:1，差 0.06 不过 AA */
 .vote.on{background:var(--amber);border-color:var(--amber-ink);color:var(--ink)}
 
 /* 出题人卡片 */

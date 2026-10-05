@@ -182,7 +182,10 @@ ANCESTRY = {
     ".logo": ".nav", ".nav nav a": ".nav", "body>.nav": ".nav",
     ".vote": ".board",                      # guess：榜单行由 renderBoard() 生成在深色板里
     "#score .srow": "#score", "#score .throw": "#score",
-    ".row.top1": ".rk", ".rk .row": ".rk",
+    ".row.top1": ".rk", ".rk .row": ".board",   # ⚠ 原来写的是 .rk —— 但 .rk 是**纸**（.sheet.rk），
+    #   深色的是它里面的 <div class="board" id="rk-wrong">。
+    #   这一条猜错，让普查静默放过了两条 2.0:1 的文字（票数与副标题）。
+    ".rk .c3 b": ".board", ".rk .sub": ".board", ".rk .c1": ".board",
     "#score": ".board", ".srow": ".board", ".throw": ".board",
 }
 # ② 豁免表：真·误报，写明理由。
