@@ -71,8 +71,6 @@
 .urge b{color:var(--ink)}
 
 /* ---------- 装订成册：孔要穿透装订带 ---------- */
-.bind::before{z-index:3}
-.bind-strip{z-index:2}
 
 /* ---------- 票根列表 ---------- */
 #list{display:grid;gap:24px}
@@ -223,9 +221,6 @@
   .tl-row:not(:last-child) .tl-x::before{left:9px}
   .tl-mark{grid-column:3}
   .sweetnote{margin-left:0}
-  .bind{padding-left:26px}
-  .bind::before{left:7px}
-  .bind-strip{left:3px;width:20px}
 }
 </style>
 <link rel="manifest" href="manifest.webmanifest">
@@ -372,10 +367,7 @@
 <!-- ============ 票根册（装订 + 打孔） ============ -->
 <section class="listsec">
   <div class="wrap">
-    <div class="bind">
-      <span class="bind-strip" aria-hidden="true"></span>
-      <div id="list" class="reveal"></div>
-    </div>
+    <div id="list" class="reveal"></div>
 
     <!-- 卷宗调阅（真分页） -->
     <div class="pager sheet" id="pager" aria-label="卷宗调阅"></div>

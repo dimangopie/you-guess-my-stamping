@@ -78,7 +78,7 @@ section[id]{scroll-margin-top:130px}
    编号是变长的（演示循环会换号），若编号变长而 .thinbar 有 min-width:80px 顶着，
    整行会溢出；高度也可能随字号/换行变化。这里把高度钉死、编号用等宽数字。 */
 .feed{display:flex;align-items:center;gap:12px;padding-bottom:10px;height:30px}
-.feed-no{font-family:var(--mono);font-size:12px;letter-spacing:.1em;color:#B0BACC;
+.feed-no{font-family:var(--mono);font-size:12px;letter-spacing:.1em;color:var(--screen-ink);
   white-space:nowrap;font-variant-numeric:tabular-nums;min-width:15ch}
 /* 进度条必须脱离文档流。
    #fill 的宽度由 JS 从 0% 写到 100%，百分比相对 .thinbar 解析；

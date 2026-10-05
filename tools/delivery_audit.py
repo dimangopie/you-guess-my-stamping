@@ -50,6 +50,10 @@ MAP = {
     "full/plaza-mobile.png": "plaza.html", "full/compose-mobile.png": "compose.html",
     "full/guess-mobile.png": "guess.html",
     "issues.png": "issues.html",
+    # 元素特写（定点评审用的分析图），来源页见右
+    "el-1-bind.png": "works.html", "el-2-footer-login.png": "login.html",
+    "el-3-footer-guess.png": "guess.html",
+    "el-all.png": "works.html",
 }
 stale, missing = [], []
 for img, src in MAP.items():

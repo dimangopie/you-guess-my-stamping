@@ -240,8 +240,6 @@
 .dcard .hint{display:block;line-height:1.7}
 .flds .fld:last-child{border-bottom:none}
 .fld .sv{font-family:var(--sans);font-size:13px}
-.bind::before{z-index:3}
-.bind-strip{z-index:2}
 .lcard-ft{margin-top:16px;padding-top:14px;border-top:1.5px dashed var(--ink-3);
   display:flex;align-items:center;gap:14px;flex-wrap:wrap}
 .lcard-ft .btn{margin-left:auto}
@@ -482,10 +480,7 @@
           <span class="meta mla">前 12 / 48 条</span>
         </div>
         <div class="sheet-bd">
-          <div class="bind">
-            <span class="bind-strip" aria-hidden="true"></span>
-            <div class="board light" id="termBoard"></div>
-          </div>
+          <div class="board light" id="termBoard"></div>
           <div class="lcard-ft">
             <a class="btn sm ghost" href="banks.html#termBoard">展开全部 48 条</a>
           </div>

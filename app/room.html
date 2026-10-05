@@ -121,7 +121,7 @@
 /* 倒计时读数 = 屏 */
 .cd-strip{display:flex;align-items:flex-end;justify-content:space-between;gap:16px}
 .cd-box{background:var(--screen);border-radius:2px;padding:8px 18px;text-align:right}
-.cd-box .k{font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:#A8B2C6}
+.cd-box .k{font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:var(--screen-ink)}
 /* 字号交给 .flap 控制 */.cd-v{font-size:inherit;font-family:var(--mono);font-weight:700;font-size:clamp(32px,4.4vw,50px);line-height:.95;
   color:var(--amber-ink);font-variant-numeric:tabular-nums;transition:color .25s}
 .cd-v.urgent{color:var(--red-ink)}
@@ -138,7 +138,7 @@
 .winbar{margin-top:16px;background:var(--screen);border-radius:2px;padding:14px 18px;
   display:flex;align-items:center;gap:22px;flex-wrap:wrap;border-bottom:4px solid var(--amber)}
 .winbar .q{display:grid;gap:2px;text-align:center}
-.winbar .q .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.22em;color:#A8B2C6}
+.winbar .q .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.22em;color:var(--screen-ink)}
 .winbar .queue-no{font-size:44px}
 .winbar .signs{display:flex;gap:8px;flex-wrap:wrap;flex:1;min-width:190px}
 .winbar .window-sign{background:rgba(242,239,228,.08);border-bottom-color:var(--ink-3)}
@@ -185,8 +185,8 @@
 .srow .c2{display:flex;align-items:center;gap:9px}
 .srow .sc{font-family:var(--mono);font-weight:700;font-size:15px;color:var(--paper);
   font-variant-numeric:tabular-nums}
-#score .throw .lbl{color:#A8B2C6}
-#score .srow .c4{color:#A8B2C6;font-size:13px}
+#score .throw .lbl{color:var(--screen-ink)}
+#score .srow .c4{color:var(--screen-ink);font-size:13px}
 /* 猜测流的合计：emoji 承担名词，一行两三个数字（律五） */
 .flow-sum{display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:0 14px;
   font-family:var(--mono);font-size:11px;letter-spacing:.06em;color:var(--ink-3);
@@ -225,8 +225,8 @@ footer.site a[aria-current]{color:var(--amber-lit)}
 .ctx button:hover{background:rgba(201,138,14,.16);color:var(--amber-lit)}
 .ctx button .ci{width:17px;text-align:center;opacity:.7}
 .ctx button .cl{display:flex;flex-direction:column;line-height:1.5}
-.ctx button .cl i{font-style:normal;font-size:10.5px;color:#8D99B1;letter-spacing:.04em}
-.ctx .ctx-f{padding:7px 12px;font-family:var(--mono);font-size:10px;letter-spacing:.08em;color:#8D99B1}
+.ctx button .cl i{font-style:normal;font-size:10.5px;color:var(--screen-ink-2);letter-spacing:.04em}
+.ctx .ctx-f{padding:7px 12px;font-family:var(--mono);font-size:10px;letter-spacing:.08em;color:var(--screen-ink-2)}
 
 /* ---- 画布上的柜台动作结果 ---- */
 /* 撕口：一条锯齿纸边压在画布下沿（用元素不用伪元素，避免和别的伪元素打架） */
@@ -345,7 +345,7 @@ footer.site a[aria-current]{color:var(--amber-lit)}
               <span class="hint" title="本题时限">⏱ <b id="limitTxt">60</b>s</span>
               <span class="cd-box">
                 <span class="k">本 题 剩 余</span>
-                <span class="cd-v" id="cd">47</span><span class="cd-u" style="color:#A8B2C6">秒</span>
+                <span class="cd-v" id="cd">47</span><span class="cd-u" style="color:var(--screen-ink)">秒</span>
               </span>
             </div>
             <div class="tick" id="tick"><i id="tickFill" style="width:78%"></i></div>

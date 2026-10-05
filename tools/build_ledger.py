@@ -191,16 +191,19 @@ def build():
     # ⚠ 幂等：内容没变就不写盘。
     #   否则 check.sh 每跑一次都把 issues.html 的 mtime 推新，
     #   第 5 组就永远报「截图过期」—— 自己把自己判成陈旧交付物。
+    #
+    #   第一版的判定正则写成「截至 …」，而页面里的真实文本是「截 至 …」
+    #   （截与至之间**有空格**），于是它永远匹配不上、每次都判定为「变了」，
+    #   把幂等写成了每跑必写。教训：判定用的模式必须从真实产物里取，不能凭记忆写。
+    STAMP_RE = r"截\s*至\s*[\d\-]+\s+[\d:]+"
     old = OUT.read_text(encoding="utf-8") if OUT.exists() else ""
-    new = page.replace(stamp, "STAMP")            # 时间戳不参与比较
-    if old.replace(re.search(r"截 至 [\d-]+ [\d:]+", old).group(0), "STAMP") if re.search(r"截 至 [\d-]+ [\d:]+", old) else old != new:
-        pass
-    changed = not old or re.sub(r"截至 [\d\-]+ [\d:]+", "", old) != re.sub(r"截至 [\d\-]+ [\d:]+", "", page)
+    changed = re.sub(STAMP_RE, "STAMP", old) != re.sub(STAMP_RE, "STAMP", page)
     if changed:
         OUT.write_text(page, encoding="utf-8")
-        print(f"  ✓ {OUT.relative_to(ROOT)} 已更新（{n} 条：已改 {c['fixed']} · 半改 {c['partial']} · 未改 {c['open']}）")
+        print(f"  \u2713 {OUT.relative_to(ROOT)} \u5df2\u66f4\u65b0\uff08{n} \u6761\uff1a"
+              f"\u5df2\u6539 {c['fixed']} \u00b7 \u534a\u6539 {c['partial']} \u00b7 \u672a\u6539 {c['open']}\uff09")
     else:
-        print(f"  = {OUT.relative_to(ROOT)} 无变化（内容与上次一致，不写盘）")
+        print(f"  = {OUT.relative_to(ROOT)} \u65e0\u53d8\u5316\uff08\u5185\u5bb9\u4e0e\u4e0a\u6b21\u4e00\u81f4\uff0c\u4e0d\u5199\u76d8\uff09")
 
 
 ROUND_TITLE = {

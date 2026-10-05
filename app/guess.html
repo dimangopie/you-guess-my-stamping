@@ -64,11 +64,11 @@
 .wrong .board .row.you{background:rgba(211,58,44,.16)}
 .wrong .board .row.you .c2{color:#FFD9D2}
 .wrong .board .top .c2{color:var(--amber-lit)}   /* 深底 --screen：amber-ink 只有 2.27:1，原色 4.44:1 */
-.wrong .locked{padding:26px 20px;text-align:center;background:var(--screen);color:#A9B4CB;
+.wrong .locked{padding:26px 20px;text-align:center;background:var(--screen);color:var(--screen-ink);
   font-family:var(--mono);font-size:12px;line-height:2;border:2px solid var(--ink);
   border-radius:var(--rad)}
 .wrong .locked b{color:var(--amber-lit)}   /* 深底：amber-ink 只有 2.27:1 */
-.vote{background:none;border:1.5px solid #4A4841;border-radius:2px;color:#A8B2C6;
+.vote{background:none;border:1.5px solid #4A4841;border-radius:2px;color:var(--screen-ink);
   font-family:var(--mono);font-size:11px;padding:2px 8px;cursor:pointer;line-height:1.5}
 .vote:hover{border-color:var(--amber-lit);color:var(--amber-lit)}
 .vote.on{background:var(--amber);border-color:var(--amber-ink);color:var(--ink)}
@@ -113,7 +113,7 @@
 
 <section class="head">
   <div class="wrap">
-    <span class="lbl-lg">猜 题 单 · NO. 1管5-128</span>
+    <span class="lbl-lg">收 发 处 · 猜 题 单 · NO. 1管5-128</span>
     <h1 class="tk">这堆 emoji 是什么？</h1>
     <div class="from">
       <div class="fromcard">
@@ -211,12 +211,7 @@
 
 </main>
 
-<footer class="site">
-  <div class="wrap">
-    <span>你拼我猜 · 猜题单</span>
-    <span>1管51 站 · 收发处</span>
-  </div>
-</footer>
+<!-- 页脚已删（同上）。「收发处」是它唯一一次出现，已搬进抬头。 -->
 
 <script>
 const $=id=>document.getElementById(id);

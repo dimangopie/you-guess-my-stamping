@@ -7,6 +7,11 @@ set -u
 cd "$(dirname "$0")"
 
 fail=0
+
+# ⚠ 台账必须在**任何交付物审计之前**生成。
+#   否则「第 8 组重写 issues.html」会把它的 mtime 推到「第 5 组检查截图」之后，
+#   造成同一个脚本第一次跑绿、第二次跑红 —— 检查结果取决于这是第几次跑。
+python3 "$(dirname "$0")/tools/build_ledger.py" >/dev/null 2>&1 || fail=1
 ok(){ printf '  \033[32m✓\033[0m %s\n' "$1"; }
 no(){ printf '  \033[31m✗\033[0m %s\n' "$1"; fail=1; }
 
@@ -119,7 +124,6 @@ python3 "$(dirname "$0")/tools/pwa_selectors.py" || fail=1
 
 echo "── 8. 整改台账 ──"
 python3 "$(dirname "$0")/tools/verify_quotes.py" || fail=1
-python3 "$(dirname "$0")/tools/build_ledger.py" >/dev/null 2>&1 || { echo "    build_ledger.py 跑不起来"; fail=1; }
 if [ -f app/issues.html ]; then
   n=$(grep -c 'class="s-' app/issues.html 2>/dev/null || echo 0)
   [ "$n" -gt 0 ] && ok "整改台账 app/issues.html（$n 条）" || no "台账页为空"

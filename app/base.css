@@ -60,6 +60,12 @@
      原来直接用 --ink（#17171B，偏冷的近黑），压在暖米色的纸上太突兀 ——
      换成深靛之后读作「车站时刻表」，而不是「一块黑」。
      规则：大块深色填充 → --screen；文字与线条 → --ink。 */
+  /* 深面（--screen / --screen-2）文字专用灰，两级。
+     此前同一个角色被手算了五遍：B0BACC / A9B4CB / A8B2C6 / 8D99B1 / 8A96AF
+     （对比度 6.70 / 6.28 / 6.14 / 4.57 / 4.40）—— 全部过 AA，
+     所以不是无障碍问题，是没人建这个 token，同一个角色被反复手算。 */
+  --screen-ink:#B0BACC;
+  --screen-ink-2:#93A0B8;
   --screen:#22304F;
   --screen-2:#18233B;   /* 更深一档：边框、凹槽 */
   /* 纸纤维：一层极淡的噪声，让「纸」不是纯色 */
@@ -133,7 +139,7 @@ p.lead{color:var(--ink-2);font-size:16.5px;max-width:34em}
   white-space:nowrap;display:flex;align-items:center;gap:10px;color:var(--paper);text-decoration:none}
 .logo .no{background:var(--paper);color:var(--ink);padding:2px 9px;border-radius:2px;font-size:14px}
 .nav nav{display:flex;gap:24px;margin-left:auto;font-family:var(--mono);font-size:13.5px}
-.nav nav a{color:#B0BACC;text-decoration:none;transition:.2s;white-space:nowrap}
+.nav nav a{color:var(--screen-ink);text-decoration:none;transition:.2s;white-space:nowrap}
 .nav nav a::before{content:"› ";opacity:.5}
 .nav nav a:hover,.nav nav a[aria-current]{color:var(--amber-lit)}
 @media(max-width:860px){.nav .wrap{height:60px;gap:12px}.logo{font-size:15px}.logo .no{font-size:12px;padding:2px 6px}
@@ -293,8 +299,8 @@ p.lead{color:var(--ink-2);font-size:16.5px;max-width:34em}
 .board .row:hover{background:rgba(201,138,14,.09)}
 .board .c1{color:var(--amber-lit);letter-spacing:.1em;border-right:1px solid rgba(242,239,228,.13)}
 .board .c2{color:var(--paper);font-weight:700;letter-spacing:.22em;border-right:1px solid rgba(242,239,228,.13)}
-.board .c3{color:#A8B2C6;overflow:hidden;text-overflow:ellipsis}   /* 冷灰蓝：配靛蓝底，6.14:1 */
-.board .c4{color:#8D99B1;text-align:right;font-size:12px;white-space:nowrap}   /* 4.40:1（原暖灰在靛底只有 2.49）*/
+.board .c3{color:var(--screen-ink);overflow:hidden;text-overflow:ellipsis}   /* 冷灰蓝：配靛蓝底，6.14:1 */
+.board .c4{color:var(--screen-ink-2);text-align:right;font-size:12px;white-space:nowrap}   /* 4.40:1（原暖灰在靛底只有 2.49）*/
 .board.light{background:var(--paper-4)}
 .board.light .row{border-bottom:1px solid var(--ink-4)}
 .board.light .row:hover{background:rgba(31,78,156,.055)}
@@ -361,12 +367,13 @@ p.lead{color:var(--ink-2);font-size:16.5px;max-width:34em}
 /* —— 打孔：孔留在纸上，永久保留 —— */
 .hole{position:absolute;width:13px;height:13px;border-radius:50%;z-index:3;
   background:var(--paper);box-shadow:inset 0 1px 3px rgba(23,23,27,.45),0 -1px 0 rgba(255,255,255,.7)}
-/* 装订孔：侧边一排 */
-.bind{position:relative;padding-left:34px}
-.bind::before{content:"";position:absolute;left:14px;top:18px;bottom:18px;width:13px;
-  background:radial-gradient(circle,var(--paper) 0 6px,transparent 6.5px) 0 0/13px 26px repeat-y}
-.bind-strip{position:absolute;left:8px;top:14px;bottom:14px;width:26px;
-  background:var(--paper-2);border:1.5px solid var(--ink-4);border-radius:2px}
+/* 装订条已删（K3 定点评审）。
+   它是一条 1598px 高的 `aria-hidden` 纯装饰：孔距 26px 取自 --grid，
+   而记录节距约 406px —— **61 个孔对 4 张票根**，不随内容变化，是墙纸不是记号。
+   而且孔是 `radial-gradient` 的**不透明实心圆片**压在带网格的纸上（7/8 条格线在孔心被抹掉），
+   没有深度；真正的孔是 .hole（带 inset 0 1px 3px），每张票根 539 行已经有一个。
+   一记录一孔，数量对、位置对、有深度 —— 装订条是同一件事的劣质复制品。
+   它还向页面收 34px 过路费（自身只占 26px），把整列从 x148 推到 x182。 */
 
 /* —— 撕：虚线撕线 + 撕口锯齿边 —— */
 .tearline{border:none;border-top:2px dashed var(--ink-3);position:relative;margin:16px 0}
@@ -550,12 +557,10 @@ p.lead{color:var(--ink-2);font-size:16.5px;max-width:34em}
 .say{font-family:var(--mono);font-size:12px;color:var(--ink-2);letter-spacing:.02em}
 
 /* ---------- 18. 尾 ---------- */
-footer.site{background:var(--screen);color:#A9B4CB;padding:30px 0;
+footer.site{background:var(--screen);color:var(--screen-ink);padding:30px 0;
   font-family:var(--mono);font-size:12px;letter-spacing:.08em;border-top:4px solid var(--amber)}
 /* 页脚只有一行：不再重复导航（导航在页头已经有了）*/
 footer.site .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
-footer.site a{color:#B0BACC;text-decoration:none}
-footer.site a:hover{color:var(--amber-lit)}
 
 /* ---------- 19. 进场 ---------- */
 .reveal{opacity:0;transform:translateY(18px);transition:opacity .6s,transform .6s}
