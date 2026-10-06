@@ -200,6 +200,22 @@ footer.site{padding:14px 0}
    房间的 .col 也是 section，但它没暴露这个（房间本来就长）。
    这里是画布页，必须一屏装下，所以显式清零。 */
 .bench > .col{padding:0}
+/* 中栏盒体：照房间 —— 有边框、填纸白、画布缩在盒里当内边距 */
+.stage-box{border-radius:0 0 var(--rad) var(--rad)}
+.stage-box .sheet-bd{padding:18px;display:flex;flex-direction:column;align-items:center}
+/* ── 三栏竖向拉满（K3 第 2 项）────────────────────────────────
+   K3：「房间栏栏顶到视口底，拼图台全页 814px 封顶，1080 下留 266px 死区，
+   左/右栏高度固定 585/430，页面显得「小件、浮在顶上」。
+   **房间的感觉来自「栏顶齐、栏身到底」，而不是栏底齐。**」
+   做法：三栏等高（stretch），每栏竖向 flex，栏内的盒体吃满剩余高度。 */
+.bench{align-items:stretch}
+.bench > .col{align-self:stretch}
+.bench .col > .sheet,
+.bench .col > .board,
+.bench .col > .stage-box{flex:1 1 auto}
+.bench .col > .stage-box{display:flex;flex-direction:column}
+.bench .col > .stage-box > .sheet-bd{flex:1 1 auto}
+.lib-grid{align-content:start}
 </style>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#22304F">
@@ -274,18 +290,25 @@ footer.site{padding:14px 0}
 
   <!-- ================= 画板 ================= -->
   <section class="col">
-  <div class="col-hd">
+  <!-- 中栏是**盒体**，照房间：.sheet > .sheet-hd + .sheet-bd。
+       K3：「房间中栏是一个有完整边框的盒子，从栏顶直通到视口底外，盒内填纸白；
+       画布缩在盒里，两侧留白读作盒子的内边距。
+       拼图台的中栏**没有盒子** —— 只有一条贯通栏宽的标头条，下面悬一个正方形画布，
+       两侧直接露出页面格纸底，中栏看起来是「断的」。」 -->
+  <div class="sheet stage-box">
+  <div class="sheet-hd">
     <span class="tag-no blue">谜 面</span>
     <span class="stamp bar blue" id="stateStamp">未 封 存</span>
     <span class="lbl r">谜 底 待 填</span>
   </div>
-  <div class="canvas-box">
+  <div class="sheet-bd canvas-box">
     <div class="canvas" id="canvas">
       <div class="ph" id="ph">把 emoji 拖到这里<br><span style="font-size:11px">点一下已放好的可以调它</span></div>
     </div>
     <div class="btn-row" style="justify-content:center;margin-top:14px">
       <button class="btn sm ghost" id="resetBtn">清 空 画 布</button>
     </div>
+  </div>
   </div>
   </section>
 
