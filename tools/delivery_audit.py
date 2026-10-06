@@ -53,6 +53,16 @@ MAP = {
     "full/works-mobile.png": "works.html",
     "issues.png": "issues.html",
     "canvas-full.png": "compose.html",   # 画布改动：三档视口对比
+    # 宽屏 1920×1080（以横屏 web 为标准后新增的一档）
+    "wide-index.png": "index.html",
+    "wide-login.png": "login.html",
+    "wide-plaza.png": "plaza.html",
+    "wide-room.png": "room.html",
+    "wide-compose.png": "compose.html",
+    "wide-guess.png": "guess.html",
+    "wide-me.png": "me.html",
+    "wide-works.png": "works.html",
+    "wide-banks.png": "banks.html",
     "routemap.png": "404.html",           # 站台导向图特写
 
 }
