@@ -298,10 +298,10 @@ footer.site a[aria-current]{color:var(--amber-lit)}
         <div class="board light bind seats" id="seats"></div>
         <div class="rules">
           <span class="lbl">本 房 规 程</span>
-          <div class="rule"><span>抢猜</span><b>允许</b></div>
-          <div class="rule"><span>禁用</span><b>无</b></div>
+          <div class="rule"><span>出题</span><b>轮流 · 每人一次</b></div>
+          <div class="rule"><span>抢猜</span><b>常开</b></div>
+          <div class="rule"><span>回合结束</span><b>全员猜中</b></div>
           <div class="rule"><span>可见性</span><b>仅链接</b></div>
-          <div class="rule"><span>歪解投票</span><b>开</b></div>
         </div>
       </section>
 
@@ -374,8 +374,15 @@ const SEATS=[                          // 席位：四种状态都要看得见
   {no:"01",n:"阿野",av:"阿",st:"composing",live:true,sc:120,gain:40},
   {no:"02",n:"小舟",av:"舟",st:"guessing",stTxt:"猜题中 · 已猜 4 次",sc:80,gain:20},
   {no:"03",n:"Lina",av:"L",st:"solved",stTxt:"已猜中 · 用时 8.2s",sc:200,gain:80},
-  {no:"04",n:"访客",av:"访",st:"offline",stTxt:"离线 · 刚离开",sc:30,gain:0}
+  {no:"04",n:"访客",av:"访",st:"offline",stTxt:"离线 · 刚离开",sc:30,gain:0,guessed:false}
 ];
+/* ── 出题顺序 / 回合 ─────────────────────────────────────────
+   用户：「按顺序每个玩家玩一遍，每个玩家玩一遍就算一个回合。」
+        「所有玩家本身就应该可以抢猜。」
+        「所有玩家都猜到正确答案就直接结束。」
+   turnIdx = 轮到谁出题；绕完一圈（每个在线玩家各出一次）= 一个回合。
+   抢猜常开，出题人也能猜，所以「全员」判在线人数。 */
+let turnIdx=0, roundMax=3;
 const JOINER={no:"05",n:"阿麦",av:"麦",st:"guessing",stTxt:"猜题中 · 刚入座",sc:0,gain:null};
 const DOT_TXT={composing:"拼图中",guessing:"猜题中",solved:"已猜中",offline:"离线"};
 /* 轴 3：一枚章 = 一个状态。四态四枚，一章一义，不重复用。 */
@@ -417,7 +424,10 @@ const SETS=[                           // 房间设置：点一下换一个取�
   {k:"模式",i:0,v:["经典","接力","同题","合作"]},
   {k:"词库",i:0,v:["成语俗语","日常短语","影视"]},
   {k:"牌数",i:0,v:["10 张","5 张","3 张","2 张"]},
-  {k:"时限",i:0,v:["60s","120s","30s"]}
+  {k:"时限",i:0,v:["60s","120s","30s"]},
+  /* 用户：「房间规则中设置回合数，按顺序每个玩家玩一遍，
+     每个玩家玩一遍就算一个回合。」 */
+  {k:"回合",i:1,v:["1 回合","3 回合","5 回合"]}
 ];
 const STAMPS=["歪","已 阅","存 疑","作 废","甜 区","重 拼"];
 
@@ -426,7 +436,7 @@ const $=id=>document.getElementById(id);
 const seatsEl=$("seats"),flowEl=$("flow"),cvEl=$("canvas"),
 
       pieceV=$("pieceV"),elapsedV=$("elapsedV"),qNoEl=$("qNo"),
-      flowCount=$("flowCount"),flowSum=$("flowSum"),seatCount=$("seatCount"),
+      flowCount=$("flowCount"),flowSum=$("flowSum"),seatCount=$("seatCount"),roundV=$("roundV"),whoV=$("whoV"),
       rhSet=$("rhSet"),modeTag=$("modeTag"),hitV=$("hitV"),
 copyOut=$("copyOut"),stubOut=$("stubOut"),
       castBar=$("castBar"),castTxt=$("castTxt");
@@ -524,12 +534,26 @@ function updateFlowMeta(){
     `<span><i class="ico-solo">✕</i> <b>${n-hits}</b></span>`+
     `<span><i class="ico-solo">⚡</i> <b>8.2s</b></span>`;
   if(hitV) hitV.textContent=hits;
+  /* 用户：「所有玩家都猜到正确答案就直接结束。」
+     「所有玩家本身就应该可以抢猜」—— 判在线玩家（含出题人）。
+     全员猜中 → 本回合立即结束；这也是席位表展开（结算）的时机。 */
+  const L=liveSeats();
+  const allGuessed=L.length>0 && L.every(p=>p.guessed);
+  if(allGuessed && !window.__endT){
+    window.__endT=1;
+    sysLine("第 "+round+" 回合结束 · "+L.length+" 人全部猜中");
+    if(turnIdx+1 >= L.length*roundMax){
+      sysLine("本局结束 · 共 "+roundMax+" 回合");
+    } else {
+      setTimeout(()=>{ window.__endT=0; nextDrawer(); },900);
+    }
+  }
   /* 一局结束（有人猜中）→ 展开玩家列表；游戏中收起。
      用户：玩家列表游戏过程中没必要展示。 */
   const grid=document.querySelector(".grid3");
   const col=document.getElementById("seatsCol");
   if(grid && col){
-    const over=hits>0;
+    const over=allGuessed;
     grid.classList.toggle("settled",over);
     col.classList.toggle("settle",!over);
   }
@@ -565,45 +589,44 @@ function paint(){
   const lv=document.querySelector("[data-live]");
   if(lv) lv.textContent="+"+left+" 秒";
 }
-function newRound(){
-  elapsed=0; round++;
-  qNoEl.textContent="第 "+round+" 题";
-  sysLine(`第 ${round} 题 · 开始 · 阿野 重新拼 · 时限 ${limit}s`);
-  cvEl.querySelectorAll(".pc").forEach(n=>n.remove());
-  pieceI=0;
-  place(pieceI++,true);
-  updateFlowMeta();
-  paint();
-}
-
-/* ---------- 8. 猜测流：每隔几秒滑入一条 ---- */
-function pushGuess(){
-  let g=POOL[pi++%POOL.length];
-  if(g.w==="阿麦"&&!joined){pi--;g={w:"小舟",t:"再想想"};}
-  appendGuess(g);
-}
-function joinGuest(){
-  if(joined) return;
-  joined=true;
-  SEATS.push({...JOINER});
-  renderSeats();
-  sysLine("阿麦 入座 05 席 · 加入抢猜");
-  updateFlowMeta();
-  broadcast();
-}
-
-/* ---------- 9. 房间设置：点一下换值 + 广播 ---------- */
-/* 反馈靠两件事：chip 自己闪一下 + 数值变了。文字条只在广播发生的 2.6 秒里存在 */
-let rhNote=null;
-function note(txt){
-  if(!txt){ if(rhNote){rhNote.remove();rhNote=null;} return; }
-  if(!rhNote){
-    rhNote=document.createElement("span");
-    rhNote.className="lbl rh-note on";
-    $("rhSet").parentNode.insertBefore(rhNote,$("rhSet"));
+function liveSeats(){ return SEATS.filter(p=>p.st!=="offline"); }
+  function drawer(){ const L=liveSeats(); return L.length?L[turnIdx % L.length]:null; }
+  function paintTurn(){
+    const d=drawer();
+    if(roundV) roundV.textContent="第 "+Math.max(1,round)+" / "+roundMax+" 回合";
+    if(whoV)  whoV.textContent=d?d.n:"—";
   }
-  rhNote.textContent=txt;
-}
+  /* ── 一局 = 若干回合；一个回合 = 每个在线玩家各出一次题 ──────
+       用户：「按顺序每个玩家玩一遍，每个玩家玩一遍就算一个回合。」 */
+  function newRound(){
+    elapsed=0;
+    const L=liveSeats();
+    if(turnIdx>0 && L.length && turnIdx % L.length===0){
+      round++;
+      SEATS.forEach(p=>{p.guessed=false;});
+      sysLine("第 "+round+" 回合 · 开始 · 全员重新抢猜");
+    } else { round=Math.max(1,round); }
+    const d=drawer();
+    qNoEl.textContent="第 "+round+" 题";
+    sysLine("轮到 "+(d?d.n:"—")+" 出题 · 时限 "+limit+"s");
+    cvEl.querySelectorAll(".pc").forEach(x=>x.remove());
+    pieceI=0;
+    place(pieceI++,true);
+    paintTurn();
+    updateFlowMeta();
+    paint();
+  }
+  function nextDrawer(){ turnIdx++; newRound(); }
+  /* note() 的头部被上一步的正则吞掉了 —— 从 HEAD 取回完整定义 */
+  function note(txt){
+    if(!txt){ if(rhNote){rhNote.remove();rhNote=null;} return; }
+    if(!rhNote){
+      rhNote=document.createElement("span");
+      rhNote.className="lbl rh-note on";
+      $("rhSet").parentNode.insertBefore(rhNote,$("rhSet"));
+    }
+    rhNote.textContent=txt;
+  }
 rhSet.addEventListener("click",e=>{
   const btn=e.target.closest(".setchip");
   if(!btn) return;
@@ -614,6 +637,13 @@ rhSet.addEventListener("click",e=>{
   setTimeout(()=>btn.classList.remove("flash"),420);
   let extra="";
   if(s.k==="模式"){modeTag.textContent=s.v[s.i]+" · 同房";}
+  if(s.k==="回合"){
+    roundMax=parseInt(s.v[s.i],10)||3;
+    /* 改回合数 = 重开一局：回合归零、出题人回到第一位、猜中记录清空 */
+    round=0; turnIdx=0;
+    SEATS.forEach(p=>{p.guessed=false;});
+    newRound();
+  }
   if(s.k==="时限"){
     limit=parseInt(s.v[s.i],10);
     if(limit-elapsed<5){elapsed=0;extra=" · 重开";}
@@ -818,7 +848,8 @@ console.log("%c会看控制台的人，柜台直接放行，不用取号。","co
 
 /* ---------- 17. 启动 ---- */
 renderChips();
-renderSeats();
+  round=1; paintTurn();          // 出题人与回合数：开局先画一次
+  renderSeats();
 
 renderFlow();
 
