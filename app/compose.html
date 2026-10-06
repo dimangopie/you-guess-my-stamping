@@ -212,7 +212,6 @@ body{display:flex;flex-direction:column;min-height:100vh}
 main{flex:1 1 auto;display:flex;flex-direction:column}
 main > .wrap{flex:none}
 .bench{flex:1 1 auto;min-height:0}
-.site{flex:none}
 /* ④ 让 grid 的那一行吃满 bench 的高度 —— 光有 bench{flex:1} 不够：
    bench 元素变高了，但里面唯一那行 grid 仍是 auto（= 最高内容），
    实测三栏底边在 768/900/1080 三档下**都是 586**，多余高度全浪费。
@@ -370,13 +369,6 @@ main > *{width:100%}
 </section>
 
 </main>
-
-<footer class="site">
-  <div class="wrap">
-    <span>你拼我猜 · 拼图台</span>
-    <span>1管51 站 · 制版处</span>
-  </div>
-</footer>
 
 <script>
 const $=id=>document.getElementById(id);

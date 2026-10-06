@@ -235,7 +235,11 @@ footer.site a[aria-current]{color:var(--amber-lit)}
    游戏过程中没必要展示。」
    收起时三栏变两栏（画布 + 猜测流），画布拿到左栏让出的宽。 */
 .grid3 > .col.settle{display:none}
-.grid3.settled{grid-template-columns:266px minmax(0,1fr) 326px}
+.grid3.settled{grid-template-columns:294px minmax(0,1fr) 326px}
+/* ⚠ 原来写的是 266px —— 比拼图台的 294 少 28px，那 28px 全落到中栏，
+   于是同一视口下两页画布差 28px（456 vs 428）。
+   用户要求「同一窗口尺寸下房间和拼图台画布大小应该一样」，
+   左右两栏的宽度必须逐像素一致，画布才能一致。 */
 .grid3:not(.settled){grid-template-columns:minmax(0,1fr) 326px}
 </style>
 <link rel="manifest" href="manifest.webmanifest">
@@ -356,13 +360,6 @@ footer.site a[aria-current]{color:var(--amber-lit)}
   </div>
 
 </main>
-
-<footer class="site">
-  <div class="wrap">
-    <span>你拼我猜 · 用 emoji 说话</span>
-    <span>1管51 站 · 调度单当场打印</span>
-  </div>
-</footer>
 
 <script>
 /* ============================================================
