@@ -18,7 +18,13 @@
    ④ 缩放 / 旋转 / 图层都由控制点决定，不用滑杆
    ============================================================ */
 
-.head{padding:46px 0 6px}
+.head{padding:22px 0 4px}
+/* ⚠ 原来是 46px 上边距 + 两行巨型标题，在 1366×768 上吃掉约 300px ——
+   K3：「画布上沿起始于 ~320px、画布底边落在 ~790px，视口只有 768px，
+   画布最下面一截和「重发这手牌」按钮整个掉出首屏。而这个页面的核心手势是拖放，
+   **拖到画布下四分之一之前得先滚一次页面。**」
+   改成单行 + 收紧上边距，回收约 150px。 */
+.head .tk{font-size:clamp(24px,2.6vw,36px);line-height:1.25}
 .head h1{margin:12px 0 14px}
 
 /* 子元素解除 min-width 下限：grid 的 1fr 是 minmax(auto,1fr)，
@@ -70,7 +76,7 @@
 
 /* ---------- 画板 ---------- */
 .canvas-box{min-width:0}
-.canvas{position:relative;width:100%;max-width:520px;aspect-ratio:1/1;margin:0 auto;
+.canvas{position:relative;width:100%;max-width:min(520px, calc(100vh - 300px))   /* 768 高的屏上让出按钮的位置 */;aspect-ratio:1/1;margin:0 auto;
   overflow:hidden;background:var(--paper-4);border:2px solid var(--ink);border-radius:var(--rad);
   box-shadow:var(--sh-soft);touch-action:none;
   background-image:
@@ -170,7 +176,7 @@
 <section class="head">
   <div class="wrap">
     <span class="lbl-lg">拼 图 台 · 制 作 单 NO. 1管5-129</span>
-    <h1 class="tk">从素材库里挑 emoji，<br>拖到画布上拼成谜面</h1>
+    <h1 class="tk">从素材库里挑 emoji，拖到画布上拼成谜面</h1>
   </div>
 </section>
 
@@ -200,10 +206,10 @@
   <!-- ================= 画板 ================= -->
   <div class="canvas-box">
     <div class="canvas" id="canvas">
-      <div class="ph" id="ph">把牌拖到这里<br><span style="font-size:11px">点一下已放好的可以调它</span></div>
+      <div class="ph" id="ph">把 emoji 拖到这里<br><span style="font-size:11px">点一下已放好的可以调它</span></div>
     </div>
     <div class="btn-row" style="justify-content:center;margin-top:14px">
-      <button class="btn sm ghost" id="resetBtn">重 发 这 手 牌</button>
+      <button class="btn sm ghost" id="resetBtn">清 空 画 布</button>
     </div>
   </div>
 
@@ -218,7 +224,7 @@
         <input type="text" id="ans" placeholder="谜底答案" maxlength="12" autocomplete="off">
       </div>
       <div class="od"><span class="k">分 类</span><span class="d"></span><b>成语</b></div>
-      <div class="od"><span class="k">用 牌</span><span class="d"></span><b class="blue" id="used">0 / 10</b></div>
+      <div class="od"><span class="k">已 用</span><span class="d"></span><b class="blue" id="used">0</b></div>
       <div class="od"><span class="k">限 时</span><span class="d"></span><b>60 秒</b></div>
       <div class="od"><span class="k">编 号</span><span class="d"></span><b>1管5-129</b></div>
       <div class="btn-row" style="margin-top:16px">
@@ -300,12 +306,18 @@ const LIB = {
   "自然": ["☀️","🌙","⭐","🔥","💧","🌊","🌧️","❄️","🌈","🌪️","⚡","🌫️","🌋","🏔️","🌵","🍃"],
   "器物": ["🪵","🧯","🔪","🔨","🚪","🪜","🧲","⏰","🔑","💡","📌","🧱","🪣","🔦","📎","🧰"],
   "人物": ["🧑","👶","👴","🧑‍🍳","🧑‍🚒","🧑‍⚕️","🕵️","👮","🧑‍🌾","🧑‍🎤","🧑‍🚀","👻"],
-  "动作": ["🏃","🤝","👀","🗣️","🚶","🤔","🙇","🤸","🧗","🤾","🕺","💃"],
+  "动作": ["🏃","🤝","👀","🗣️","🚶","🙇","🤸","🧗","🤾","🕺","💃","🧎"],
+  /* K3：「动作类里塞着 🤔 和 👀，说明表情脸被拆散进了人物/动作。
+     对成语猜谜来说 😂😭😡😱 这类脸是一等材料（哭笑不得、目瞪口呆、眉开眼笑），
+     埋在动作和人物里会找不到。」→ 独立成类。 */
+  "表情": ["😂","😭","😡","😱","🤔","😴","🥶","🥵","😊","😬","🤯","😇","🤑","🤫","😤","🥳"],
   "食物": ["🍚","🍜","🍎","🍞","🍵","🍶","🥚","🍖","🧂","🍯","🍕","🍰"],
   "场所": ["🏠","🏢","🏫","🏥","🚉","🏭","🏪","🏟️","🏝️","🌉","🏰","⛺"],
   "动物": ["🐶","🐱","🐟","🐦","🐍","🐘","🦊","🐝","🦀","🐢","🦌","🐑"],
   "交通": ["🚗","🚌","🚲","✈️","🚢","🚂","🛵","🚁","🛺","⛵"],
-  "符号": ["❓","❗","💤","💥","♻️","⭕","❌","✅","🔺","🔻","⬆️","⬇️"]
+  /* 符号类补上数字与方向箭头 —— 七上八下要 7️⃣8️⃣、东张西望要 ↔️ */
+  "符号": ["❓","❗","💤","💥","♻️","⭕","❌","✅","🔺","🔻","⬆️","⬇️","⬅️","➡️",
+           "1️⃣","2️⃣","3️⃣","7️⃣","8️⃣","🔟","➕","➖"]
 };
 const LIB_KEYS = Object.keys(LIB);
 let libCur = LIB_KEYS[0];
@@ -324,7 +336,7 @@ $("libTabs").addEventListener("click",e=>{
 });
 renderLib();
 
-let pieces=[], zTop=1, sel=null, usedCount=0, carry=null;
+let pieces=[], zTop=1, sel=null, carry=null;   /* 计数不用变量 —— 从 pieces.length 派生 */
 
 /* ============================================================
    ③ 取牌 = 从素材库拖到画布（落点由玩家决定）
@@ -360,8 +372,7 @@ function putDown(clientX,clientY){
   const sp=carry.btn, glyph=carry.glyph;
   carry.ghost.remove(); carry=null; cv.classList.remove("armed");
   sp.classList.add("used");
-  usedCount++; $("used").textContent=usedCount;
-  $("hintTxt").textContent = usedCount>=10 ? "牌发完了" : "按住 emoji 拖到画布";
+  $("hintTxt").textContent = "按住 emoji 拖到画布";
   place(glyph,x,y,true);
   return true;
 }
@@ -431,7 +442,7 @@ function box(){
            w:cv.clientWidth, h:cv.clientHeight };
 }
 
-/* 把牌夹在画布里，不让它被裁掉 */
+/* 把 emoji 夹在画布里，不让它被裁掉 */
 function clampInto(el){
   const s=num(el.style.getPropertyValue("--s"),1);
   const b=box();
@@ -518,7 +529,7 @@ addEventListener("pointerup",()=>{ mode=null; });
    制作单 / 交题
    ============================================================ */
 function refresh(){
-  $("used").textContent=usedCount;
+  $("used").textContent=pieces.length;
   const ok=pieces.length>0 && $("ans").value.trim().length>0;
   $("fileBtn").disabled=!ok;
   $("fileHint").textContent = !pieces.length ? "先拖几个 emoji，再填答案"
@@ -527,9 +538,9 @@ function refresh(){
 $("ans").addEventListener("input",refresh);
 
 $("resetBtn").addEventListener("click",()=>{
-  if(pieces.length && !confirm("重发这手牌？画布会清空，十张牌都会回来。")) return;
+  if(pieces.length && !confirm("清空画布？已拖上去的 emoji 都会拿掉。")) return;
   pieces.forEach(p=>p.remove()); pieces=[]; select(null);
-  usedCount=0; $("used").textContent=usedCount;
+  $("used").textContent=pieces.length;
   /* 素材库无限取用，没有「已用」状态要清 */
   $("ph").style.display=""; $("hintTxt").textContent="按住 emoji 拖到画布";
   cancelCarry(); refresh();
