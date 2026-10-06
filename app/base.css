@@ -104,6 +104,11 @@
   --sh-soft:5px 5px 0 rgba(23,23,27,.12);
   /* 栅格 */
   --grid:26px;
+  /* ⚠ 这是一个**死值**，也是全站窄屏思维的源头。
+     1920 的屏上内容列只有 1180 = 61%，两侧空 740px（39%）。
+     全站 74 处媒体查询全是 max-width（屏幕变窄时怎么缩），
+     而 min-width 一处都没有 —— 没有「屏幕变宽时怎么用」的规则。
+     现在给它两个宽屏档（见文件末尾的 min-width 段）。 */
   --wrap:1180px;
   --rad:3px;
 }
@@ -590,4 +595,24 @@ footer.site .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:
 @media(prefers-reduced-motion:reduce){
   .reveal{opacity:1;transform:none;transition:none}
   *{animation:none!important}
+}
+
+/* ── 宽屏：屏幕变宽时**用它**，而不是继续空着 ─────────────
+   全站此前 74 处媒体查询全是 max-width，min-width 一处没有。
+   这一段是第一批：宽屏加宽内容列、多栏区块加列。
+   注意：文字段落单独限宽（--prose），否则行宽会超过可读上限（约 70 字符）。 */
+@media(min-width:1560px){
+  :root{--wrap:1360px}
+}
+@media(min-width:1840px){
+  :root{--wrap:1600px}
+}
+@media(min-width:2200px){
+  :root{--wrap:1800px}
+}
+
+/* 长文本段落单独限制行宽，不跟着容器一起变宽。
+   容器变宽是为了网格与列表；正文行宽超过 ~70 字符就开始难读。 */
+@media(min-width:1560px){
+  .lead,.ntc-t,.hint,.proc-tip,.copy-ok,p.meta{max-width:72ch}
 }
