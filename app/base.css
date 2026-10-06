@@ -620,7 +620,13 @@ footer.site .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:
    拼图台要照房间的布局做「左 / 中画布 / 右」，这几条是它的骨架。
    提到这里之前它们只写在 room.html 里 —— 设计系统该管的是这类
    跨页复用的结构件，不是各页各写一份。 */
-.col{min-width:0}
+.col{min-width:0;
+  /* ⚠ `.col` 是**布局原语**（grid 的一栏），但它的元素是 <section>，
+     于是吃到了 base.css:141 的 `section{padding:80px 0}` ——
+     房间实测三栏各 padT/padB 都是 80px，**每栏白吃 160px，三栏共 480px**。
+     清零放在这里而不是各页：拼图台原来只在 `.bench > .col` 上修过一次，
+     房间就一直带着这个 padding。布局原语的规矩该由设计系统定。 */
+  padding:0}
 .col-hd{display:flex;align-items:center;gap:12px;flex-wrap:wrap;
   background:var(--paper-2);border:2px solid var(--ink);border-bottom:none;
   border-radius:var(--rad) var(--rad) 0 0;padding:8px 14px}
@@ -642,6 +648,6 @@ footer.site .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:
    min(520px, calc(100vh - 340px))，同一视口下量出来 399 vs 427。
    画布是这个产品的主体，尺寸不该按页面分叉：收到这里，两页共用。
    高度也纳入：矮屏（768）上要让出按钮与页脚的位置。 */
-.canvas{--cv:min(520px, calc(100vh - 340px));max-width:var(--cv)}
+.canvas{--cv:min(520px, calc(100vh - 356px));max-width:var(--cv)}
 @media(min-width:1560px){.canvas{--cv:min(620px, calc(100vh - 300px))}}
 @media(min-width:2000px){.canvas{--cv:min(700px, calc(100vh - 300px))}}

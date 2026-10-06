@@ -191,8 +191,8 @@ footer.site{padding:14px 0}
 /* ⚠ 三栏用的是 <section class="col">，而 base.css:141 有 section{padding:80px 0} ——
    每栏白吃 80px 上下内边距，三栏共多出 160px，整页因此超高 115px。
    房间的 .col 也是 section，但它没暴露这个（房间本来就长）。
-   这里是画布页，必须一屏装下，所以显式清零。 */
-.bench > .col{padding:0}
+   这里是画布页，必须一屏装下，所以显式清零。
+   （现已收归 base.css 的 .col，两页共用） */
 /* 中栏盒体：照房间 —— 有边框、填纸白、画布缩在盒里当内边距 */
 .stage-box{border-radius:0 0 var(--rad) var(--rad)}
 .stage-box .sheet-bd{display:flex;flex-direction:column;align-items:center}
