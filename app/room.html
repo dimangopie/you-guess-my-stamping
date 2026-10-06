@@ -112,8 +112,13 @@
 .stats.st3 .k{color:var(--ink-3)}
 
 /* ---- 右：猜测流（房间的心脏） ---- */
-.flow-wrap{border:2px solid var(--ink);border-top:none;border-radius:0 0 3px 3px;
-  background:var(--paper-4);padding:0 0 12px}
+/* ⚠ 这里才是页面溢出的真正原因（不是画布）：
+   实测 1440×900 → 文档 1025、纵溢 125，而**中栏（画布栏）底 822 是在屏内的**，
+   撑出去的是右栏：猜测流记录 463 + 我新加的输入槽 226 = 底 961。
+   记录条数一多就把页面顶出视口。给它一个跟视口挂钩的高度上限（520 → 562：实测还差 42px），
+   超出时**在栏内**滚，不牵动整页。
+   用户：「现状会溢出, 导致页面比屏幕大，出现滚轮」 */
+.flow-wrap{max-height:calc(100vh - 562px);overflow:auto;overscroll-behavior:contain}
 .flow{list-style:none;max-height:520px;overflow-y:auto;overscroll-behavior:contain}
 .flow::-webkit-scrollbar{width:9px}
 .flow::-webkit-scrollbar-thumb{background:var(--paper-3);border-left:2px solid var(--ink)}
