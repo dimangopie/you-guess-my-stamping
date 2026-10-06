@@ -161,6 +161,15 @@ p.lead{color:var(--ink-2);font-size:16.5px;max-width:34em}
 /* ---------- 4. 导航（车站指示牌） ---------- */
 .nav{position:sticky;top:0;z-index:100;background:var(--screen);color:var(--paper);
   border-bottom:4px solid var(--amber)}
+/* ── 页眉是全宽横条，它的内容不该被正文内容列收进中间 ──────────
+   用户：「div.wrap 的作用是什么？为什么要限制页眉中内容的排布居中，删除了」
+   .wrap 是**正文内容列**容器（max-width + margin:auto + 24px 内边距），
+   放在页眉里等于把「框架」当成「内容」：深蓝横条与琥珀线贯穿全宽，
+   里面的 logo 和导航却被收进居中的 1180 列 —— 宽屏上 logo 离左边 160px。
+   页眉只保留安全内边距，不再限制宽度、不再居中。 */
+.nav > .wrap{max-width:none;margin:0;padding:0 24px}
+/* 同理：页脚也是全宽横条，与页眉一致 */
+footer.site > .wrap{max-width:none;margin:0;padding:0 24px}
 .nav .wrap{display:flex;align-items:center;gap:26px;height:68px}
 .logo{font-family:var(--mono);font-weight:700;font-size:18px;letter-spacing:.06em;
   white-space:nowrap;display:flex;align-items:center;gap:10px;color:var(--paper);text-decoration:none}
