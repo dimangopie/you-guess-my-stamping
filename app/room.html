@@ -101,13 +101,6 @@
 .cv-stamp{position:absolute;top:12px;right:12px;z-index:3}
 @media(max-width:520px){.canvas .pc{font-size:26px}}
 /* 抽签筒档口：这一题的牌还剩几张，从筒里一张张抽到画布上（轴 8） */
-.slotbar{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:16px;
-  border-bottom:1.5px dashed var(--ink-4);padding-bottom:14px}
-.slotbar .slot{padding:8px 16px 14px;box-shadow:none}
-.slotbar .slot .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.2em;color:var(--ink-3)}
-.slotbar .slot .v{font-family:var(--mono);font-weight:700;font-size:22px;line-height:1.1;
-  font-variant-numeric:tabular-nums}
-.slotbar .slot .v i{font-style:normal;color:var(--ink-3);font-size:13px}
 /* 倒计时读数 = 屏 */
 
 /* ── 倒计时翻牌 ──────────────────────────────────────────────
@@ -125,7 +118,6 @@
 .stats.st3{margin-top:6px}
 .stats.st3 .st{flex:1 1 0;min-width:0;padding:12px 14px}
 .stats.st3 .k{color:var(--ink-3)}
-
 
 /* ---- 右：猜测流（房间的心脏） ---- */
 .flow-wrap{border:2px solid var(--ink);border-top:none;border-radius:0 0 3px 3px;
@@ -227,6 +219,16 @@ footer.site a[aria-current]{color:var(--amber-lit)}
 /* 「本题已用 / 时限」的 11/60 形式 —— 用户要求把「剩余」与「已用」两个
    重复的信息点融成一句：60 秒用了 11 秒，读作 11/60。 */
 .stats .v .of{font-size:.5em;color:var(--ink-3);font-weight:700;margin-left:1px}
+
+/* ── 画布父容器的左上角：题号 · 回合 · 谁在拼 ────────────────
+   用户：「第X题独占一个标签是不是有点过分了」
+        「把抽签捅删除了省得占空间，画布空间是很宝贵的」
+        「第几题第几回合以及哪个人在画这些信息都应该放在画布的父亲容器的左上方」
+   所以：调度单第二行（.rh-bar）与画布上方的抽签筒（.slotbar）都删掉，
+   信息压进中栏 sheet-hd 的左侧一行。 */
+.qmeta{font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;color:var(--ink-3)}
+.qmeta b{color:var(--ink-2);font-weight:700}
+.qmeta .sep{margin:0 5px;color:var(--ink-3)}   /* --ink-4 是装饰档，只有 3.77:1 */
 </style>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#22304F">
@@ -268,9 +270,6 @@ footer.site a[aria-current]{color:var(--amber-lit)}
         </span>
         <div class="rh-set" id="rhSet"></div>
       </div>
-      <div class="sheet-bd rh-bar">
-        <span class="tag-no blue" id="qNo">第 3 题</span>
-      </div>
     </div>
   </div>
 
@@ -298,20 +297,16 @@ footer.site a[aria-current]{color:var(--amber-lit)}
       <section class="col">
         <div class="sheet">
           <div class="sheet-hd">
+            <!-- 用户：「第几题第几回合以及哪个人在画这些信息
+                 都应该放在画布的父亲容器的左上方」 -->
+            <span class="tag-no blue" id="qNo">第 3 题</span>
             <span class="tag-no blue">谜面</span>
+            <span class="qmeta"><b id="roundV">第 1 回合</b><span class="sep">·</span><b id="whoV">阿野</b> 正在拼</span>
             <span class="tag-out" id="copyTag">未 复 印</span>
             <span class="lbl" style="margin-left:auto">谜底 封 存 中</span>
             <a class="ibtn" href="compose.html" title="去拼图台出题" aria-label="去拼图台出题">🖌</a>
           </div>
           <div class="sheet-bd">
-
-            <!-- 抽签筒：这一题还剩几张牌没抽出来（说明文字已删，筒自己会说） -->
-            <div class="slotbar">
-              <div class="slot" title="牌从这个筒里一张张抽出来">
-                <div class="k">抽 签 筒</div>
-                <div class="v"><span id="tubeLeft">3</span><i> / 7 张</i></div>
-              </div>
-            </div>
 
             <div class="snap canvas" id="canvas" role="img" aria-label="当前谜面：阿野正在拼">
               <div class="canvas-fine"></div>
@@ -432,7 +427,6 @@ const seatsEl=$("seats"),flowEl=$("flow"),cvEl=$("canvas"),
       flowCount=$("flowCount"),flowSum=$("flowSum"),seatCount=$("seatCount"),
       rhSet=$("rhSet"),modeTag=$("modeTag"),hitV=$("hitV"),
       flowMark=$("flowMark"),copyTag=$("copyTag"),copyOut=$("copyOut"),stubOut=$("stubOut"),
-      tubeLeft=$("tubeLeft"),
       castBar=$("castBar"),castTxt=$("castTxt");
 const pad=n=>String(n).padStart(2,"0");
 const stamp=ms=>{const t=new Date(ms);return pad(t.getHours())+":"+pad(t.getMinutes())+":"+pad(t.getSeconds())};
@@ -531,11 +525,6 @@ function updateFlowMeta(){
 }
 
 /* ---------- 5. 谜面：从抽签筒里一张张抽出来 ---- */
-function paintTube(){
-  const left=PUZZLE.length-pieceI;
-  tubeLeft.textContent=left;
-  reanim(tubeLeft,"flip");
-}
 function place(i,anim){
   const p=PUZZLE[i];
   if(!p) return;
@@ -546,7 +535,6 @@ function place(i,anim){
   cvEl.appendChild(el);
   pieceV.textContent=(i+1)+"/"+PUZZLE.length;
   reanim(pieceV,"flip");
-  paintTube();
   cvEl.setAttribute("aria-label",`当前谜面：阿野正在拼，已落 ${i+1} 枚 emoji`);
 }
 
