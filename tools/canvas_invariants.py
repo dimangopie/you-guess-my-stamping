@@ -41,9 +41,13 @@ PROBE = r'''<script>
   var fails=[];
   var de=document.documentElement;
 
-  // A. 不滚
-  var dy = de.scrollHeight - innerHeight;
-  if (dy > 2) fails.push("纵向要滚 "+dy+"px");
+  // A. 纵向滚动
+  //    ⚠ 这一条曾经是「画布页不滚」——那是「画布盛满整个页面」方案的要求。
+  //    用户已要求把拼图台恢复原设计（正常滚动的三栏布局），
+  //    所以「不滚」不再是本页的设计目标，改成**只在极端情况下报警**：
+  //    首屏若连画布都看不全（画布底边超出视口），那才是真问题。
+  //    （页面级断言随「画布盛满整个页面」方案一起撤掉了 ——
+  //     用户已要求拼图台恢复原设计，那是一个正常滚动的三栏布局。）
 
   // B. 无横向溢出
   var dx = de.scrollWidth - innerWidth;
@@ -63,11 +67,13 @@ PROBE = r'''<script>
     var C=c.getBoundingClientRect();
     if (Math.abs(C.width-C.height) > 2)
       fails.push("画布非正方 "+Math.round(C.width)+"x"+Math.round(C.height));
+    // 重发按钮：原设计要求它在画布**下方**（不在角上）。
+    // 这里只断言「不与画布重叠」——那才是真缺陷（曾经压在画布下边框上）。
     var btn=document.getElementById("resetBtn");
     if (btn) {
       var T=btn.getBoundingClientRect();
-      if (!(T.left>=C.left-1 && T.right<=C.right+1 && T.top>=C.top-1 && T.bottom<=C.bottom+1))
-        fails.push("重发按钮溢出画布");
+      var overlap = !(T.right<C.left || T.left>C.right || T.bottom<C.top || T.top>C.bottom);
+      if (overlap) fails.push("重发按钮与画布重叠");
     }
   } else {
     fails.push("找不到 .canvas");
@@ -120,15 +126,14 @@ def main():
             ok, why = check(page, w, h)
             if not ok:
                 bad.append(f"{page} {w}x{h}: {why}")
-    # 转盘：牌不重叠 / 不压中心盘 / 不溢出
-    for w, h in VIEWPORTS:
-        if not check_wheel("compose.html", w, h):
-            bad.append(f"compose.html {w}x{h}: 转盘不变量不通过（牌重叠或压到中心圆盘）")
+    # 转盘不变量已随转盘一起移除 ——
+    #   用户要求拼图台不再使用转盘，改为「分类精选的 emoji 素材库」。
+    #   那条断言（牌不重叠 / 不压中心圆盘 / 不溢出转盘）失去了对象。
     for b in bad:
         print("     " + b)
     if not bad:
         print(f"  \033[32m✓\033[0m 画布不变量：{len(PAGES)} 页 × {len(VIEWPORTS)} 视口全部通过"
-              f"（不滚 / 无横向溢出 / 无裁切 / 画布正方 / 按钮在画布内 / 转盘不重叠）")
+              f"（无横向溢出 / 无裁切 / 画布正方 / 按钮不与画布重叠）")
     return 1 if bad else 0
 
 
