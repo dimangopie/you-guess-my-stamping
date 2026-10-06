@@ -229,6 +229,14 @@ footer.site a[aria-current]{color:var(--amber-lit)}
 .qmeta{font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;color:var(--ink-3)}
 .qmeta b{color:var(--ink-2);font-weight:700}
 .qmeta .sep{margin:0 5px;color:var(--ink-3)}   /* --ink-4 是装饰档，只有 3.77:1 */
+
+/* ── 玩家列表：游戏过程中不展示，一局结束再出来 ──────────────
+   用户：「玩家列表其实并不重要，在游戏结束之后再展示一下就行了，
+   游戏过程中没必要展示。」
+   收起时三栏变两栏（画布 + 猜测流），画布拿到左栏让出的宽。 */
+.grid3 > .col.settle{display:none}
+.grid3.settled{grid-template-columns:266px minmax(0,1fr) 326px}
+.grid3:not(.settled){grid-template-columns:minmax(0,1fr) 326px}
 </style>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#22304F">
@@ -278,7 +286,7 @@ footer.site a[aria-current]{color:var(--amber-lit)}
     <div class="grid3">
 
       <!-- 左 · 玩家调度单（纸）-->
-      <section class="col">
+      <section class="col settle" id="seatsCol">
         <div class="col-hd">
           <span class="tag-no">A</span>
           <span class="lbl r" id="seatCount">4 / 6 席</span>
@@ -300,11 +308,8 @@ footer.site a[aria-current]{color:var(--amber-lit)}
             <!-- 用户：「第几题第几回合以及哪个人在画这些信息
                  都应该放在画布的父亲容器的左上方」 -->
             <span class="tag-no blue" id="qNo">第 3 题</span>
-            <span class="tag-no blue">谜面</span>
             <span class="qmeta"><b id="roundV">第 1 回合</b><span class="sep">·</span><b id="whoV">阿野</b> 正在拼</span>
-            <span class="tag-out" id="copyTag">未 复 印</span>
-            <span class="lbl" style="margin-left:auto">谜底 封 存 中</span>
-            <a class="ibtn" href="compose.html" title="去拼图台出题" aria-label="去拼图台出题">🖌</a>
+                        <a class="ibtn" href="compose.html" title="去拼图台出题" aria-label="去拼图台出题">🖌</a>
           </div>
           <div class="sheet-bd">
 
@@ -426,7 +431,7 @@ const seatsEl=$("seats"),flowEl=$("flow"),cvEl=$("canvas"),
       pieceV=$("pieceV"),elapsedV=$("elapsedV"),qNoEl=$("qNo"),
       flowCount=$("flowCount"),flowSum=$("flowSum"),seatCount=$("seatCount"),
       rhSet=$("rhSet"),modeTag=$("modeTag"),hitV=$("hitV"),
-      flowMark=$("flowMark"),copyTag=$("copyTag"),copyOut=$("copyOut"),stubOut=$("stubOut"),
+copyOut=$("copyOut"),stubOut=$("stubOut"),
       castBar=$("castBar"),castTxt=$("castTxt");
 const pad=n=>String(n).padStart(2,"0");
 const stamp=ms=>{const t=new Date(ms);return pad(t.getHours())+":"+pad(t.getMinutes())+":"+pad(t.getSeconds())};
@@ -522,6 +527,15 @@ function updateFlowMeta(){
     `<span><i class="ico-solo">✕</i> <b>${n-hits}</b></span>`+
     `<span><i class="ico-solo">⚡</i> <b>8.2s</b></span>`;
   if(hitV) hitV.textContent=hits;
+  /* 一局结束（有人猜中）→ 展开玩家列表；游戏中收起。
+     用户：玩家列表游戏过程中没必要展示。 */
+  const grid=document.querySelector(".grid3");
+  const col=document.getElementById("seatsCol");
+  if(grid && col){
+    const over=hits>0;
+    grid.classList.toggle("settled",over);
+    col.classList.toggle("settle",!over);
+  }
 }
 
 /* ---------- 5. 谜面：从抽签筒里一张张抽出来 ---- */
@@ -748,7 +762,6 @@ function stampAt(){
 let printT=0;
 function copySheet(){
   copies++;
-  copyTag.textContent="已 复 印 "+copies+" 份";
   copyOut.innerHTML=`
     <div class="cv-copy copy2" style="margin-top:14px">
       <span class="snap" style="display:block;max-width:400px;margin:0 auto">${
