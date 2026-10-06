@@ -351,6 +351,13 @@ footer.site a[aria-current]{color:var(--amber-lit)}
           </div>
           <div class="sheet-bd">
 
+            <div class="stats st3">
+              <div class="st"><div class="v" id="elapsedV">13<b class="of">/60</b></div><div class="n">本 题 已 用</div></div>
+              <div class="st"><div class="v" id="pieceV">4/7</div><div class="n">谜 面 已 落</div></div>
+              <div class="st"><div class="v blue" id="hitV">1</div><div class="n">已 猜 中</div></div>
+            </div>
+            <div class="tick" id="tick"><i id="tickFill" style="width:78%"></i></div>
+            <hr class="dash">
             <div class="snap canvas" id="canvas" role="img" aria-label="当前谜面：阿野正在拼">
               <div class="canvas-fine"></div>
               <span class="cv-stamp"><span class="stamp blue crooked">抢 猜 中</span></span>
@@ -358,13 +365,7 @@ footer.site a[aria-current]{color:var(--amber-lit)}
               <button class="ibtn cv-ctx" type="button" id="cvCtx"
                       title="柜台操作：撕下票根 / 盖一个章 / 复印这份" aria-label="柜台操作">🧾</button>
             </div>
-            <hr class="dash">
-            <div class="tick" id="tick"><i id="tickFill" style="width:78%"></i></div>
-            <div class="stats st3">
-              <div class="st"><div class="v" id="elapsedV">13<b class="of">/60</b></div><div class="n">本 题 已 用</div></div>
-              <div class="st"><div class="v" id="pieceV">4/7</div><div class="n">谜 面 已 落</div></div>
-              <div class="st"><div class="v blue" id="hitV">1</div><div class="n">已 猜 中</div></div>
-            </div>
+
             <div id="copyOut"></div>
 
           </div>
@@ -495,7 +496,6 @@ function reanim(el,cls){
 let limit=LIMIT0, elapsed=13, round=3, pieceI=OPEN, pi=0, joined=false, noteT=0;
 let unread=0, copies=0, stubs=0, stampI=0, castN=0;
 const prevSc={};
-
 
 /* ── 素材库数据：与拼图台**同一套**（一份定义，两处共用）─────────
    绘制态时它出现在猜测流面板底部的输入槽里 —— 这就是那个
