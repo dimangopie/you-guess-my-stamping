@@ -233,6 +233,35 @@ footer.site a[aria-current]{color:var(--amber-lit)}
    用户要求「同一窗口尺寸下房间和拼图台画布大小应该一样」，
    左右两栏的宽度必须逐像素一致，画布才能一致。 */
 .grid3:not(.settled){grid-template-columns:minmax(0,1fr) 326px}
+
+/* ── 输入槽：绘制 / 观赏唯一的差异点 ───────────────────────────
+   参考《破烂艺术家》：一个修改承接两个逻辑冲突。
+   槽位本身不变，只换内容。 */
+.flow-slot{border-top:1.5px solid var(--ink);padding:12px 14px;
+  background:var(--paper-4);border-radius:0 0 var(--radius,2px) 2px}
+.flow-slot .say{display:flex;gap:8px;align-items:center}
+.flow-slot .say input{flex:1;min-width:0;font-family:var(--mono);font-size:12.5px;
+  padding:8px 10px;border:1.5px solid var(--ink);border-radius:2px;
+  background:var(--paper-4);color:var(--ink)}
+.flow-slot .say input::placeholder{color:var(--ink-2)}
+.flow-slot .say .like{white-space:nowrap}
+/* 绘制态：同一位置换成素材区 */
+.flow-slot .lib-tabs{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:9px}
+.flow-slot .lib-tabs button{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;
+  padding:3px 7px;border:1.5px solid var(--ink-4);border-radius:2px;
+  background:var(--paper-4);color:var(--ink-3);cursor:pointer;line-height:1.5}
+.flow-slot .lib-tabs button.on{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.flow-slot .lib-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px}
+.flow-slot .lib-grid button{aspect-ratio:1;display:grid;place-items:center;
+  font-family:var(--emoji);font-size:20px;line-height:1;
+  background:var(--paper-4);border:1.5px solid var(--ink-4);border-radius:2px;
+  cursor:grab;padding:0;touch-action:none}
+.flow-slot .lib-grid button:hover{border-color:var(--ink);box-shadow:2px 2px 0 var(--ink)}
+.flow-slot .lib-note{margin-top:9px;font-family:var(--mono);font-size:10.5px;
+  letter-spacing:.06em;color:var(--ink-3)}
+/* 画布：观赏态只读 —— 不是换一套画布，是同一个画布不给改 */
+.canvas.view-only{pointer-events:none}
+.canvas.view-only .cv-ctx{pointer-events:auto}
 </style>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#22304F">
@@ -346,6 +375,15 @@ footer.site a[aria-current]{color:var(--amber-lit)}
           <!-- 合计：emoji 说名词，数字是内容（律五） -->
           <div class="flow-sum" id="flowSum"></div>
         </div>
+        <!-- ── 输入槽：绘制与观赏的**唯一**结构差异 ─────────────────
+             参考《破烂艺术家》的做法：绘制与观赏的交互逻辑不变，
+             只有两个冲突点 —— 能否交流、能否改画布。
+             而**一处替换同时承接两者**：
+               观赏态 → 这里是「发表言论」（画布只读，因为你改不了）
+               绘制态 → 这里换成**素材区**（画布可改，且不能发言 ——
+                        会画的人一说话就把谜底说了）
+             槽位不变、位置不变、尺寸不变，只换里面的东西。 -->
+        <div class="flow-slot" id="flowSlot"></div>
       </section>
 
     </div>
@@ -444,6 +482,58 @@ function reanim(el,cls){
 let limit=LIMIT0, elapsed=13, round=3, pieceI=OPEN, pi=0, joined=false, noteT=0;
 let unread=0, copies=0, stubs=0, stampI=0, castN=0;
 const prevSc={};
+
+
+/* ── 素材库数据：与拼图台**同一套**（一份定义，两处共用）─────────
+   绘制态时它出现在猜测流面板底部的输入槽里 —— 这就是那个
+   「一个修改承接两个冲突」的那一处修改。 */
+const LIB={
+  "自然":["☀️","🌙","⭐","🔥","💧","🌊","🌧️","❄️","🌈","🌪️","⚡","🌫️"],
+  "器物":["🪵","🧯","🔪","🔨","🚪","🪜","🧲","⏰","🔑","💡","📌","🧱"],
+  "人物":["🧑","👶","👴","🧑‍🍳","🧑‍🚒","🕵️","👮","🧑‍🌾","🎅","👻"],
+  "动作":["🏃","🤝","👀","🗣️","🚶","🙇","🤸","🧗","🕺","💃"],
+  "表情":["😂","😭","😡","😱","🤔","😴","🥶","🥵","😊","🤯"],
+  "食物":["🍚","🍜","🍎","🍞","🍵","🍶","🥚","🍖","🧂","🍯"],
+  "场所":["🏠","🏢","🏫","🏥","🚉","🏭","🏪","🏝️","🌉","🏰"],
+  "动物":["🐶","🐱","🐟","🐦","🐍","🐘","🦊","🐝","🦀","🐢"],
+  "符号":["❓","❗","💤","💥","♻️","⭕","❌","✅","⬆️","⬇️"]
+};
+const LIB_KEYS=Object.keys(LIB);
+let libCur=LIB_KEYS[0];
+/* 「我」是谁 —— 房间的所有者，也是这一局的出题人之一。
+   房间头部的 .tag-out 就是这个名字。 */
+const ME="阿野";
+
+/* ── 输入槽：绘制 / 观赏**唯一的**结构差异 ──────────────────────
+   参考《破烂艺术家》：
+     · 绘制与观赏的交互逻辑不变（同一个画布、同一套操作）
+     · 只有两个不同点：能否交流、能否修改画布
+     · **一处替换同时承接两者** —— 把交流区的「发表言论」换成素材区
+   所以这里不建两套界面，只换这一个槽的内容。 */
+function paintSlot(){
+  const slot=$("flowSlot"); if(!slot) return;
+  const d=drawer();
+  const isMe = d && d.n===ME;          // 轮到我画 = 绘制态
+  const cv=$("canvas");
+  if(cv) cv.classList.toggle("view-only", !isMe);
+  if(isMe){
+    /* 绘制态：素材区。不能发言（一说话就把谜底说了），但别人说的照样看得见。 */
+    slot.innerHTML =
+      '<div class="lib-tabs">'+LIB_KEYS.map(k=>
+        `<button type="button" data-k="${k}" class="${k===libCur?"on":""}">${k}</button>`).join("")+'</div>'+
+      '<div class="lib-grid">'+LIB[libCur].map(g=>
+        `<button type="button" title="拖到画布上">${g}</button>`).join("")+'</div>'+
+      '<div class="lib-note">轮到你出题 · 按住拖到画布 · 不能发言，但可以看别人猜</div>';
+  } else {
+    /* 观赏态：发表言论。画布只读 —— 因为你改不了，这是同一个冲突的另一面。 */
+    slot.innerHTML =
+      '<div class="say">'+
+        '<input id="sayIn" type="text" placeholder="发表你的猜测" maxlength="20">'+
+        '<button class="btn sm" type="button" id="sayBtn">发 送</button>'+
+        '<button class="btn sm ghost" type="button" id="likeBtn" title="给这一笔点赞">👍 <b id="likeN">12</b></button>'+
+      '</div>';
+  }
+}
 
 /* ---------- 4. 渲染 ---------- */
 function renderChips(){
@@ -587,6 +677,7 @@ function liveSeats(){ return SEATS.filter(p=>p.st!=="offline"); }
     const d=drawer();
     if(roundV) roundV.textContent="第 "+Math.max(1,round)+" / "+roundMax+" 回合";
     if(whoV)  whoV.textContent=d?d.n:"—";
+    paintSlot();   /* 绘制/观赏分岔就在这一处 */
   }
   /* ── 一局 = 若干回合；一个回合 = 每个在线玩家各出一次题 ──────
        用户：「按顺序每个玩家玩一遍，每个玩家玩一遍就算一个回合。」 */
