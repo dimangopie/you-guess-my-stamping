@@ -476,12 +476,6 @@ p.lead{color:var(--ink-2);font-size:16.5px;max-width:34em}
   0%{transform:scale(0);opacity:0;box-shadow:0 0 0 6px rgba(23,23,27,.18)}
   100%{transform:scale(1);opacity:1;box-shadow:inset 0 1px 3px rgba(23,23,27,.45),0 -1px 0 rgba(255,255,255,.7)}
 }
-/* 翻牌：机械翻页（用于数字变化） */
-.flip{display:inline-block;animation:flip-in .34s ease-out}
-@keyframes flip-in{
-  0%{transform:rotateX(-88deg);opacity:.2}
-  100%{transform:rotateX(0);opacity:1}
-}
 /* 抽签：从筒里抽出来 */
 .slot-draw{animation:draw-out .42s cubic-bezier(.2,1.5,.5,1)}
 @keyframes draw-out{
@@ -492,7 +486,7 @@ p.lead{color:var(--ink-2);font-size:16.5px;max-width:34em}
 .copy2{opacity:.72;filter:contrast(.92)}
 
 @media(prefers-reduced-motion:reduce){
-  .stamping,.punching,.flip,.slot-draw,.queue-no.called{animation:none!important}
+  .stamping,.punching,.slot-draw,.queue-no.called{animation:none!important}
 }
 
 

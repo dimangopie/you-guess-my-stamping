@@ -103,14 +103,6 @@
 /* 抽签筒档口：这一题的牌还剩几张，从筒里一张张抽到画布上（轴 8） */
 /* 倒计时读数 = 屏 */
 
-/* ── 倒计时翻牌 ──────────────────────────────────────────────
-   ⚠ 这里原来**一条样式都没有**。
-   翻牌 JS（room.html 底部）把每个数字渲染成 `<i>4</i>4` ——
-   `<i>` 是翻牌的动层，本该**叠在**静态数字之上；
-   但没有 CSS 去叠它，两层就并排显示，`47` 渲染成 `4477`，
-   而且 `<i>` 默认斜体，正是 K3 说的
-   「5 倍放大确认是两组斜体数字（44 与 77）叠印在同一位置，静态截图下读作坏字」。
-   结构在、样式缺 —— 这是半成品，不是坏值。 */
 .tick{height:10px;border:1.5px solid var(--ink);background:var(--paper-3);border-radius:2px;
   margin-top:10px;overflow:hidden}
 .tick i{display:block;height:100%;background:var(--amber);transition:width .95s linear,background .3s}
@@ -364,7 +356,7 @@ footer.site a[aria-current]{color:var(--amber-lit)}
 <script>
 /* ============================================================
    房间页脚本：一份数据 → 三块渲染 → 几个定时器
-   v3：柜台的物理动作（撕 / 盖 / 印 / 打孔 / 叫号 / 翻牌）
+   v3：柜台的物理动作（撕 / 盖 / 印 / 打孔）
    ============================================================ */
 
 /* ---------- 1. 数据 ---------- */
@@ -442,7 +434,7 @@ copyOut=$("copyOut"),stubOut=$("stubOut"),
       castBar=$("castBar"),castTxt=$("castTxt");
 const pad=n=>String(n).padStart(2,"0");
 const stamp=ms=>{const t=new Date(ms);return pad(t.getHours())+":"+pad(t.getMinutes())+":"+pad(t.getSeconds())};
-/* 重放一次签名动画（翻牌 / 盖章 / 打孔 / 抽签 共用）*/
+/* 重放一次签名动画（盖章 / 打孔 / 抽签 共用）*/
 function reanim(el,cls){
   if(!el) return;
   el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls);
@@ -569,7 +561,7 @@ function place(i,anim){
   el.style.cssText=`left:${p.x}%;top:${p.y}%;--s:${p.s};--r:${p.r}deg`;
   cvEl.appendChild(el);
   pieceV.textContent=(i+1)+"/"+PUZZLE.length;
-  reanim(pieceV,"flip");
+  reanim(pieceV,"punching");
   cvEl.setAttribute("aria-label",`当前谜面：阿野正在拼，已落 ${i+1} 枚 emoji`);
 }
 
@@ -582,7 +574,7 @@ function paint(){
   /* 用户要求：把「剩余」与「已用」两个重复的信息点融成一句 ——
      60 秒用了 11 秒，读作 11/60。 */
   const etxt=elapsed+'<b class="of">/'+limit+'</b>';
-  if(elapsedV.dataset.v!==etxt){reanim(elapsedV,"flip");elapsedV.dataset.v=etxt;}
+  if(elapsedV.dataset.v!==etxt){reanim(elapsedV,"punching");elapsedV.dataset.v=etxt;}
   elapsedV.innerHTML=etxt;
   elapsedV.classList.toggle("urgent",urgent);
   /* 席位上的实时读数：只剩一个数字加单位，不再写「拼图中 · 剩 Xs」（律一） */
