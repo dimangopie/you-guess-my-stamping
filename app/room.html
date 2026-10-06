@@ -24,16 +24,9 @@
 
 /* ---- 房间头 ---- */
 
-
-
-
 .rh-note{margin-left:auto;transition:color .2s}
 .rh-note.on{color:var(--blue)}
 /* 本站广播（页头的一枚小条，不做弹窗、不动标题栏） */
-
-
-
-
 
 /* 可点的设置摘要（不弹窗：点一下换一个取值，并广播） */
 .setchip{display:inline-flex;align-items:center;gap:7px;cursor:pointer;
@@ -51,10 +44,7 @@
 @media(max-width:1060px){.grid3{grid-template-columns:266px minmax(0,1fr) 292px;gap:14px}}
 @media(max-width:900px){.grid3{grid-template-columns:1fr;gap:18px}}
 
-
 /* 栏头：与 .sheet-hd 同高同面，但下沿让给下方表格自己的边线 */
-
-
 
 /* ---- 左：玩家席位表 = 纸，装订孔留在纸边 ---- */
 .seats{position:relative}
@@ -119,9 +109,6 @@
   font-variant-numeric:tabular-nums}
 .slotbar .slot .v i{font-style:normal;color:var(--ink-3);font-size:13px}
 /* 倒计时读数 = 屏 */
-.cd-strip{display:flex;align-items:flex-end;justify-content:space-between;gap:16px}
-.cd-box{background:var(--screen);border-radius:2px;padding:8px 18px;text-align:right}
-.cd-box .k{font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:var(--screen-ink)}
 
 /* ── 倒计时翻牌 ──────────────────────────────────────────────
    ⚠ 这里原来**一条样式都没有**。
@@ -131,25 +118,6 @@
    而且 `<i>` 默认斜体，正是 K3 说的
    「5 倍放大确认是两组斜体数字（44 与 77）叠印在同一位置，静态截图下读作坏字」。
    结构在、样式缺 —— 这是半成品，不是坏值。 */
-.flap{display:inline-flex;gap:1px;font-family:var(--mono);font-weight:700;
-  font-size:clamp(32px,4.4vw,50px);line-height:.95;color:var(--amber-lit);
-  font-variant-numeric:tabular-nums}   /* --amber-ink 在 --screen 上只有 2.02:1 */
-.flap .d{position:relative;display:inline-grid;place-items:center;min-width:.62em}
-.flap .d i{position:absolute;inset:0;display:grid;place-items:center;
-  font-style:normal;font-weight:inherit;color:inherit;backface-visibility:hidden}
-.flap .d.go i{animation:flapTurn .32s ease-out}
-@keyframes flapTurn{
-  from{transform:rotateX(-88deg);opacity:.25}
-  to{transform:rotateX(0);opacity:1}
-}
-/* ⚠ #cd 被 JS 藏成 1px 数据源；可见的是旁边的 .flap。
-   这条留着只为「JS 没跑起来」时兜底。 */
-.cd-v{font-family:var(--mono);font-weight:700;font-size:clamp(32px,4.4vw,50px);
-  line-height:.95;color:var(--amber-lit);   /* 在 .cd-box(--screen) 上，纸面档只有 2.02:1 */
-  font-variant-numeric:tabular-nums;transition:color .25s}
-.cd-v.urgent{color:var(--red-ink)}
-.cd-u{font-family:var(--mono);font-size:11.5px;color:var(--screen-ink);margin-left:7px;
-  letter-spacing:.1em}   /* 在 .cd-box(--screen) 里：--ink-3 只有 1.93:1 */
 .tick{height:10px;border:1.5px solid var(--ink);background:var(--paper-3);border-radius:2px;
   margin-top:10px;overflow:hidden}
 .tick i{display:block;height:100%;background:var(--amber);transition:width .95s linear,background .3s}
@@ -158,16 +126,6 @@
 .stats.st3 .st{flex:1 1 0;min-width:0;padding:12px 14px}
 .stats.st3 .k{color:var(--ink-3)}
 
-/* 柜台窗口牌 + 叫号（谁该到哪个窗口去猜） */
-.winbar{margin-top:16px;background:var(--screen);border-radius:2px;padding:14px 18px;
-  display:flex;align-items:center;gap:22px;flex-wrap:wrap;border-bottom:4px solid var(--amber)}
-.winbar .q{display:grid;gap:2px;text-align:center}
-.winbar .q .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.22em;color:var(--screen-ink)}
-.winbar .queue-no{font-size:44px}
-.winbar .signs{display:flex;gap:8px;flex-wrap:wrap;flex:1;min-width:190px}
-.winbar .window-sign{background:rgba(242,239,228,.08);border-bottom-color:var(--ink-3)}
-.winbar .window-sign.on{background:var(--red);border-bottom-color:#7A1F16}
-.winbar .window-sign.on b{color:#FFF9F7}   /* 原 #FFE2DA 在印红上 3.89:1，不足 4.5 */
 
 /* ---- 右：猜测流（房间的心脏） ---- */
 .flow-wrap{border:2px solid var(--ink);border-top:none;border-radius:0 0 3px 3px;
@@ -203,23 +161,18 @@
 .flow-mark.faded{cursor:default;box-shadow:none;transform:rotate(-7deg)}
 
 /* ---- 底部得分板 =「屏」（深底）：席位表是纸，记分牌是屏 ---- */
-.srow,.throw{grid-template-columns:64px minmax(0,1fr) 96px 116px}
-.throw{background:rgba(255,255,255,.07)}
-.throw:hover{background:rgba(255,255,255,.07)}
-.srow .c2{display:flex;align-items:center;gap:9px}
-.srow .sc{font-family:var(--mono);font-weight:700;font-size:15px;color:var(--paper);
-  font-variant-numeric:tabular-nums}
-#score .throw .lbl{color:var(--screen-ink)}
-#score .srow .c4{color:var(--screen-ink);font-size:13px}
 /* 猜测流的合计：emoji 承担名词，一行两三个数字（律五） */
 .flow-sum{display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:0 14px;
-  font-family:var(--mono);font-size:11px;letter-spacing:.06em;color:var(--ink-3);
+  font-family:var(--mono);font-size:11px;letter-spacing:.06em;color:var(--screen-ink-2);
   font-variant-numeric:tabular-nums}
 .flow-sum span{display:inline-flex;align-items:baseline;gap:5px}
-.flow-sum b{color:var(--ink);font-weight:700}
+.flow-sum b{color:var(--paper);font-weight:700}
+/* ⚠ 原为 var(--ink) —— 墨黑画在 .board(--screen #22304F) 上只有 1.37:1。
+   这个 bug 一直藏在一条假选择器后面：删 #score 规则时留下一段注释残片
+   `#score /* … */` 粘在 .flow-sum 前，普查把它当成选择器，算出的底色是页面纸。
+   残片清掉后立刻现形。 */
 @media(max-width:640px){
-  .srow,.throw{grid-template-columns:40px minmax(0,1fr) 58px 78px}
-  .seat{grid-template-columns:30px minmax(0,1fr) 74px}
+    .seat{grid-template-columns:30px minmax(0,1fr) 74px}
   .g{grid-template-columns:64px minmax(0,1fr);row-gap:2px}
   .g-t{grid-row:1;grid-column:1}
   .g-who{grid-row:1;grid-column:2}
@@ -270,6 +223,10 @@ footer.site a[aria-current]{color:var(--amber-lit)}
 /* 复印的第二联：比原件淡（.copy2），纸张不涂黑 */
 .cv-copy .snap{filter:contrast(.92) brightness(1.02)}
 .cv-copy .copy-tag{margin-top:10px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+
+/* 「本题已用 / 时限」的 11/60 形式 —— 用户要求把「剩余」与「已用」两个
+   重复的信息点融成一句：60 秒用了 11 秒，读作 11/60。 */
+.stats .v .of{font-size:.5em;color:var(--ink-3);font-weight:700;margin-left:1px}
 </style>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#22304F">
@@ -281,7 +238,6 @@ footer.site a[aria-current]{color:var(--amber-lit)}
 <meta name="apple-mobile-web-app-title" content="你拼我猜">
 </head>
 <body>
-
 
 <header class="nav">
   <div class="wrap">
@@ -365,16 +321,9 @@ footer.site a[aria-current]{color:var(--amber-lit)}
                       title="柜台操作：撕下票根 / 盖一个章 / 复印这份" aria-label="柜台操作">🧾</button>
             </div>
             <hr class="dash">
-            <div class="cd-strip">
-              <span class="hint" title="本题时限">⏱ <b id="limitTxt">60</b>s</span>
-              <span class="cd-box">
-                <span class="k">本 题 剩 余</span>
-                <span class="cd-v" id="cd">47</span><span class="cd-u">秒</span>
-              </span>
-            </div>
             <div class="tick" id="tick"><i id="tickFill" style="width:78%"></i></div>
             <div class="stats st3">
-              <div class="st"><div class="v" id="elapsedV">13</div><div class="n">本 题 已 用</div></div>
+              <div class="st"><div class="v" id="elapsedV">13<b class="of">/60</b></div><div class="n">本 题 已 用</div></div>
               <div class="st"><div class="v" id="pieceV">4/7</div><div class="n">谜 面 已 落</div></div>
               <div class="st"><div class="v blue" id="hitV">1</div><div class="n">已 猜 中</div></div>
             </div>
@@ -384,15 +333,6 @@ footer.site a[aria-current]{color:var(--amber-lit)}
         </div>
 
         <!-- 柜台窗口牌 + 叫号 -->
-        <div class="winbar">
-          <div class="q">
-            <span class="k">叫 号</span>
-            <span class="queue-no" id="queueNo">A06</span>
-          </div>
-          <div class="signs" id="winSigns"></div>
-          <span class="hint" id="queueHint">听 号 动 身</span>
-        </div>
-
         <div class="stub-out" id="stubOut"></div>
       </section>
 
@@ -412,18 +352,6 @@ footer.site a[aria-current]{color:var(--amber-lit)}
         </div>
       </section>
 
-    </div>
-  </div>
-
-  <!-- ============ 底部得分板（常驻，不弹窗；屏） ============ -->
-  <div class="wrap">
-    <div class="sheet torn-bottom" style="padding-bottom:9px">
-      <div class="sheet-hd">
-        <span class="tag-no red">得分</span>
-        <span class="lbl">得 分 板</span>
-        <span class="stamp bar amber">本 局 结 算 中</span>
-      </div>
-      <div class="board" id="score"></div>
     </div>
   </div>
 
@@ -495,22 +423,16 @@ const SETS=[                           // 房间设置：点一下换一个取�
   {k:"时限",i:0,v:["60s","120s","30s"]}
 ];
 const STAMPS=["歪","已 阅","存 疑","作 废","甜 区","重 拼"];
-const CALLERS=["阿野","小舟","Lina","访客","阿麦"];
-const WINDOWS=[                        // 三个窗口牌：叫到谁，谁亮
-  {w:"1 号窗口",t:"拼图"},
-  {w:"2 号窗口",t:"抢猜"},
-  {w:"3 号窗口",t:"结算"}
-];
 
 /* ---------- 2. 节点 ---------- */
 const $=id=>document.getElementById(id);
-const seatsEl=$("seats"),scoreEl=$("score"),flowEl=$("flow"),cvEl=$("canvas"),
-      cdEl=$("cd"),tickEl=$("tick"),tickFill=$("tickFill"),
-      pieceV=$("pieceV"),elapsedV=$("elapsedV"),qNoEl=$("qNo"),limitTxt=$("limitTxt"),
+const seatsEl=$("seats"),flowEl=$("flow"),cvEl=$("canvas"),
+
+      pieceV=$("pieceV"),elapsedV=$("elapsedV"),qNoEl=$("qNo"),
       flowCount=$("flowCount"),flowSum=$("flowSum"),seatCount=$("seatCount"),
       rhSet=$("rhSet"),modeTag=$("modeTag"),hitV=$("hitV"),
       flowMark=$("flowMark"),copyTag=$("copyTag"),copyOut=$("copyOut"),stubOut=$("stubOut"),
-      tubeLeft=$("tubeLeft"),queueNo=$("queueNo"),winSigns=$("winSigns"),queueHint=$("queueHint"),
+      tubeLeft=$("tubeLeft"),
       castBar=$("castBar"),castTxt=$("castTxt");
 const pad=n=>String(n).padStart(2,"0");
 const stamp=ms=>{const t=new Date(ms);return pad(t.getHours())+":"+pad(t.getMinutes())+":"+pad(t.getSeconds())};
@@ -522,7 +444,7 @@ function reanim(el,cls){
 
 /* ---------- 3. 状态 ---------- */
 let limit=LIMIT0, elapsed=13, round=3, pieceI=OPEN, pi=0, joined=false, noteT=0;
-let unread=0, copies=0, stubs=0, stampI=0, door=6, callT=0, castN=0;
+let unread=0, copies=0, stubs=0, stampI=0, castN=0;
 const prevSc={};
 
 /* ---------- 4. 渲染 ---------- */
@@ -544,7 +466,7 @@ function seatHTML(p){
     <div class="c2 who">
       <span class="av">${p.av}</span>
       <span class="pn"><b>${p.n}</b>
-        <span class="sc"${p.live?' data-live="1"':''}>+${p.gain==null?"—":p.gain} 分</span></span>
+        <span class="sc"${p.live?' data-live="1"':''}>${p.gain==null?"—":(p.gain>0?"+"+p.gain+" 分":p.gain+" 分")}</span></span>
     </div>
     <div class="c3">${sealHTML(p)}</div>
   </div>`;
@@ -564,23 +486,6 @@ function renderSeats(){
       if(document.body.contains(row)){row.dataset.inked="1";reanim(row,"stamping");clearInterval(iv);}
     },4500);
   }
-}
-function renderScore(){
-  const rows=[...SEATS].sort((a,b)=>b.sc-a.sc);
-  scoreEl.innerHTML=rows.map((p,i)=>`<div class="row srow" data-no="${p.no}">
-      <div class="c1">${pad(i+1)}</div>
-      <div class="c2"><span class="pip ${PIP[p.st]}"></span>${p.n}</div>
-      <div class="c3">${p.gain==null?"—":"+"+p.gain}</div>
-      <div class="c4"><b class="sc">${p.sc}</b> 分</div>
-    </div>`).join("");
-  /* 分数变化 = 翻牌（.flip），不是淡入 */
-  rows.forEach(p=>{
-    if(prevSc[p.no]!==undefined && prevSc[p.no]!==p.sc){
-      const el=scoreEl.querySelector(`.srow[data-no="${p.no}"] .sc`);
-      if(el) reanim(el,"flip");
-    }
-    prevSc[p.no]=p.sc;
-  });
 }
 function guessHTML(g,anim){
   const cls=["g"];
@@ -645,34 +550,18 @@ function place(i,anim){
   cvEl.setAttribute("aria-label",`当前谜面：阿野正在拼，已落 ${i+1} 枚 emoji`);
 }
 
-/* ---------- 6. 叫号：轮到谁，哪个窗口牌就亮 ---- */
-function renderSigns(act){
-  winSigns.innerHTML=WINDOWS.map(w=>
-    `<span class="window-sign${w.w===act?' on':''}"><b>${w.w}</b>${w.t}</span>`).join("");
-}
-function callNext(){
-  const who=CALLERS[door% CALLERS.length];
-  door++;
-  const no="A"+pad(door);
-  queueNo.textContent=no;
-  reanim(queueNo,"called");
-  const act=WINDOWS[door%WINDOWS.length].w;
-  renderSigns(act);
-  queueHint.innerHTML=`<b style="color:var(--amber-ink)">${no}</b> · ${who} · ${act}`;
-  sysLine(`叫号 ${no} · ${who} · ${act}`);
-}
-
 /* ---------- 7. 倒计时：真走，到 0 重置 ---- */
 function paint(){
   const left=Math.max(0,limit-elapsed);
-  if(cdEl.textContent!==String(left)) reanim(cdEl,"flip");
-  cdEl.textContent=left;
   tickFill.style.width=(left/limit*100).toFixed(1)+"%";
   const urgent=left<=15;
-  cdEl.classList.toggle("urgent",urgent);
   tickEl.classList.toggle("urgent",urgent);
-  if(elapsedV.textContent!==String(elapsed)) reanim(elapsedV,"flip");
-  elapsedV.textContent=elapsed;
+  /* 用户要求：把「剩余」与「已用」两个重复的信息点融成一句 ——
+     60 秒用了 11 秒，读作 11/60。 */
+  const etxt=elapsed+'<b class="of">/'+limit+'</b>';
+  if(elapsedV.dataset.v!==etxt){reanim(elapsedV,"flip");elapsedV.dataset.v=etxt;}
+  elapsedV.innerHTML=etxt;
+  elapsedV.classList.toggle("urgent",urgent);
   /* 席位上的实时读数：只剩一个数字加单位，不再写「拼图中 · 剩 Xs」（律一） */
   const lv=document.querySelector("[data-live]");
   if(lv) lv.textContent="+"+left+" 秒";
@@ -698,7 +587,7 @@ function joinGuest(){
   if(joined) return;
   joined=true;
   SEATS.push({...JOINER});
-  renderSeats();renderScore();
+  renderSeats();
   sysLine("阿麦 入座 05 席 · 加入抢猜");
   updateFlowMeta();
   broadcast();
@@ -728,7 +617,6 @@ rhSet.addEventListener("click",e=>{
   if(s.k==="模式"){modeTag.textContent=s.v[s.i]+" · 同房";}
   if(s.k==="时限"){
     limit=parseInt(s.v[s.i],10);
-    limitTxt.textContent=limit;
     if(limit-elapsed<5){elapsed=0;extra=" · 重开";}
     paint();
   }
@@ -933,46 +821,17 @@ console.log("%c会看控制台的人，柜台直接放行，不用取号。","co
 /* ---------- 17. 启动 ---- */
 renderChips();
 renderSeats();
-renderScore();
+
 renderFlow();
-renderSigns("");
+
 for(let i=0;i<OPEN;i++) place(i,false);   // 已经落下的牌：载入即实心，不参与进场动画
 paint();
 setInterval(()=>{ if(pieceI<PUZZLE.length) place(pieceI++,true); },3400);  // 抽签筒继续出牌
 setInterval(()=>{ elapsed++; paint(); if(limit-elapsed<=0) newRound(); },1000); // 倒计时
 setInterval(pushGuess,7000);                                          // 猜测流
 setTimeout(joinGuest,10000);                                          // 阿麦入座
-callT=setTimeout(callNext,2600);                                      // 第一次叫号
-setInterval(callNext,14000);                                          // 之后每 14 秒叫一次
 
-/* ── 倒计时翻牌化 ──
-   ⚠ 不能让 observer 观察「自己会写入的元素」，否则自激死循环。
-   第一版把 #cd 本身重绘成 <span class="d"><i>4</i>4</span>，
-   而它的 textContent 是 "44"（<i> 里的 4 + 文本节点的 4），
-   守卫 dataset.v===textContent 永不成立 → observer 无限重绘 → 页面卡死。
-   现在：#cd 只当数据源（视觉隐藏，内容只由原计时逻辑写），
-   翻牌渲染到旁边的兄弟节点 #cdFlap 上 —— 结构上不可能自激。 */
-(function(){
-  var src=document.getElementById("cd"); if(!src) return;
-  if(document.getElementById("cdFlap")) return;
-  var box=document.createElement("span");
-  box.className="flap"; box.id="cdFlap";
-  src.style.cssText="position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap";
-  src.parentNode.insertBefore(box, src.nextSibling);
-  var last="";
-  function paint(){
-    var s=src.textContent;
-    if(s===last) return;
-    var prev=last; last=s;
-    box.innerHTML=Array.prototype.map.call(s,function(ch,i){
-      if(!/\d/.test(ch)) return '<span style="align-self:center;opacity:.55">'+ch+'</span>';
-      var go=(prev.charAt(i)!==ch&&prev)?" go":"";
-      return '<span class="d'+go+'"><i>'+ch+'</i>'+ch+'</span>';
-    }).join("");
-  }
-  new MutationObserver(paint).observe(src,{childList:true,characterData:true,subtree:true});
-  paint();
-})();</script>
+</script>
 <script src="pwa.js"></script>
 </body>
 </html>

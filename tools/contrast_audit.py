@@ -202,7 +202,8 @@ ANCESTRY = {
     ".feed-no": ".gate", ".gk": ".gate", ".thinbar": ".gate", ".feed": ".gate",
     ".logo": ".nav", ".nav nav a": ".nav", "body>.nav": ".nav",
     ".vote": ".board",                      # guess：榜单行由 renderBoard() 生成在深色板里
-    "#score .srow": "#score", "#score .throw": "#score",
+    ".flow-sum": ".board",   # 猜测流合计，在右栏深面里
+    ".flow-sum b": ".board",
     ".row.top1": ".rk", ".rk .row": ".board",   # ⚠ 原来写的是 .rk —— 但 .rk 是**纸**（.sheet.rk），
     #   深色的是它里面的 <div class="board" id="rk-wrong">。
     #   这一条猜错，让普查静默放过了两条 2.0:1 的文字（票数与副标题）。
@@ -210,7 +211,6 @@ ANCESTRY = {
     ".flap": ".cd-box", ".cd-v": ".cd-box", ".cd-u": ".cd-box",   # 倒计时数字在深色屏里
     ".rk .row.top1 .c2": ".board",   # 复合类（.row.top1）让 .rk .row 匹配不到
     ".rk .row.top1 .c1": ".board", ".rk .row .c2": ".board",
-    "#score": ".board", ".srow": ".board", ".throw": ".board",
 }
 # ② 豁免表：真·误报，写明理由。
 #    banks 的 .box 白字只在 :checked 后出现，而那时底色已变成 --blue；
