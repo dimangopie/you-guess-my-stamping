@@ -40,7 +40,20 @@
 .setchip.flash{background:var(--paper-2);border-color:var(--amber-ink)}
 
 /* ---- 三栏主体 ---- */
-.grid3{display:grid;grid-template-columns:294px minmax(0,1fr) 326px;gap:18px;align-items:start}
+/* ── 三栏：比例 + 计算，不用断点 ────────────────────────────────
+   用户：「div.grid3 的大小你还是不要用响应式，用比例或者计算得到，
+   还有一些其他的布局也是能用比例或计算得到的就不要用响应，
+   不然很容易超出一些范围。」
+   ⚠ 原来是一条死值 + 两档断点（1060 / 900）。断点之间那一整段宽度
+   只能拿到相邻档的值，边界附近就"超出范围"。
+   系数按 1366 这一档反推，保证 1366 下与原值逐像素一致：
+     左栏 21.5vw = 294 ✓   右栏 23.8vw = 325 ✓   间距 1.32vw = 18 ✓
+   clamp 的下限防止极窄视口把中栏挤没。 */
+.grid3{--sl:clamp(196px,21.5vw,294px);--sr:clamp(216px,23.8vw,326px);
+  --g3:clamp(10px,1.32vw,18px);
+  /* 布局交给 base.css 的 flex-wrap（连续换行，无断点）——
+     这里只提供比例变量，不再写 display/grid-template。 */
+  gap:var(--g3)}
 @media(max-width:1060px){.grid3{grid-template-columns:266px minmax(0,1fr) 292px;gap:14px}}
 @media(max-width:900px){.grid3{grid-template-columns:1fr;gap:18px}}
 
