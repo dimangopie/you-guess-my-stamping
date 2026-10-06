@@ -30,8 +30,8 @@
 /* 子元素解除 min-width 下限：grid 的 1fr 是 minmax(auto,1fr)，
    那个 auto 等于内容的 min-content，窄屏下列会被顶住不缩。 */
 .bench>*{min-width:0}
-.bench{display:grid;grid-template-columns:300px minmax(0,1fr) 244px;gap:22px;align-items:start;
-  padding-top:26px}
+.bench{display:grid;grid-template-columns:300px minmax(0,1fr) 244px;gap:22px;align-items:stretch;
+  padding-top:18px}
 @media(max-width:1120px){.bench{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.bench .order{grid-column:1/-1}}
 @media(max-width:820px){.bench{grid-template-columns:minmax(0,1fr)}
   .bench .canvas-box{order:1}.bench .wheel-box{order:2}.bench .order{order:3}}
@@ -145,6 +145,36 @@
 .od .d{flex:1;border-bottom:1px dotted var(--ink-4);transform:translateY(-4px)}
 .od b{color:var(--ink);white-space:nowrap}
 .od b.blue{color:var(--blue)}
+
+/* ── 整页铺满视口（导航 + 报头 + 三栏 + 页尾都在一屏内）──────────
+   实测 1366×768：文档 827px，**页尾 y743→827 完全在屏外**，
+   要滚 59px 才看得到 —— 用户的原话是「页尾没有」。
+   同时三栏底部参差 140px（素材库 465 / 画布栏 521 / 制作单 381），
+   三个岛各自结束在不同高度上。
+
+   做法：body 竖排 flex，main 撑满，bench 撑满 → 页尾被顶到视口底部。
+   三栏 align-items:stretch 等高，底边齐平。 */
+/* 三栏等高（原来是 align-items:start，各自结束在不同高度） */
+/* 画布按可用高度定尺寸，不写死 */
+
+
+/* ── 让整页（含页尾）落在一屏内 ────────────────────────────────
+   实测 1366×768、未改前：
+       nav 72 · head 72→196(124) · bench 196→743(547) · footer 743→827(84)
+       文档 827 —— **页尾整条在屏外**，要滚 59px 才看得到（用户：「页尾没有」）
+   需要砍 59px。逐项砍：head −28、footer −28、画布 −3。 */
+.head{padding:12px 0 2px}
+.head h1{margin:8px 0 10px}
+footer.site{padding:14px 0}
+
+/* 三栏等高：原来是 align-items:start，三块各自结束在不同高度
+   （素材库 657 / 画布栏 662 / 制作单 573），底边参差 89px。
+   改成 stretch，并把每块做成竖向 flex，让内部的纸面撑满。 */
+.bench .sheet,.bench .canvas-box{display:flex;flex-direction:column}
+.bench .sheet .sheet-bd{flex:1 1 auto}
+.bench .canvas-box{justify-content:flex-start}
+/* 素材库的说明条推到面板底 —— 面板被 stretch 拉高后，它下面会空 ~95px 纸 */
+.lib-note{margin-top:auto}
 </style>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#22304F">
