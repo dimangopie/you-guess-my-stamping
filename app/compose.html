@@ -30,11 +30,6 @@
 /* 子元素解除 min-width 下限：grid 的 1fr 是 minmax(auto,1fr)，
    那个 auto 等于内容的 min-content，窄屏下列会被顶住不缩。 */
 .bench>*{min-width:0}
-.bench{display:grid;grid-template-columns:300px minmax(0,1fr) 244px;gap:22px;align-items:stretch;
-  padding-top:18px}
-@media(max-width:1120px){.bench{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.bench .order{grid-column:1/-1}}
-@media(max-width:820px){.bench{grid-template-columns:minmax(0,1fr)}
-  .bench .canvas-box{order:1}.bench .wheel-box{order:2}.bench .order{order:3}}
 
 /* ---------- 素材库（原转盘位）---------- */
 
@@ -76,12 +71,10 @@
 
 /* ---------- 画板 ---------- */
 .canvas-box{min-width:0}
-.canvas{position:relative;width:100%;max-width:min(520px, calc(100vh - 300px))   /* 768 高的屏上让出按钮的位置 */;aspect-ratio:1/1;margin:0 auto;
+.canvas{position:relative;width:100%;aspect-ratio:1/1;margin:0 auto;
   overflow:hidden;background:var(--paper-4);border:2px solid var(--ink);border-radius:var(--rad);
   box-shadow:var(--sh-soft);touch-action:none;
-  background-image:
-    repeating-linear-gradient(0deg,rgba(23,23,27,.055) 0 1px,transparent 1px 33.4%),
-    repeating-linear-gradient(90deg,rgba(23,23,27,.055) 0 1px,transparent 1px 33.4%)}
+  background-image: repeating-linear-gradient(0deg,rgba(23,23,27,.06) 0 1px,transparent 1px 8px), repeating-linear-gradient(90deg,rgba(23,23,27,.06) 0 1px,transparent 1px 8px)}
 .canvas.armed{outline:2px dashed var(--blue);outline-offset:-7px}
 .canvas .ph{position:absolute;inset:0;display:grid;place-items:center;text-align:center;
   font-family:var(--mono);font-size:12px;color:var(--ink-2);line-height:2;pointer-events:none}   /* --ink-4 只有 4.12:1 */
@@ -189,7 +182,7 @@ footer.site{padding:14px 0}
 .lib-box .sheet-bd{padding:14px}
 .col-hd .tag-no{font-size:10.5px}
 /* 画布接视口高度 —— 房室里画布是主体，但不能把按钮挤出屏幕 */
-.canvas{max-width:min(520px, calc(100vh - 340px))}
+
 .lib-grid button{font-size:22px}
 /* 交题单的竖向节奏收紧 —— 它是三栏里最高的一栏，之前是它在决定整页高度 */
 .order .sheet-bd{padding:14px}
@@ -202,7 +195,10 @@ footer.site{padding:14px 0}
 .bench > .col{padding:0}
 /* 中栏盒体：照房间 —— 有边框、填纸白、画布缩在盒里当内边距 */
 .stage-box{border-radius:0 0 var(--rad) var(--rad)}
-.stage-box .sheet-bd{padding:18px;display:flex;flex-direction:column;align-items:center}
+.stage-box .sheet-bd{display:flex;flex-direction:column;align-items:center}
+/* ⚠ 不要再写 padding ——base.css 的 .sheet-bd{padding:22px} 就是两页共用的值。
+   我原来在这里覆盖成 18px，导致同一视口下画布差 8px（436 vs 428）。
+   用户要求：「在同一窗口尺寸下，房间和拼图台画布大小应该一样」。 */
 /* ── 三栏竖向拉满（K3 第 2 项）────────────────────────────────
    K3：「房间栏栏顶到视口底，拼图台全页 814px 封顶，1080 下留 266px 死区，
    左/右栏高度固定 585/430，页面显得「小件、浮在顶上」。
@@ -216,6 +212,48 @@ footer.site{padding:14px 0}
 .bench .col > .stage-box{display:flex;flex-direction:column}
 .bench .col > .stage-box > .sheet-bd{flex:1 1 auto}
 .lib-grid{align-content:start}
+/* ② 右栏边框色：这一栏从 .sheet 改成 .board 之后，
+   .board 的 border 是 var(--screen-2)（藏青 #18233B），左右两栏却是 var(--ink)。
+   K3：「拼图台右栏框线是藏青 (24,35,59)，房间右栏是墨黑 (23,23,27)；
+   中栏盒框两边都是 (23,23,27) ✅。**同屏两种框色，细看能察觉。**」 */
+.order{border-color:var(--ink)}
+/* ③ 竖向拉满：让栏身在任何视口高度都够到视口底。
+   K3 第 2 项实测：@768 死区 0px ✅，但 @900 剩 120px、@1080 剩 216px。
+   它的判断：「房间的『到底』来自内容溢出、栏身被视口底边切断；
+   拼图台是『页脚收口 + 下面空着』——@768 恰好收在底边上，@900/@1080 就露馅。」
+   做法：body 竖排 flex + main 撑满 + bench 撑满，页脚被顶到视口底。
+   内容比视口高时照常滚动，不会压扁。 */
+body{display:flex;flex-direction:column;min-height:100vh}
+main{flex:1 1 auto;display:flex;flex-direction:column}
+main > .wrap{flex:none}
+.bench{flex:1 1 auto;min-height:0}
+.site{flex:none}
+/* ④ 让 grid 的那一行吃满 bench 的高度 —— 光有 bench{flex:1} 不够：
+   bench 元素变高了，但里面唯一那行 grid 仍是 auto（= 最高内容），
+   实测三栏底边在 768/900/1080 三档下**都是 586**，多余高度全浪费。
+   minmax(0,1fr) 才是「这一行吃掉剩余高度」。 */
+/* ④ 两个 flex bug（实测出来的）：
+   ① `.bench` 的类名是 "bench wrap" —— 我的 `main > .wrap{flex:none}` 把它也打中了，
+      实测 bench 的 flexGrow = 0，所以它在 768/900/1080 三档下高度都是 454，不跟视口长。
+      改成只命中控制条那个 wrap。
+   ② 画布是 flex 子项，被 flex 收缩挤到 247px。加 flex:none 让它按自身宽度定尺。 */
+main > .wrap:not(.bench){flex:none}
+.canvas{flex:none}
+/* ⑤ 画布在 .sheet-bd（column flex + align-items:center）里被收缩到内容宽 ——
+   实测三档都是 247px，而同一视口下房间是 428/428/620。
+   align-self:stretch 让它吃满盒宽，再由 .canvas 的 max-width(--cv) 与 margin:auto 定尺居中。 */
+.stage-box .sheet-bd > .canvas{align-self:stretch}
+/* 响应式（照房间的三档）—— 老设计那三条已删，避免两套模板并存 */
+@media(max-width:1240px){.bench{grid-template-columns:266px minmax(0,1fr) 292px;gap:14px}}
+@media(max-width:1000px){.bench{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .bench > .col:nth-of-type(3){grid-column:1/-1}}
+@media(max-width:820px){.bench{grid-template-columns:minmax(0,1fr)}}
+/* ⑥ ⚠ 这个坑我在第 1 轮修过一次，加 flex 链时又引回来了：
+   `.bench` 的类名含 `wrap`，而 `.wrap{margin:0 auto}` —— 在 flex 列容器里，
+   交叉轴上的 auto 外边距会让子项按 **fit-content** 定宽，
+   于是 bench 实测卡在 991px，三档视口都不长（房间是 1132 / 1552）。
+   显式给满宽即可。 */
+main > *{width:100%}
 </style>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#22304F">

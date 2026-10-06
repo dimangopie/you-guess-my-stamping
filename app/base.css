@@ -636,3 +636,12 @@ footer.site .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:
 .cast.quiet{background:var(--paper-3);color:var(--ink-3);border-bottom-color:var(--ink-3)}
 .cast.quiet b{color:var(--ink-2)}
 @media(max-width:900px){.rh-set{margin-left:0;width:100%}.cast{margin-left:0}}
+/* ── 画布尺寸：**全站唯一定义** ────────────────────────────────
+   用户要求：「在同一窗口尺寸下，房间和拼图台画布大小应该一样」。
+   此前两页各写各的 —— 房间是 400/560/700，拼图台是
+   min(520px, calc(100vh - 340px))，同一视口下量出来 399 vs 427。
+   画布是这个产品的主体，尺寸不该按页面分叉：收到这里，两页共用。
+   高度也纳入：矮屏（768）上要让出按钮与页脚的位置。 */
+.canvas{--cv:min(520px, calc(100vh - 340px));max-width:var(--cv)}
+@media(min-width:1560px){.canvas{--cv:min(620px, calc(100vh - 300px))}}
+@media(min-width:2000px){.canvas{--cv:min(700px, calc(100vh - 300px))}}
