@@ -110,7 +110,10 @@ main>*{width:100%}
   /* 左轨 296：转盘足迹 254px（半径 104 + 牌 23）+ sheet 内边距。
      压到 200 时实测右侧溢出 92px，被切掉的正是拖牌落手点。 */
   grid-template-columns:minmax(0,296px) minmax(0,1fr) minmax(0,224px);gap:16px;
-  max-width:min(1600px,100% - 48px)}   /* 比全站 wrap(1180) 宽 —— 画布页优先给画布 */
+  max-width:min(1600px,100% - 48px)}
+/* 宽屏放开上限 —— 画布是被高度限制的，工作台越宽两轨越松、画布越大。 */
+@media(min-width:1800px){.bench{max-width:min(2000px,100% - 64px)}}
+@media(min-width:2300px){.bench{max-width:min(2500px,100% - 80px)}}   /* 比全站 wrap(1180) 宽 —— 画布页优先给画布 */
 .bench>*{min-height:0}
 /* 三栏都撑满 → 底边对齐。
    评委原话：「左右两栏面板都在 y≈370 处结束，下面空出约 270px 米色死区，

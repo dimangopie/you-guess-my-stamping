@@ -277,6 +277,16 @@
 @media(max-width:720px){
   .mc-hd .stamp{margin-left:0}
 }
+
+/* ── 宽屏：十类卡加列 ──
+   词库在横屏下是最长的页面（1366×768 时 5.27 屏）。
+   十类卡是固定数量的网格，宽屏多一列就少翻一屏。 */
+@media(min-width:1560px){
+  #catGrid{grid-template-columns:repeat(5,minmax(0,1fr))}   /* .g4 基础是 4 列 */
+}
+@media(min-width:2100px){
+  #catGrid{grid-template-columns:repeat(6,minmax(0,1fr))}
+}
 </style>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#22304F">

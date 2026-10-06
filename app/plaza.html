@@ -174,6 +174,19 @@
 .bankrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(232px, 100%), 1fr));gap:16px}
 .idx .gauge{margin-top:10px}
 .idx .gauge .val{font-size:15px}
+
+/* ── 宽屏：列表加列 ────────────────────────────────────────
+   .body 是 1fr + 388px，在 --wrap:1600 下列表列有 **1178px 宽**，
+   却仍然一列一张卡 —— 一屏只装得下两张。
+   这是「拉宽的竖屏」，不是宽屏形态：宽度有了，形态没跟上。
+   卡片本身按 ~580px 设计（原 495px 那一版的经验），双列正合适。 */
+@media(min-width:1560px){
+  .notices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:20px;align-items:start}
+}
+@media(min-width:2200px){
+  .notices{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
 </style>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#22304F">
