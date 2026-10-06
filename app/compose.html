@@ -274,6 +274,22 @@ main>*{width:100%}
 
 /* ⚠ 必须排在所有基础规则之后：媒体查询不提升优先级，同权重下靠后的赢。 */
 
+/* ── 横屏矮屏（1280×720 是最矮的常见横屏）──────────────────
+   以横屏 web 为标准：竖向预算紧。720 高时制作单面板比可用高度多 5px，
+   画布不变量当场抓到（.sheet 纵向裁切 5px）。这里把面板的竖向节奏收紧。 */
+@media(max-height:820px){
+  .bench{padding-top:12px}
+  .sheet-hd{padding:8px 14px}
+  .sheet-bd{padding:10px 14px}
+  .od{padding:5px 0}
+  .ansrow input{padding:8px 10px}
+  .proc{padding-top:8px}
+  .proc-list{gap:4px}
+  .proc-tip{margin-top:6px}
+  .wheel-note{margin-top:6px}
+}
+
+
 /* 窄窗（901–1200）让两条轨道自己收缩，把宽度让给画布。
    评委原话：「1024 下画布被挤到只剩屏宽约 1/3 的小方块，而左侧转盘反而变大了。
    一个『拖、转、缩放』的游戏，在最窄窗口里工作台比工具盒还小，优先级完全颠倒。」

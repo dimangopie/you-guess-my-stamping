@@ -30,8 +30,10 @@ APP = ROOT / "app"
 WORK = pathlib.Path("/home/mango/workspace/.ffwork")
 FF = "/snap/firefox/current/usr/lib/firefox/firefox"
 
-# 1024x768 是老笔记本 / iPad 横屏 —— 上一轮正是它掉进了无人区。
-VIEWPORTS = [(1024, 768), (1280, 800), (1440, 900), (1920, 1080)]
+# **以横屏 web 为标准。**
+# 横屏 = 宽而矮，竖向预算比横向紧得多，所以矮屏（768 / 720）必须进验收集。
+# 1280x720 是最矮的常见横屏，放在最后压测。
+VIEWPORTS = [(1366, 768), (1280, 720), (1440, 900), (1920, 1080)]
 PAGES = ["compose.html"]
 
 PROBE = r'''<script>
