@@ -8,7 +8,7 @@
 <style>
 /* ============================================================
    拼图台 · 制作单
-   素材库取牌 → 拖到画布 → 控制点调姿 → 封存交题
+   素材库取牌 → 拖到画布 → 控制点调姿 → 封存入册（进个人作品集）
 
    四条修正：
    ① 画布是固定比例的「画板」，牌用画布相对单位定尺寸 ——
@@ -154,8 +154,8 @@ footer.site{padding:14px 0}
 /* 素材库的说明条推到面板底 —— 面板被 stretch 拉高后，它下面会空 ~95px 纸 */
 .lib-note{margin-top:auto}
 
-/* ── 照房间的布局：紧凑控制条 + 三栏（左素材 / 中画布 / 右交题）──
-   房间的比例是 294 / 1fr / 326，这里照搬（右栏要放得下交题单）。
+/* ── 照房间的布局：紧凑控制条 + 三栏（左素材 / 中画布 / 右入册）──
+   房间的比例是 294 / 1fr / 326，这里照搬（右栏要放得下入册单）。
    顶部控制条取代了原来的大报头 —— 房间的调度单就是这么做的。 */
 
 .bench .col{display:flex;flex-direction:column;min-width:0}
@@ -168,7 +168,7 @@ footer.site{padding:14px 0}
 /* 画布接视口高度 —— 房室里画布是主体，但不能把按钮挤出屏幕 */
 
 .lib-grid button{font-size:22px}
-/* 交题单的竖向节奏收紧 —— 它是三栏里最高的一栏，之前是它在决定整页高度 */
+/* 入册单的竖向节奏收紧 —— 它是三栏里最高的一栏，之前是它在决定整页高度 */
 .order .sheet-bd{padding:14px}
 .order .od{padding:6px 0}
 .order .ansrow{margin-top:8px}
@@ -254,6 +254,10 @@ main > *{width:100%}
 .bench > .col > .sheet,.bench > .col > .stage-box{flex:1 1 auto;display:flex;flex-direction:column}
 .bench > .col > .stage-box > .sheet-bd{flex:1 1 auto}
 /* 窄视口：画布整行，侧栏并排落在下面（两页共用，见 base.css） */
+/* 入册提示里的链接 —— 用设计系统的印蓝，不要浏览器的默认蓝下划线 */
+#fileHint a{color:var(--blue);text-decoration:none;
+  border-bottom:1.5px solid var(--blue);padding-bottom:1px}
+#fileHint a:hover{background:rgba(31,78,156,.08)}
 </style>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#22304F">
@@ -363,7 +367,7 @@ main > *{width:100%}
       <div class="od"><span class="k">分 类</span><span class="d"></span><b>成语</b></div>
       <div class="od"><span class="k">已 用</span><span class="d"></span><b class="blue" id="used">0</b></div>
       <div class="btn-row" style="margin-top:16px">
-        <button class="btn" id="fileBtn" disabled>封 存 交 题</button>
+        <button class="btn" id="fileBtn" disabled>封 存 入 册</button>
       </div>
       <div class="hint" style="margin-top:10px" id="fileHint">先拖几个 emoji，再填答案</div>
     </div>
@@ -655,14 +659,14 @@ addEventListener("pointermove",e=>{
 addEventListener("pointerup",()=>{ mode=null; });
 
 /* ============================================================
-   制作单 / 交题
+   制作单 / 封存入册
    ============================================================ */
 function refresh(){
   $("used").textContent=pieces.length;
   const ok=pieces.length>0 && $("ans").value.trim().length>0;
   $("fileBtn").disabled=!ok;
   $("fileHint").textContent = !pieces.length ? "先拖几个 emoji，再填答案"
-                            : (!$("ans").value.trim() ? "还差一个答案" : "可以封存了");
+                            : (!$("ans").value.trim() ? "还差一个答案" : "可以封存入册了");
 }
 $("ans").addEventListener("input",refresh);
 
@@ -680,11 +684,14 @@ $("fileBtn").addEventListener("click",()=>{
   const st=$("stateStamp");
   st.className="stamp bar"; st.textContent="已 封 存";
   st.classList.add("stamping");
-  $("fileBtn").disabled=true; $("fileHint").textContent="已交到广场";
+  $("fileBtn").disabled=true;
+    /* 用户：「拼图台还是要保留下来的，因为它可以用来搞搞自己创作
+       放在个人的作品集中。」——
+       所以出口是**我的作品（归档票根册）**，不是广场。 */
+    $("fileHint").innerHTML='已收入我的作品集 · <a href="works.html">去归档票根册看</a>';
   const h=document.createElement("span");
   h.className="hole"; h.style.right="10px"; h.style.top="10px";
   cv.appendChild(h); requestAnimationFrame(()=>h.classList.add("punching"));
-  setTimeout(()=>{ location.href="plaza.html"; },900);
 });
 
 $("sndBtn").addEventListener("click",()=>{
