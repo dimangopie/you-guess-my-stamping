@@ -109,7 +109,8 @@
      全站 74 处媒体查询全是 max-width（屏幕变窄时怎么缩），
      而 min-width 一处都没有 —— 没有「屏幕变宽时怎么用」的规则。
      现在给它两个宽屏档（见文件末尾的 min-width 段）。 */
-  --wrap:1180px;
+  /* 1180/1366 ≈ 86.4%；上限仍是绝对值（最大宽度本身就是个绝对概念） */
+  --wrap:min(86.4%, 1800px);
   --rad:3px;
 }
 
@@ -136,10 +137,10 @@ body{
   background-size:var(--grid) var(--grid),var(--grid) var(--grid),160px 160px;
   overflow-x:hidden;
 }
-.wrap{max-width:var(--wrap);margin:0 auto;padding:0 24px}
+.wrap{max-width:var(--wrap);margin:0 auto;padding:0 clamp(14px, 1.9vw, 24px)}
 .wrap-nar{max-width:820px;margin:0 auto;padding:0 24px}
-section{padding:80px 0}
-@media(max-width:700px){section{padding:56px 0}.wrap,.wrap-nar{padding:0 16px}}
+section{padding:clamp(48px, 6.2vw, 80px) 0}
+
 
 /* ---------- 3. 排版 ---------- */
 .mono{font-family:var(--mono)}
@@ -344,7 +345,7 @@ footer.site > .wrap{max-width:none;margin:0;padding:0 24px}
 .board.light .c2{color:var(--ink);border-right-color:var(--ink-4)}
 .board.light .c3{color:var(--ink-2)}
 .board.light .c4{color:var(--ink-3)}
-@media(max-width:640px){.board .row>div{padding:11px 10px;font-size:12px}}
+
 
 /* ---------- 11. 状态灯 ---------- */
 .dot{width:9px;height:9px;border-radius:50%;display:inline-block;flex:none;

@@ -40,8 +40,15 @@
 .setchip.flash{background:var(--paper-2);border-color:var(--amber-ink)}
 
 /* ---- 三栏主体 ---- */
-.grid3{display:grid;grid-template-columns:294px minmax(0,1fr) 326px;gap:18px;align-items:start}
-@media(max-width:1060px){.grid3{grid-template-columns:266px minmax(0,1fr) 292px;gap:14px}}
+/* ── 三栏：用百分比，不用固定 px ────────────────────────────────
+   用户：「尽量把响应式全改成具体计算, 尽量用%, 而不是 ps」
+   % 相对**网格容器的内容盒**。按 1366 这一档反推容器 = 1180 − 48 = 1132：
+     左栏 294/1132 = 25.97%    右栏 326/1132 = 28.80%    间距 18/1132 = 1.59%
+   1366 下与原值逐像素一致；窄下去时自然等比缩小，
+   所以下面那条 1060 的固定值断点可以删掉（它本来就在做同一件事）。 */
+.grid3{display:grid;
+  grid-template-columns:25.97% minmax(0,1fr) 28.8%;
+  gap:1.59%;align-items:start}
 @media(max-width:900px){.grid3{grid-template-columns:1fr;gap:18px}}
 
 /* 栏头：与 .sheet-hd 同高同面，但下沿让给下方表格自己的边线 */
@@ -232,12 +239,12 @@ footer.site a[aria-current]{color:var(--amber-lit)}
    游戏过程中没必要展示。」
    收起时三栏变两栏（画布 + 猜测流），画布拿到左栏让出的宽。 */
 .grid3 > .col.settle{display:none}
-.grid3.settled{grid-template-columns:294px minmax(0,1fr) 326px}
+.grid3.settled{grid-template-columns:25.97% minmax(0,1fr) 28.8%}
 /* ⚠ 原来写的是 266px —— 比拼图台的 294 少 28px，那 28px 全落到中栏，
    于是同一视口下两页画布差 28px（456 vs 428）。
    用户要求「同一窗口尺寸下房间和拼图台画布大小应该一样」，
    左右两栏的宽度必须逐像素一致，画布才能一致。 */
-.grid3:not(.settled){grid-template-columns:minmax(0,1fr) 326px}
+.grid3:not(.settled){grid-template-columns:minmax(0,1fr) 28.8%}
 
 /* ── 输入槽：绘制 / 观赏唯一的差异点 ───────────────────────────
    参考《破烂艺术家》：一个修改承接两个逻辑冲突。

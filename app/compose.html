@@ -248,8 +248,10 @@ main > *{width:100%}
    「中栏被限制到页眉」，那正是这条造成的。
    bench 的高度一律由**内容**决定：画布按 --cv 定尺 → 中栏高确定 →
    另外两栏由 align-items:stretch 拉齐。 */
-.bench{display:grid;grid-template-columns:294px minmax(0,1fr) 326px;
-  gap:18px;align-items:stretch;padding-top:16px}
+/* 同 room：百分比。1366 下与 294 / 1fr / 326、gap 18 一致 */
+.bench{display:grid;
+  grid-template-columns:25.97% minmax(0,1fr) 28.8%;
+  gap:1.59%;align-items:stretch;padding-top:16px}
 .bench > .col{min-width:0;display:flex;flex-direction:column}
 .bench > .col > .sheet,.bench > .col > .stage-box{flex:1 1 auto;display:flex;flex-direction:column}
 .bench > .col > .stage-box > .sheet-bd{flex:1 1 auto}
