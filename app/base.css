@@ -616,3 +616,23 @@ footer.site .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:
 @media(min-width:1560px){
   .lead,.ntc-t,.hint,.proc-tip,.copy-ok,p.meta{max-width:72ch}
 }
+/* ── 控制条与栏标头（原为房间私有，提到设计系统共用）────────────
+   拼图台要照房间的布局做「左 / 中画布 / 右」，这几条是它的骨架。
+   提到这里之前它们只写在 room.html 里 —— 设计系统该管的是这类
+   跨页复用的结构件，不是各页各写一份。 */
+.col{min-width:0}
+.col-hd{display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+  background:var(--paper-2);border:2px solid var(--ink);border-bottom:none;
+  border-radius:var(--rad) var(--rad) 0 0;padding:8px 14px}
+.col-hd .r{margin-left:auto}
+.rh-hd{gap:14px}
+.rh-title{font-weight:900;letter-spacing:.22em;font-size:16px}
+.rh-set{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+.rh-bar{padding:9px 18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.cast{display:inline-flex;align-items:center;gap:10px;background:var(--screen);
+  color:var(--paper);font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;
+  padding:4px 11px;border-bottom:2px solid var(--amber)}
+.cast b{color:var(--amber-lit)}
+.cast.quiet{background:var(--paper-3);color:var(--ink-3);border-bottom-color:var(--ink-3)}
+.cast.quiet b{color:var(--ink-2)}
+@media(max-width:900px){.rh-set{margin-left:0;width:100%}.cast{margin-left:0}}

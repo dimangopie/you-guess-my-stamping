@@ -23,19 +23,17 @@
 @media(max-width:700px){.room{padding:16px 0 44px}.room .wrap+.wrap{margin-top:14px}}
 
 /* ---- 房间头 ---- */
-.rh-hd{gap:14px}
-.rh-title{font-weight:900;letter-spacing:.22em;font-size:16px}
-.rh-set{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
-.rh-bar{padding:9px 18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+
+
+
+
 .rh-note{margin-left:auto;transition:color .2s}
 .rh-note.on{color:var(--blue)}
 /* 本站广播（页头的一枚小条，不做弹窗、不动标题栏） */
-.cast{display:inline-flex;align-items:center;gap:10px;background:var(--screen);
-  color:var(--paper);font-family:var(--mono);font-size:11.5px;letter-spacing:.1em;
-  padding:5px 12px;border-radius:2px;border-bottom:3px solid var(--amber);transition:.2s}
-.cast b{color:var(--amber-lit)}
-.cast.quiet{background:var(--paper-3);color:var(--ink-3);border-bottom-color:var(--ink-3)}
-.cast.quiet b{color:var(--ink-2)}
+
+
+
+
 
 /* 可点的设置摘要（不弹窗：点一下换一个取值，并广播） */
 .setchip{display:inline-flex;align-items:center;gap:7px;cursor:pointer;
@@ -52,13 +50,11 @@
 .grid3{display:grid;grid-template-columns:294px minmax(0,1fr) 326px;gap:18px;align-items:start}
 @media(max-width:1060px){.grid3{grid-template-columns:266px minmax(0,1fr) 292px;gap:14px}}
 @media(max-width:900px){.grid3{grid-template-columns:1fr;gap:18px}}
-.col{min-width:0}
+
 
 /* 栏头：与 .sheet-hd 同高同面，但下沿让给下方表格自己的边线 */
-.col-hd{display:flex;align-items:center;gap:12px;flex-wrap:wrap;
-  background:var(--paper-2);border:2px solid var(--ink);border-bottom:none;
-  border-radius:3px 3px 0 0;padding:10px 14px}
-.col-hd .r{margin-left:auto}
+
+
 
 /* ---- 左：玩家席位表 = 纸，装订孔留在纸边 ---- */
 .seats{position:relative}
@@ -230,8 +226,8 @@
   .g-t{grid-row:1;grid-column:1}
   .g-who{grid-row:1;grid-column:2}
   .g-main{grid-row:2;grid-column:1/-1}
-  .rh-set{margin-left:0;width:100%}
-  .cast{margin-left:0}
+  
+  
 }
 
 /* 页脚当前页高亮：base.css 未定义 footer 的 aria-current 状态，这里补一条 */

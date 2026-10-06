@@ -175,6 +175,31 @@ footer.site{padding:14px 0}
 .bench .canvas-box{justify-content:flex-start}
 /* 素材库的说明条推到面板底 —— 面板被 stretch 拉高后，它下面会空 ~95px 纸 */
 .lib-note{margin-top:auto}
+
+/* ── 照房间的布局：紧凑控制条 + 三栏（左素材 / 中画布 / 右交题）──
+   房间的比例是 294 / 1fr / 326，这里照搬（右栏要放得下交题单）。
+   顶部控制条取代了原来的大报头 —— 房间的调度单就是这么做的。 */
+.bench{display:grid;grid-template-columns:294px minmax(0,1fr) 326px;
+  gap:18px;align-items:start;padding-top:16px}
+.bench .col{display:flex;flex-direction:column;min-width:0}
+.bench .sheet,.bench .canvas-box,.bench .order{display:flex;flex-direction:column}
+.canvas-box{justify-content:flex-start}
+.order{border-top:none;border-radius:0 0 var(--rad) var(--rad)}
+.lib-box{border-radius:0 0 var(--rad) var(--rad);padding:0}
+.lib-box .sheet-bd{padding:14px}
+.col-hd .tag-no{font-size:10.5px}
+/* 画布接视口高度 —— 房室里画布是主体，但不能把按钮挤出屏幕 */
+.canvas{max-width:min(520px, calc(100vh - 340px))}
+.lib-grid button{font-size:22px}
+/* 交题单的竖向节奏收紧 —— 它是三栏里最高的一栏，之前是它在决定整页高度 */
+.order .sheet-bd{padding:14px}
+.order .od{padding:6px 0}
+.order .ansrow{margin-top:8px}
+/* ⚠ 三栏用的是 <section class="col">，而 base.css:141 有 section{padding:80px 0} ——
+   每栏白吃 80px 上下内边距，三栏共多出 160px，整页因此超高 115px。
+   房间的 .col 也是 section，但它没暴露这个（房间本来就长）。
+   这里是画布页，必须一屏装下，所以显式清零。 */
+.bench > .col{padding:0}
 </style>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#22304F">
@@ -203,12 +228,23 @@ footer.site{padding:14px 0}
 
 <main>
 
-<section class="head">
-  <div class="wrap">
-    <span class="lbl-lg">拼 图 台 · 制 作 单 NO. 1管5-129</span>
-    <h1 class="tk">从素材库里挑 emoji，拖到画布上拼成谜面</h1>
+<!-- ============ 制作单控制条（照房间的调度单模式）============
+     原来这里是 46px 大报头 + 巨型标题，吃掉 176px。
+     房间的写法是紧凑控制条：标题在条里，不单起一屏。 -->
+<div class="wrap">
+  <div class="sheet creased">
+    <div class="sheet-hd rh-hd">
+      <span class="tag-no">NO. 1管5-129</span>
+      <span class="rh-title tk-sm">制 作 单</span>
+      <span class="tag-out">拼 图 台</span>
+      <span class="cast quiet">按住 emoji 拖到画布 · 点已放好的可以调它</span>
+      <div class="rh-set">
+        <span class="tag-out">限时 60 秒</span>
+        <button class="ibtn" id="sndBtn" title="音效开关" aria-label="音效开关">🔊</button>
+      </div>
+    </div>
   </div>
-</section>
+</div>
 
 <section class="bench wrap">
 
@@ -217,11 +253,13 @@ footer.site{padding:14px 0}
        与房间的关系：两处共用同一个画布与同一套牌（同一套 .pc 物理），
        区别只在**牌从哪来** —— 房间由计时器自动出牌（看+猜），
        拼图台由玩家从素材库取牌（制作）。逻辑不冲突。 -->
-  <div class="sheet lib-box">
-    <div class="sheet-hd">
-      <span class="tag-no">素 材 库</span>
-      <span class="lbl" id="libName">自 然</span>
-    </div>
+  <section class="col">
+  <div class="col-hd">
+    <span class="tag-no">A</span>
+    <span class="lbl" id="libName">自 然</span>
+    <span class="lbl r">素 材 库</span>
+  </div>
+  <div class="board light bind lib-box">
     <div class="sheet-bd">
       <div class="lib-tabs" id="libTabs" role="tablist"></div>
       <div class="lib-grid" id="libGrid" role="group" aria-label="emoji 素材"></div>
@@ -232,8 +270,15 @@ footer.site{padding:14px 0}
       </div>
     </div>
   </div>
+  </section>
 
   <!-- ================= 画板 ================= -->
+  <section class="col">
+  <div class="col-hd">
+    <span class="tag-no blue">谜 面</span>
+    <span class="stamp bar blue" id="stateStamp">未 封 存</span>
+    <span class="lbl r">谜 底 待 填</span>
+  </div>
   <div class="canvas-box">
     <div class="canvas" id="canvas">
       <div class="ph" id="ph">把 emoji 拖到这里<br><span style="font-size:11px">点一下已放好的可以调它</span></div>
@@ -242,27 +287,28 @@ footer.site{padding:14px 0}
       <button class="btn sm ghost" id="resetBtn">清 空 画 布</button>
     </div>
   </div>
+  </section>
 
   <!-- ================= 制作单 ================= -->
-  <aside class="sheet order">
-    <div class="sheet-hd">
-      <span class="lbl">制 作 单</span>
-      <span class="stamp bar blue" id="stateStamp">未 封 存</span>
-    </div>
+  <section class="col">
+  <div class="col-hd">
+    <span class="tag-no">C</span>
+    <span class="lbl">交 题 单</span>
+  </div>
+  <aside class="board light bind order">
     <div class="sheet-bd">
       <div class="ansrow">
         <input type="text" id="ans" placeholder="谜底答案" maxlength="12" autocomplete="off">
       </div>
       <div class="od"><span class="k">分 类</span><span class="d"></span><b>成语</b></div>
       <div class="od"><span class="k">已 用</span><span class="d"></span><b class="blue" id="used">0</b></div>
-      <div class="od"><span class="k">限 时</span><span class="d"></span><b>60 秒</b></div>
-      <div class="od"><span class="k">编 号</span><span class="d"></span><b>1管5-129</b></div>
       <div class="btn-row" style="margin-top:16px">
         <button class="btn" id="fileBtn" disabled>封 存 交 题</button>
       </div>
       <div class="hint" style="margin-top:10px" id="fileHint">先拖几个 emoji，再填答案</div>
     </div>
   </aside>
+</section>
 
 </section>
 
