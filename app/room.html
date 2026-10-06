@@ -96,8 +96,14 @@
 .rule b{color:var(--ink-2);font-weight:700}
 
 /* ---- 中：当前谜面（画布 = base 的 .snap 零件） ---- */
-.canvas{max-width:400px;margin:0 auto}
-.canvas .pc{font-size:38px}
+.canvas{max-width:400px;margin:0 auto;container-type:size}
+/* ⚠ 400px 硬上限 —— 与 guess 的 520px、全站的 --wrap:1180px 是同一个写法。
+   K3：「房间：中央面板拉到 900px 宽，里面的画布还是 384px，两侧各 258px 内白边。
+   **全站玩的时间最长的一屏，1920 没给它带来任何东西。**」
+   放开上限，并让牌随画布等比（容器查询）。 */
+@media(min-width:1560px){.canvas{max-width:560px}}
+@media(min-width:2000px){.canvas{max-width:700px}}
+.canvas .pc{font-size:9.5cqw}   /* 38/400 = 9.5%，与原比例一致 */
 .canvas .pc.drop{animation:drop .5s cubic-bezier(.2,1.4,.4,1)}
 @keyframes drop{
   from{opacity:0;transform:translate(-50%,-50%) scale(calc(var(--s) * .35)) rotate(var(--r))}
