@@ -54,25 +54,11 @@
   padding-top:10px;border-top:1.5px dashed var(--ink-4)}
 .lib-note .lbl:last-of-type{margin-left:auto}
 .lib-note b{color:var(--ink);font-weight:700}
-.wheel-box{text-align:center}
-.wheel{position:relative;width:min(268px,74vw);aspect-ratio:1;margin:4px auto 0}
-.wheel .ring{position:absolute;inset:0;border:1.5px dashed var(--ink-3);border-radius:50%}
-.wheel .ring2{position:absolute;inset:16%;border:1px solid rgba(23,23,27,.16);border-radius:50%}
-
-/* 用掉即打孔 —— 孔留在牌上 */
-
-.wheel .hub{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-  width:84px;height:84px;border-radius:50%;background:var(--paper-2);border:2px solid var(--ink);
-  display:grid;place-items:center;z-index:4;text-align:center;padding:6px}
-.wheel .hub::after{content:"";position:absolute;inset:-8px;border:1.5px dotted var(--ink-3);border-radius:50%}
-.wheel .hub .n{font-family:var(--mono);font-weight:700;font-size:23px;line-height:1}
-.wheel .hub .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;color:var(--ink-3);margin-top:3px}
-.wheel-note{margin-top:12px;display:flex;gap:10px;justify-content:center;align-items:center}
 
 /* ---------- 画板 ---------- */
 .canvas-box{min-width:0}
 .canvas{position:relative;width:100%;aspect-ratio:1/1;margin:0 auto;
-  overflow:hidden;background:var(--paper-4);border:2px solid var(--ink);border-radius:var(--rad);
+  overflow:hidden;background:var(--paper-4);border:1.5px solid var(--ink-4);border-radius:var(--rad);
   box-shadow:var(--sh-soft);touch-action:none;
   background-image: repeating-linear-gradient(0deg,rgba(23,23,27,.06) 0 1px,transparent 1px 8px), repeating-linear-gradient(90deg,rgba(23,23,27,.06) 0 1px,transparent 1px 8px)}
 .canvas.armed{outline:2px dashed var(--blue);outline-offset:-7px}
@@ -149,7 +135,6 @@
    三栏 align-items:stretch 等高，底边齐平。 */
 /* 三栏等高（原来是 align-items:start，各自结束在不同高度） */
 /* 画布按可用高度定尺寸，不写死 */
-
 
 /* ── 让整页（含页尾）落在一屏内 ────────────────────────────────
    实测 1366×768、未改前：
@@ -254,6 +239,18 @@ main > .wrap:not(.bench){flex:none}
    于是 bench 实测卡在 991px，三档视口都不长（房间是 1132 / 1552）。
    显式给满宽即可。 */
 main > *{width:100%}
+
+/* ── 画布不该有「单据级」的框 ────────────────────────────────
+   用户问：「画布嵌入在容器内部是不是违背了设计语言？」
+   ——是，而且是**同一材质自我嵌套**：
+       .sheet.stage-box  border:2px solid var(--ink)  background:var(--paper-4)  ← 单据级
+         .sheet-bd       padding:22px
+           .canvas       border:2px solid var(--ink)  background:var(--paper-4)  ← 又一模一样的圈
+   设计语言里 2px --ink 是**单据边界**的分量（.sheet 用它）；
+   纸上的内容块该用 --ink-4 —— base.css 的 .snap 正是 1.5px solid var(--ink-4)，
+   房间中栏的画布就是 .snap。拼图台却给了画布单据级的框，
+   等于在同一张单里又画了一个「单据」，读起来是两张单叠在一起。
+   改成与 .snap 同款：**一粗（单据）一细（内容）**。
 </style>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#22304F">
@@ -265,7 +262,6 @@ main > *{width:100%}
 <meta name="apple-mobile-web-app-title" content="你拼我猜">
 </head>
 <body>
-
 
 <header class="nav">
   <div class="wrap">
